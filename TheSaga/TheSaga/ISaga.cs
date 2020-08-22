@@ -2,7 +2,8 @@
 
 namespace TheSaga
 {
-    public interface ISaga
+    public interface ISaga<TState> 
+        where TState : ISagaState
     {
     }
 }

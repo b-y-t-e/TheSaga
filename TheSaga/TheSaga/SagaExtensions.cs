@@ -4,45 +4,66 @@ namespace TheSaga
 {
     public static class SagaExtensions
     {
-        public static ISaga Start(
-            this ISaga saga,
+        public static ISaga<TState> Start<TState>(
+            this ISaga<TState> saga,
+            IEvent @event) where TState : ISagaState
+        {
+            return saga;
+        }
+
+        public static ISaga<TState> During<TState>(
+            this ISaga<TState> saga,
+            IState state) where TState : ISagaState
+        {
+            return saga;
+        }
+
+        public static ISaga<TState> When<TState>(
+            this ISaga<TState> saga,
             IEvent @event)
+            where TState : ISagaState
         {
             return saga;
         }
 
-        public static ISaga During(
-            this ISaga saga,
-            IState state)
+        public static ISaga<TState> Then<TState>(
+            this ISaga<TState> saga,
+            Type activityType)
+            where TState : ISagaState
+            // where TActivity : ISagaActivity 
         {
             return saga;
         }
 
-        public static ISaga When(
-            this ISaga saga,
-            IEvent @event)
+        public static ISaga<TState> Then<TState>(
+            this ISaga<TState> saga,
+            Type activityType,
+            Type compensateType)
+            where TState : ISagaState
+            // where TActivity : ISagaActivity 
         {
             return saga;
         }
 
-        public static ISaga After(
-            this ISaga saga,
-            TimeSpan time)
+
+        public static ISaga<TState> After<TState>(
+            this ISaga<TState> saga,
+            TimeSpan time) where TState : ISagaState
         {
             return saga;
         }
 
-        public static ISaga Then(
-            this ISaga saga,
-            ThenFunction action)
+        public static ISaga<TState> Then<TState>(
+            this ISaga<TState> saga,
+            ThenFunction action) where TState : ISagaState
         {
             action(null);
             return saga;
         }
 
-        public static ISaga TransitionTo(
-            this ISaga saga,
-            IState state)
+        public static ISaga<TState> TransitionTo<TState>(
+            this ISaga<TState> saga,
+            IState state) where TState : ISagaState
         {
             return saga;
         }

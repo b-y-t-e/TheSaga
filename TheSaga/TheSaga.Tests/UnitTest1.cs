@@ -20,7 +20,12 @@ namespace TheSaga.Tests
         }
     }
 
-    public class OrderTestSaga : ISaga
+    public class OrderData : ISagaState
+    {
+
+    }
+
+    public class OrderTestSaga : ISaga<OrderData>
     {
         IState Nowe;
 
@@ -43,7 +48,7 @@ namespace TheSaga.Tests
         IEvent Dostarczono;
 
         //////////////////////////////////
-        
+
         public OrderTestSaga()
         {
             this.
@@ -54,7 +59,9 @@ namespace TheSaga.Tests
             this.
                 During(Nowe).
                 When(Skompletowano).
-                Then(ctx => { }).
+                Then(typeof(WyslijEmailDoKlienta)).
+                Then(typeof(WyslijWiadomoscDoKierownika)).
+                Then(typeof(ZamowKuriera)).
                 TransitionTo(Skompletowane);
 
             this.
@@ -75,6 +82,18 @@ namespace TheSaga.Tests
                 Then(ctx => { }).
                 TransitionTo(Zakonczono);
         }
+    }
+
+    internal class ZamowKuriera : ISagaActivity
+    {
+    }
+
+    internal class WyslijWiadomoscDoKierownika : ISagaActivity
+    {
+    }
+
+    internal class WyslijEmailDoKlienta : ISagaActivity
+    {
     }
 
     public class Dostarczono : IEvent
