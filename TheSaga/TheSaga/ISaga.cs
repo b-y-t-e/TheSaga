@@ -2,7 +2,7 @@
 
 namespace TheSaga
 {
-    public interface ISaga<TState> : ISaga
+    /*public interface ISaga<TState> : ISaga
         where TState : ISagaState
     {
         void Define<TSagaType>(SagaBuilder<TSagaType, TState> builder)
@@ -11,5 +11,5 @@ namespace TheSaga
 
     public interface ISaga
     {
-    }
+    }*/
 }

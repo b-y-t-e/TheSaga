@@ -7,8 +7,7 @@ using TheSaga.Model;
 
 namespace TheSaga
 {
-    public class SagaBuilder<TSagaType, TSagaState> //: ISagaBuilder<TSagaType, TState>
-            where TSagaType : ISaga<TSagaState>
+    public class SagaBuilder<TSagaState> 
             where TSagaState : ISagaState
     {
         SagaModel<TSagaState> model;
@@ -25,7 +24,7 @@ namespace TheSaga
             //i.Define(this);
         }
 
-        public SagaBuilder<TSagaType, TSagaState> After(TimeSpan time)
+        public SagaBuilder<TSagaState> After(TimeSpan time)
         {
             throw new NotImplementedException();
         }
@@ -35,7 +34,7 @@ namespace TheSaga
             return model;
         }
 
-        public SagaBuilder<TSagaType, TSagaState> During<TState_>()
+        public SagaBuilder<TSagaState> During<TState_>()
             where TState_ : IState
         {
             currentState = typeof(TState_);
@@ -43,7 +42,7 @@ namespace TheSaga
             return this;
         }
 
-        public SagaBuilder<TSagaType, TSagaState> Start<TEvent>()
+        public SagaBuilder<TSagaState> Start<TEvent>()
             where TEvent : IEvent
         {
             currentState = null;
@@ -56,22 +55,22 @@ namespace TheSaga
             return this;
         }
 
-        public SagaBuilder<TSagaType, TSagaState> Then(Type activityType)
+        public SagaBuilder<TSagaState> Then(Type activityType)
         {
             throw new NotImplementedException();
         }
 
-        public SagaBuilder<TSagaType, TSagaState> Then(Type activityType, Type compensateType)
+        public SagaBuilder<TSagaState> Then(Type activityType, Type compensateType)
         {
             throw new NotImplementedException();
         }
 
-        public SagaBuilder<TSagaType, TSagaState> Then(ThenFunction<TSagaState> action)
+        public SagaBuilder<TSagaState> Then(ThenFunction<TSagaState> action)
         {
             throw new NotImplementedException();
         }
 
-        public SagaBuilder<TSagaType, TSagaState> TransitionTo<TState>() where TState : IState
+        public SagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState
         {
             model.Actions.GetDuring(currentState, currentEvent).Steps.Add(new SagaStep<TSagaState>()
             {
@@ -80,7 +79,7 @@ namespace TheSaga
             return this;
         }
 
-        public SagaBuilder<TSagaType, TSagaState> When<TEvent>() where TEvent : IEvent
+        public SagaBuilder<TSagaState> When<TEvent>() where TEvent : IEvent
         {
             model.Actions.Add(new SagaSteps<TSagaState>()
             {

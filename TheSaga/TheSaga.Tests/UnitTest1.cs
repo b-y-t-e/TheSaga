@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using TheSaga.Model;
 using Xunit;
 using Xunit.Sdk;
 
@@ -10,14 +11,8 @@ namespace TheSaga.Tests
         [Fact]
         public void Test1()
         {
-            OrderTestSaga testSaga = new OrderTestSaga();
-
-            var sagaBuilder = new SagaBuilder<OrderTestSaga, OrderState>();
-            sagaBuilder.
-                Start<Utworzone>().
-                Then(ctr => { }).
-                TransitionTo< Nowe>();
-
+            var sagaModel = OrderTestSaga.Create();
+            sagaModel = sagaModel;
             /*ISagaRegistrator sagaRegistrator = new SagaRegistrator();
              sagaRegistrator.Register<OrderTestSaga, OrderState>("order-test");
 
@@ -34,23 +29,12 @@ namespace TheSaga.Tests
         public string CurrentActivity { get; set; }
     }
 
-    public class OrderTestSaga : ISaga<OrderState>
+    public static class OrderTestSaga 
     {
-
-        //////////////////////////////////
-        /*
-                IEvent Utworzone;
-
-                IEvent Skompletowano;
-
-                IEvent Wyslano;
-
-                IEvent Dostarczono;
-        */
-        //////////////////////////////////
-
-        public void Define<TSagaType>(SagaBuilder<TSagaType, OrderState> builder) where TSagaType : ISaga<OrderState>
+        public static SagaModel<OrderState> Create()
         {
+            SagaBuilder<OrderState> builder = new SagaBuilder<OrderState>();
+
             builder.
                 Start<Utworzone>().
                 Then(ctx => { }).
@@ -81,6 +65,9 @@ namespace TheSaga.Tests
                 After(TimeSpan.FromDays(30)).
                 Then(ctx => { }).
                 TransitionTo<Zakonczono>();
+
+            return builder.
+                Build();
         }
     }
 

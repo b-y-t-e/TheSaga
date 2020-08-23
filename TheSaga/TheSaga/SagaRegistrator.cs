@@ -20,9 +20,7 @@ namespace TheSaga
             ISagaBuilder<TSagaType> sagaBuilder = new SagaBuilder();
         }*/
 
-        public void Register<TSagaType, TSataState>(string sagaName)
-            where TSagaType : ISaga<TSataState>
-            where TSataState : ISagaState
+        public void Register<TSagaState>(string sagaName) where TSagaState : ISagaState
         {
             throw new NotImplementedException();
         }
