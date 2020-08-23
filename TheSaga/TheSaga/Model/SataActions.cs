@@ -37,5 +37,7 @@ namespace TheSaga.Model
     public class SagaStep <TSagaState> where TSagaState : ISagaState
     {
         public ThenFunction<TSagaState> Action;
+
+        public Type Activity;
     }
 }

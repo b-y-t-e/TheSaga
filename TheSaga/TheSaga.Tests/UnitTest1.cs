@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 using TheSaga.Model;
 using Xunit;
 using Xunit.Sdk;
@@ -29,7 +30,7 @@ namespace TheSaga.Tests
         public string CurrentActivity { get; set; }
     }
 
-    public static class OrderTestSaga 
+    public static class OrderTestSaga
     {
         public static SagaModel<OrderState> Create()
         {
@@ -37,33 +38,33 @@ namespace TheSaga.Tests
 
             builder.
                 Start<Utworzone>().
-                Then(ctx => { }).
+                Then(async ctx => { }).
                 TransitionTo<Nowe>();
 
             builder.
                 During<Nowe>().
                 When<Skompletowano>().
-                Then(typeof(WyslijEmailDoKlienta)).
-                Then(typeof(WyslijWiadomoscDoKierownika)).
-                Then(typeof(ZamowKuriera)).
+                Then<WyslijEmailDoKlienta>().
+                Then<WyslijWiadomoscDoKierownika>().
+                Then<ZamowKuriera>().
                 TransitionTo<Skompletowane>();
 
             builder.
                 During<Skompletowane>().
                 When<Wyslano>().
-                Then(ctx => { }).
+                Then(async ctx => { }).
                 TransitionTo<Wyslane>();
 
             builder.
                 During<Wyslane>().
                 When<Dostarczono>().
-                Then(ctx => { }).
+                Then(async ctx => { }).
                 TransitionTo<Zakonczono>();
 
             builder.
                 During<Wyslane>().
                 After(TimeSpan.FromDays(30)).
-                Then(ctx => { }).
+                Then(async ctx => { }).
                 TransitionTo<Zakonczono>();
 
             return builder.
@@ -82,16 +83,43 @@ namespace TheSaga.Tests
     internal class Zakonczono : IState { }
 
 
-    internal class ZamowKuriera : ISagaActivity
+    internal class ZamowKuriera : ISagaActivity<OrderState>
     {
+        public Task Compensate(IContext<OrderState> context)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Execute(IContext<OrderState> context)
+        {
+            throw new NotImplementedException();
+        }
     }
 
-    internal class WyslijWiadomoscDoKierownika : ISagaActivity
+    internal class WyslijWiadomoscDoKierownika : ISagaActivity<OrderState>
     {
+        public Task Compensate(IContext<OrderState> context)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Execute(IContext<OrderState> context)
+        {
+            throw new NotImplementedException();
+        }
     }
 
-    internal class WyslijEmailDoKlienta : ISagaActivity
+    internal class WyslijEmailDoKlienta : ISagaActivity<OrderState>
     {
+        public Task Compensate(IContext<OrderState> context)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Execute(IContext<OrderState> context)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class Dostarczono : IEvent

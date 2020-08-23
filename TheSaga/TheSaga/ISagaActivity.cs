@@ -1,13 +1,13 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace TheSaga
 {
-    public interface ISagaActivity
+    public interface ISagaActivity<TSagaState>
+            where TSagaState : ISagaState
     {
+        Task Execute(IContext<TSagaState> context);
 
-    }
-    public interface ISagaActivityCompensate
-    {
-
+        Task Compensate(IContext<TSagaState> context);
     }
 }

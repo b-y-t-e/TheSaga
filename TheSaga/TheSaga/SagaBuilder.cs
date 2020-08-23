@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices.ComTypes;
+using System.Threading.Tasks;
 using TheSaga.Model;
 
 namespace TheSaga
@@ -26,7 +27,11 @@ namespace TheSaga
 
         public SagaBuilder<TSagaState> After(TimeSpan time)
         {
-            throw new NotImplementedException();
+            model.Actions.GetDuring(currentState, currentEvent).Steps.Add(new SagaStep<TSagaState>()
+            {
+                Action = ctx => Task.Delay(time)
+            });
+            return this;
         }
 
         public SagaModel<TSagaState> Build()
@@ -55,26 +60,29 @@ namespace TheSaga
             return this;
         }
 
-        public SagaBuilder<TSagaState> Then(Type activityType)
+        public SagaBuilder<TSagaState> Then<TSagaActivity>() where TSagaActivity: ISagaActivity<TSagaState>
         {
-            throw new NotImplementedException();
-        }
-
-        public SagaBuilder<TSagaState> Then(Type activityType, Type compensateType)
-        {
-            throw new NotImplementedException();
+            model.Actions.GetDuring(currentState, currentEvent).Steps.Add(new SagaStep<TSagaState>()
+            {
+                Activity = typeof(TSagaActivity)
+            });
+            return this;
         }
 
         public SagaBuilder<TSagaState> Then(ThenFunction<TSagaState> action)
         {
-            throw new NotImplementedException();
+            model.Actions.GetDuring(currentState, currentEvent).Steps.Add(new SagaStep<TSagaState>()
+            {
+                Action = action
+            });
+            return this;
         }
 
         public SagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState
         {
             model.Actions.GetDuring(currentState, currentEvent).Steps.Add(new SagaStep<TSagaState>()
             {
-                Action = ctx => ctx.Data.CurrentState = currentState.Name
+                Action =  ctx => { ctx.Data.CurrentState = currentState.Name; return Task.FromResult(0); }
             });
             return this;
         }
@@ -90,7 +98,7 @@ namespace TheSaga
         }
     }
 
-    public delegate void ThenFunction<TState>(IContext<TState> context) where TState : ISagaState;
+    public delegate Task ThenFunction<TState>(IContext<TState> context) where TState : ISagaState;
     public interface IContext<TState> where TState : ISagaState
     {
         TState Data { get; }
