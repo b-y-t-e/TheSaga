@@ -4,7 +4,8 @@ namespace TheSaga
 {
     public interface ISagaRegistrator
     {
-        void Register<TState>(ISaga<TState> saga)
-            where TState : ISagaState;
+        void Register<TSagaType, TSataState>(string sagaName)
+            where TSagaType : ISaga<TSataState>
+            where TSataState : ISagaState;
     }
 }

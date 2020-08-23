@@ -12,20 +12,26 @@ namespace TheSaga.Tests
         {
             OrderTestSaga testSaga = new OrderTestSaga();
 
-            ISagaRegistrator sagaRegistrator = new SagaRegistrator();
-            sagaRegistrator.Register(testSaga);
+            var sagaBuilder = new SagaBuilder<OrderTestSaga, OrderState>();
+            sagaBuilder.Start(new Utworzone());
+
+           /*ISagaRegistrator sagaRegistrator = new SagaRegistrator();
+            sagaRegistrator.Register<OrderTestSaga, OrderState>("order-test");
 
             ISagaCoordinator sagaCoordinator = new SagaCoordinator();
-            sagaCoordinator.Send(new Utworzone());
+            sagaCoordinator.Execute(new Utworzone());
+           */
         }
     }
 
-    public class OrderData : ISagaState
+    public class OrderState : ISagaState
     {
-
+        public Guid CorrelationID { get; set; }
+        public string CurrentState { get; set; }
+        public string CurrentActivity { get; set; }
     }
 
-    public class OrderTestSaga : ISaga<OrderData>
+    public class OrderTestSaga : ISaga<OrderState>
     {
         IState Nowe;
 
@@ -49,14 +55,14 @@ namespace TheSaga.Tests
 
         //////////////////////////////////
 
-        public OrderTestSaga()
+        public void Define<TSagaType>(ISagaBuilder<TSagaType, OrderState> builder) where TSagaType : ISaga<OrderState>
         {
-            this.
+            builder.
                 Start(Utworzone).
                 Then(ctx => { }).
                 TransitionTo(Nowe);
 
-            this.
+            builder.
                 During(Nowe).
                 When(Skompletowano).
                 Then(typeof(WyslijEmailDoKlienta)).
@@ -64,19 +70,19 @@ namespace TheSaga.Tests
                 Then(typeof(ZamowKuriera)).
                 TransitionTo(Skompletowane);
 
-            this.
+            builder.
                 During(Skompletowane).
                 When(Wyslano).
                 Then(ctx => { }).
                 TransitionTo(Wyslane);
 
-            this.
+            builder.
                 During(Wyslane).
                 When(Dostarczono).
                 Then(ctx => { }).
                 TransitionTo(Zakonczono);
 
-            this.
+            builder.
                 During(Wyslane).
                 After(TimeSpan.FromDays(30)).
                 Then(ctx => { }).
