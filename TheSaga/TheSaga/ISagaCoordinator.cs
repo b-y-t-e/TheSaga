@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace TheSaga
 {
     public interface ISagaCoordinator
     {
-        void Send(IEvent @event);
-        void Execute(IEvent @event);
+        Task Send(IEvent @event);
+        Task Execute(IEvent @event);
     }
 }

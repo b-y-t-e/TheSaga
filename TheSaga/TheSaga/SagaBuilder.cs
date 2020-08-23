@@ -36,6 +36,7 @@ namespace TheSaga
 
         public SagaModel<TSagaState> Build()
         {
+            model.Build();
             return model;
         }
 
@@ -52,7 +53,7 @@ namespace TheSaga
         {
             currentState = null;
             currentEvent = typeof(TEvent);
-            model.Actions.Add(new SagaSteps<TSagaState>()
+            model.Actions.Add(new SagaAction<TSagaState>()
             {
                 State = currentState,
                 Event = typeof(TEvent)
@@ -90,7 +91,7 @@ namespace TheSaga
         public SagaBuilder<TSagaState> When<TEvent>() where TEvent : IEvent
         {
             currentEvent = typeof(TEvent);
-            model.Actions.Add(new SagaSteps<TSagaState>()
+            model.Actions.Add(new SagaAction<TSagaState>()
             {
                 State = currentState,
                 Event = currentEvent

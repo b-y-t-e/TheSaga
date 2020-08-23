@@ -6,10 +6,11 @@ namespace TheSaga
 {
     public class SagaRegistrator : ISagaRegistrator
     {
-        //public Dictionary<string, SagaModel> models;
+        Dictionary<string, RegisteredSagaInfo> models;
 
         public SagaRegistrator()
         {
+            models = new Dictionary<string, RegisteredSagaInfo>();
             //models = new Dictionary<string, SagaModel>();
         }
 
@@ -20,9 +21,23 @@ namespace TheSaga
             ISagaBuilder<TSagaType> sagaBuilder = new SagaBuilder();
         }*/
 
-        public void Register<TSagaState>(string sagaName) where TSagaState : ISagaState
+        public void Register<TSagaState>(string sagaName, SagaModel<TSagaState> model) where TSagaState : ISagaState
         {
-            throw new NotImplementedException();
+            models[sagaName] = new RegisteredSagaInfo()
+            {
+                SagaModel = model,
+                SagaName = sagaName,
+                SagaStateType = typeof(TSagaState)
+            };
         }
+    }
+
+    internal class RegisteredSagaInfo
+    {
+        internal string SagaName;
+
+        internal ISagaModel SagaModel;
+
+        internal Type SagaStateType;
     }
 }

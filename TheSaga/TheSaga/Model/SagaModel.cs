@@ -5,51 +5,45 @@ using System.Reflection;
 
 namespace TheSaga.Model
 {
-    public class SagaModel<TSagaState> where TSagaState : ISagaState
+    public class SagaModel<TSagaState> : ISagaModel
+        where TSagaState : ISagaState 
     {
-        public Type SagaType { get; private set; }
-        public List<String> States { get; private set; }
+        public List<Type> States { get; private set; }
         public List<Type> Events { get; private set; }
-        public SataActions<TSagaState> Actions { get;  }
+        public SagaActions<TSagaState> Actions { get;  }
         //internal List<SagaSteps> Durings { get; }
 
         public SagaModel()
         {
-            States = new List<string>();
+            States = new List<Type>();
             Events = new List<Type>();
             //Starts = new List<SagaSteps>();
-            Actions = new SataActions<TSagaState>();
+            Actions = new SagaActions<TSagaState>();
         }
 
 
 
-        internal void Init(Type sagaType)
+        internal void Build()
         {
-            this.SagaType = sagaType;
 
-            this.States.AddRange(
-                sagaType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).
-                Where(p => p.PropertyType == typeof(IState) || p.PropertyType.IsAssignableFrom(typeof(IState))).
-                Select(p => p.Name));
+            States = new List<Type>();
+            Events = new List<Type>();
 
-            this.States.AddRange(
-                sagaType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).
-                Where(p => p.FieldType == typeof(IState) || p.FieldType.IsAssignableFrom(typeof(IState))).
-                Select(p => p.Name));
+            foreach( var action in Actions)
+            {
+                if (action.Event != null)
+                    Events.Add(action.Event);
 
-            this.Events.AddRange(
-                sagaType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).
-                Where(p => p.PropertyType == typeof(IEvent) || p.PropertyType.IsAssignableFrom(typeof(IEvent))).
-                Select(p => p.PropertyType));
-
-            this.Events.AddRange(
-                sagaType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance).
-                Where(p => p.FieldType == typeof(IEvent) || p.FieldType.IsAssignableFrom(typeof(IEvent))).
-                Select(p => p.FieldType));
+                if (action.State != null)
+                    States.Add(action.State);
+            }
         }
 
 
 
     }
 
+    public interface ISagaModel
+    {
+    }
 }

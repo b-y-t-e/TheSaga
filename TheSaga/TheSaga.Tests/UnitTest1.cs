@@ -14,12 +14,14 @@ namespace TheSaga.Tests
         {
             var sagaModel = OrderTestSaga.Create();
             sagaModel = sagaModel;
-            /*ISagaRegistrator sagaRegistrator = new SagaRegistrator();
-             sagaRegistrator.Register<OrderTestSaga, OrderState>("order-test");
 
-             ISagaCoordinator sagaCoordinator = new SagaCoordinator();
-             sagaCoordinator.Execute(new Utworzone());
-            */
+            ISagaRegistrator sagaRegistrator = new SagaRegistrator();
+            sagaRegistrator.Register("order-test", sagaModel);
+
+            ISagaSeeker sagaSeeker = new InMemorySagaSeeker();
+
+            ISagaCoordinator sagaCoordinator = new SagaCoordinator(sagaSeeker);
+            sagaCoordinator.Execute(new Utworzone());
         }
     }
 

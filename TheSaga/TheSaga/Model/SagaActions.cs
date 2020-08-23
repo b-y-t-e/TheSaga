@@ -4,18 +4,18 @@ using System.Linq;
 
 namespace TheSaga.Model
 {
-    public class SataActions<TSagaState> : List<SagaSteps<TSagaState>>
+    public class SagaActions<TSagaState> : List<SagaAction<TSagaState>>
         where TSagaState : ISagaState
     {
-        public IList<SagaSteps<TSagaState>> GetStarts() =>
+        public IList<SagaAction<TSagaState>> GetStarts() =>
             this.Where(s => s.State == null).ToArray();
 
-        public SagaSteps<TSagaState> GetDuring(Type stateType, Type eventType)
+        public SagaAction<TSagaState> GetDuring(Type stateType, Type eventType)
         {
             var steps = this.FirstOrDefault(s => s.State == stateType && s.Event == eventType);
             if (steps == null)
             {
-                steps = new SagaSteps<TSagaState>()
+                steps = new SagaAction<TSagaState>()
                 {
                     Event = eventType,
                     State = stateType
@@ -26,12 +26,12 @@ namespace TheSaga.Model
             return steps;
         }
 
-        public SataActions()
+        public SagaActions()
         {
 
         }
     }
-    public class SagaSteps<TSagaState> where TSagaState : ISagaState
+    public class SagaAction<TSagaState> where TSagaState : ISagaState
     {
         public Type State;
 
