@@ -8,7 +8,7 @@ using TheSaga.Model;
 
 namespace TheSaga
 {
-    public class SagaBuilder<TSagaState> 
+    public class SagaBuilder<TSagaState>
             where TSagaState : ISagaState
     {
         SagaModel<TSagaState> model;
@@ -54,13 +54,13 @@ namespace TheSaga
             currentEvent = typeof(TEvent);
             model.Actions.Add(new SagaSteps<TSagaState>()
             {
-                State = null,
+                State = currentState,
                 Event = typeof(TEvent)
             });
             return this;
         }
 
-        public SagaBuilder<TSagaState> Then<TSagaActivity>() where TSagaActivity: ISagaActivity<TSagaState>
+        public SagaBuilder<TSagaState> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>
         {
             model.Actions.GetDuring(currentState, currentEvent).Steps.Add(new SagaStep<TSagaState>()
             {
@@ -82,17 +82,18 @@ namespace TheSaga
         {
             model.Actions.GetDuring(currentState, currentEvent).Steps.Add(new SagaStep<TSagaState>()
             {
-                Action =  ctx => { ctx.Data.CurrentState = currentState.Name; return Task.FromResult(0); }
+                Action = ctx => { ctx.Data.CurrentState = currentState.Name; return Task.FromResult(0); }
             });
             return this;
         }
 
         public SagaBuilder<TSagaState> When<TEvent>() where TEvent : IEvent
         {
+            currentEvent = typeof(TEvent);
             model.Actions.Add(new SagaSteps<TSagaState>()
             {
-                State = currentEvent,
-                Event = typeof(TEvent)
+                State = currentState,
+                Event = currentEvent
             });
             return this;
         }
