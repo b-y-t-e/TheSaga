@@ -1,66 +1,99 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
 using TheSaga.Model;
 
 namespace TheSaga
 {
-    public class SagaBuilder<TSagaType, TState> : ISagaBuilder<TSagaType, TState>
-            where TSagaType : ISaga<TState>
-            where TState : ISagaState
+    public class SagaBuilder<TSagaType, TSagaState> //: ISagaBuilder<TSagaType, TState>
+            where TSagaType : ISaga<TSagaState>
+            where TSagaState : ISagaState
     {
-        SagaModel model;
+        SagaModel<TSagaState> model;
+
+        Type currentEvent;
+
+        Type currentState;
 
         public SagaBuilder()
         {
-            this.model = new SagaModel();
-            this.model.Init(typeof(TSagaType));
+            model = new SagaModel<TSagaState>();
 
-            var i = Activator.CreateInstance<TSagaType>();
-            i = i;
+            //var i = (TSagaType)Activator.CreateInstance<TSagaType>();
+            //i.Define(this);
         }
 
-        public ISaga<TState> After(TimeSpan time)
+        public SagaBuilder<TSagaType, TSagaState> After(TimeSpan time)
         {
             throw new NotImplementedException();
         }
 
-        public SagaModel Build()
+        public SagaModel<TSagaState> Build()
+        {
+            return model;
+        }
+
+        public SagaBuilder<TSagaType, TSagaState> During<TState_>()
+            where TState_ : IState
+        {
+            currentState = typeof(TState_);
+            currentEvent = null;
+            return this;
+        }
+
+        public SagaBuilder<TSagaType, TSagaState> Start<TEvent>()
+            where TEvent : IEvent
+        {
+            currentState = null;
+            currentEvent = typeof(TEvent);
+            model.Actions.Add(new SagaSteps<TSagaState>()
+            {
+                State = null,
+                Event = typeof(TEvent)
+            });
+            return this;
+        }
+
+        public SagaBuilder<TSagaType, TSagaState> Then(Type activityType)
         {
             throw new NotImplementedException();
         }
 
-        public ISaga<TState> During(IState state)
+        public SagaBuilder<TSagaType, TSagaState> Then(Type activityType, Type compensateType)
         {
             throw new NotImplementedException();
         }
 
-        public ISaga<TState> Start(IEvent @event)
+        public SagaBuilder<TSagaType, TSagaState> Then(ThenFunction<TSagaState> action)
         {
             throw new NotImplementedException();
         }
 
-        public ISaga<TState> Then(Type activityType)
+        public SagaBuilder<TSagaType, TSagaState> TransitionTo<TState>() where TState : IState
         {
-            throw new NotImplementedException();
+            model.Actions.GetDuring(currentState, currentEvent).Steps.Add(new SagaStep<TSagaState>()
+            {
+                Action = ctx => ctx.Data.CurrentState = currentState.Name
+            });
+            return this;
         }
 
-        public ISaga<TState> Then(Type activityType, Type compensateType)
+        public SagaBuilder<TSagaType, TSagaState> When<TEvent>() where TEvent : IEvent
         {
-            throw new NotImplementedException();
+            model.Actions.Add(new SagaSteps<TSagaState>()
+            {
+                State = currentEvent,
+                Event = typeof(TEvent)
+            });
+            return this;
         }
+    }
 
-        public ISaga<TState> Then(ThenFunction action)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISaga<TState> TransitionTo(IState state)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ISaga<TState> When(IEvent @event)
-        {
-            throw new NotImplementedException();
-        }
+    public delegate void ThenFunction<TState>(IContext<TState> context) where TState : ISagaState;
+    public interface IContext<TState> where TState : ISagaState
+    {
+        TState Data { get; }
     }
 }

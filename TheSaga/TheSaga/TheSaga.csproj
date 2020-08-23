@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Remove="ISagaRunningState.cs" />
+    <Compile Remove="SagaExtensions.cs" />
   </ItemGroup>
 
 </Project>

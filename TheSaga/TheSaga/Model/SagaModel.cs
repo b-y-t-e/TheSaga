@@ -5,23 +5,25 @@ using System.Reflection;
 
 namespace TheSaga.Model
 {
-    public class SagaModel
+    public class SagaModel<TSagaState> where TSagaState : ISagaState
     {
         public Type SagaType { get; private set; }
-
         public List<String> States { get; private set; }
-
         public List<Type> Events { get; private set; }
+        public SataActions<TSagaState> Actions { get;  }
+        //internal List<SagaSteps> Durings { get; }
 
         public SagaModel()
         {
             States = new List<string>();
             Events = new List<Type>();
+            //Starts = new List<SagaSteps>();
+            Actions = new SataActions<TSagaState>();
         }
 
 
 
-        public void Init(Type sagaType)
+        internal void Init(Type sagaType)
         {
             this.SagaType = sagaType;
 
@@ -49,4 +51,5 @@ namespace TheSaga.Model
 
 
     }
+
 }

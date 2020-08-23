@@ -69,8 +69,4 @@ namespace TheSaga
         }
     }
 
-    public delegate void ThenFunction(IContext context);
-    public interface IContext
-    {
-    }
 }

@@ -13,14 +13,17 @@ namespace TheSaga.Tests
             OrderTestSaga testSaga = new OrderTestSaga();
 
             var sagaBuilder = new SagaBuilder<OrderTestSaga, OrderState>();
-            sagaBuilder.Start(new Utworzone());
+            sagaBuilder.
+                Start<Utworzone>().
+                Then(ctr => { }).
+                TransitionTo< Nowe>();
 
-           /*ISagaRegistrator sagaRegistrator = new SagaRegistrator();
-            sagaRegistrator.Register<OrderTestSaga, OrderState>("order-test");
+            /*ISagaRegistrator sagaRegistrator = new SagaRegistrator();
+             sagaRegistrator.Register<OrderTestSaga, OrderState>("order-test");
 
-            ISagaCoordinator sagaCoordinator = new SagaCoordinator();
-            sagaCoordinator.Execute(new Utworzone());
-           */
+             ISagaCoordinator sagaCoordinator = new SagaCoordinator();
+             sagaCoordinator.Execute(new Utworzone());
+            */
         }
     }
 
@@ -33,62 +36,64 @@ namespace TheSaga.Tests
 
     public class OrderTestSaga : ISaga<OrderState>
     {
-        IState Nowe;
-
-        IState Skompletowane;
-
-        IState Wyslane;
-
-        IState Dostarczone;
-
-        IState Zakonczono;
 
         //////////////////////////////////
+        /*
+                IEvent Utworzone;
 
-        IEvent Utworzone;
+                IEvent Skompletowano;
 
-        IEvent Skompletowano;
+                IEvent Wyslano;
 
-        IEvent Wyslano;
-
-        IEvent Dostarczono;
-
+                IEvent Dostarczono;
+        */
         //////////////////////////////////
 
-        public void Define<TSagaType>(ISagaBuilder<TSagaType, OrderState> builder) where TSagaType : ISaga<OrderState>
+        public void Define<TSagaType>(SagaBuilder<TSagaType, OrderState> builder) where TSagaType : ISaga<OrderState>
         {
             builder.
-                Start(Utworzone).
+                Start<Utworzone>().
                 Then(ctx => { }).
-                TransitionTo(Nowe);
+                TransitionTo<Nowe>();
 
             builder.
-                During(Nowe).
-                When(Skompletowano).
+                During<Nowe>().
+                When<Skompletowano>().
                 Then(typeof(WyslijEmailDoKlienta)).
                 Then(typeof(WyslijWiadomoscDoKierownika)).
                 Then(typeof(ZamowKuriera)).
-                TransitionTo(Skompletowane);
+                TransitionTo<Skompletowane>();
 
             builder.
-                During(Skompletowane).
-                When(Wyslano).
+                During<Skompletowane>().
+                When<Wyslano>().
                 Then(ctx => { }).
-                TransitionTo(Wyslane);
+                TransitionTo<Wyslane>();
 
             builder.
-                During(Wyslane).
-                When(Dostarczono).
+                During<Wyslane>().
+                When<Dostarczono>().
                 Then(ctx => { }).
-                TransitionTo(Zakonczono);
+                TransitionTo<Zakonczono>();
 
             builder.
-                During(Wyslane).
+                During<Wyslane>().
                 After(TimeSpan.FromDays(30)).
                 Then(ctx => { }).
-                TransitionTo(Zakonczono);
+                TransitionTo<Zakonczono>();
         }
     }
+
+    internal class Nowe : IState { }
+
+    internal class Skompletowane : IState { }
+
+    internal class Wyslane : IState { }
+
+    internal class Dostarczone : IState { }
+
+    internal class Zakonczono : IState { }
+
 
     internal class ZamowKuriera : ISagaActivity
     {

@@ -6,11 +6,11 @@ namespace TheSaga
 {
     public class SagaRegistrator : ISagaRegistrator
     {
-        public Dictionary<string, SagaModel> models;
+        //public Dictionary<string, SagaModel> models;
 
         public SagaRegistrator()
         {
-            models = new Dictionary<string, SagaModel>();
+            //models = new Dictionary<string, SagaModel>();
         }
 
         /*public void Register<TSagaType, TState>(string sagaName) 

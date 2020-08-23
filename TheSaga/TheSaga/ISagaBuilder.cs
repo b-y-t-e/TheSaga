@@ -4,7 +4,7 @@ using TheSaga.Model;
 
 namespace TheSaga
 {
-    public interface ISagaBuilder<TSagaType, TState>
+  /*  public interface ISagaBuilder<TSagaType, TState>
             where TSagaType : ISaga<TState>
             where TState : ISagaState
     {
@@ -45,5 +45,5 @@ namespace TheSaga
 
             IState state);
         SagaModel Build();
-    }
+    }*/
 }

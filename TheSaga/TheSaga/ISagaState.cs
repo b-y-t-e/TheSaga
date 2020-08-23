@@ -6,8 +6,8 @@ namespace TheSaga
     {
         public Guid CorrelationID { get; }
 
-        public string CurrentState { get; }
+        public string CurrentState { get; set; }
 
-        public string CurrentActivity { get; }
+        public string CurrentActivity { get; set; }
     }
 }
