@@ -45,7 +45,10 @@ namespace TheSaga.Executors
             }
         }
 
-        public async Task<ISagaState> ExecuteStep(Guid correlationID, ISagaModel model, IEvent @event)
+        public async Task<ISagaState> ExecuteStep(
+            Guid correlationID, 
+            ISagaModel model, 
+            IEvent @event)
         {
             Type eventType = @event == null ? null : @event.GetType();
 

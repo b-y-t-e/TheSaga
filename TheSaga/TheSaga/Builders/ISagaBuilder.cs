@@ -13,6 +13,8 @@ namespace TheSaga.Builders
         SagaModel<TSagaState> Build();
         SagaBuilder<TSagaState> During<TState>() where TState : IState;
         SagaBuilder<TSagaState> Start<TEvent>() where TEvent : IEvent;
+        SagaBuilder<TSagaState> Start<TEvent, TEventHandler>() where TEvent : IEvent
+           where TEventHandler : IEventHandler<TSagaState, TEvent>;
         SagaBuilder<TSagaState> Then( ThenActionDelegate<TSagaState> action);
         SagaBuilder<TSagaState> Then(string stepName, ThenActionDelegate<TSagaState> action);
         SagaBuilder<TSagaState> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;

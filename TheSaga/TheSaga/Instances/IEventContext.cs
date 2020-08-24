@@ -7,7 +7,7 @@ namespace TheSaga.Builders
         where TSagaState : ISagaState
         where TEvent : IEvent
     {
-        public TSagaState Data { get; set; }
+        public TSagaState State { get; set; }
         public TEvent Event { get; set; }
     }
 
@@ -15,7 +15,7 @@ namespace TheSaga.Builders
         where TSagaState : ISagaState
        where TEvent : IEvent
     {
-        public TSagaState Data { get; set; }
+        public TSagaState State { get; set; }
         public TEvent Event { get; set; }
     }
 

@@ -12,7 +12,8 @@ using TheSaga.States.Actions;
 
 namespace TheSaga.Builders
 {
-    public class SagaBuilder<TSagaState> : ISagaBuilder<TSagaState> where TSagaState : ISagaState
+    public class SagaBuilder<TSagaState> : ISagaBuilder<TSagaState> 
+        where TSagaState : ISagaState
     {
         SagaModel<TSagaState> model;
 
@@ -57,6 +58,25 @@ namespace TheSaga.Builders
             {
                 State = currentState,
                 Event = typeof(TEvent)
+            });
+            return this;
+        }
+
+        public SagaBuilder<TSagaState> Start<TEvent, TEventHandler>()
+            where TEvent : IEvent
+            where TEventHandler : IEventHandler<TSagaState, TEvent>
+        {
+            currentState = null;
+            currentEvent = typeof(TEvent);
+            model.Actions.Add(new SagaAction<TSagaState>()
+            {
+                State = currentState,
+                Event = typeof(TEvent),
+                Steps = new List<ISagaStep>
+                {
+                    new SagaStepEventHandler<TSagaState, TEventHandler, TEvent>(
+                        $"{currentState}_{nameof(Start)}_{typeof(TEvent).Name}")
+                }
             });
             return this;
         }
@@ -130,7 +150,7 @@ namespace TheSaga.Builders
                     new SagaStepEventHandler<TSagaState, TEventHandler, TEvent>(
                         $"{currentState}_{nameof(When)}_{typeof(TEvent).Name}")
                 }
-            }); ;
+            }); 
             return this;
         }
     }

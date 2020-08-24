@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -20,19 +21,27 @@ namespace TheSaga.States.Actions
             this.StepName = StepName;
         }
 
-        public Task Execute(IInstanceContext context, IEvent @event)
+        public async Task Execute(IInstanceContext context, IEvent @event)
         {
-            return Task.CompletedTask;
-        }
+            IInstanceContext<TSagaState> contextForAction =
+                (IInstanceContext<TSagaState>)context;
 
-        public async Task Execute(IEventContext context, IEvent @event)
-        {
-            IEventContext<TSagaState, TEvent> contextForAction =
-                (IEventContext<TSagaState, TEvent>)context;
+            var eventContext = new EventContext<TSagaState, TEvent>()
+            {
+                Event = (TEvent)@event,
+                State = contextForAction.State
+            };
+
+            // ActivatorUtilities.CreateInstance
 
             TEventHandler activity = (TEventHandler)Activator.CreateInstance(typeof(TEventHandler));
             if (activity != null)
-                await activity.Execute(contextForAction);
+                await activity.Execute(eventContext);
+        }
+
+        public Task Execute(IEventContext context, IEvent @event)
+        {
+            return Task.CompletedTask;
         }
     }
 

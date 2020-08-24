@@ -19,6 +19,7 @@ using TheSaga.Tests.Sagas.OrderTestSaga.Events;
 using TheSaga.Tests.Sagas.OrderTestSaga.States;
 using TheSaga.Exceptions;
 using TheSaga.Tests.Sagas.OrderTestSaga.Activities;
+using TheSaga.Tests.Sagas.OrderTestSaga.EventHandlers;
 
 namespace TheSaga.Tests
 {
@@ -87,7 +88,7 @@ namespace TheSaga.Tests
             persistedState.CurrentState.ShouldBe(nameof(Nowe));
             persistedState.CurrentStep.ShouldBe(null);
             persistedState.Logi.ShouldContain(nameof(Utworzone));
-            persistedState.Logi.Count.ShouldBe(1);
+            persistedState.Logi.Count.ShouldBe(2);
         }
 
         [Fact]
@@ -120,11 +121,12 @@ namespace TheSaga.Tests
             persistedState.CurrentState.ShouldBe(nameof(Skompletowane));
             persistedState.CurrentStep.ShouldBe(null);
             persistedState.Logi.ShouldContain(nameof(Utworzone));
+            persistedState.Logi.ShouldContain(nameof(UtworzoneHandler));
             persistedState.Logi.ShouldContain(nameof(Skompletowano));
             persistedState.Logi.ShouldContain(nameof(WyslijEmailDoKlienta));
             persistedState.Logi.ShouldContain(nameof(WyslijWiadomoscDoKierownika));
             persistedState.Logi.ShouldContain(nameof(ZamowKuriera));
-            persistedState.Logi.Count.ShouldBe(5);
+            persistedState.Logi.Count.ShouldBe(6);
         }
 
         public SagaStateTests()
