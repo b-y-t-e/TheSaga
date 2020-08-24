@@ -21,13 +21,13 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga
 
             builder.
                 Start<Utworzone, UtworzoneHandler>().
-                Then(async ctx => { ctx.State.Logi.Add(nameof(Utworzone)); }).
+                Then(async ctx => { ctx.State.Logs.Add(nameof(Utworzone)); }).
                 TransitionTo<Nowe>();
 
             builder.
                 During<Nowe>().
                 When<Skompletowano>().
-                Then(async ctx => { ctx.State.Logi.Add(nameof(Skompletowano)); }).
+                Then(async ctx => { ctx.State.Logs.Add(nameof(Skompletowano)); }).
                 Then<WyslijEmailDoKlienta>("email").
                 Then<WyslijWiadomoscDoKierownika>().
                 Then<ZamowKuriera>().
@@ -36,20 +36,13 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga
             builder.
                 During<Skompletowane>().
                 When<Wyslano>().
-                Then(async ctx => { ctx.State.Logi.Add(nameof(Wyslano)); }).
+                Then(async ctx => { ctx.State.Logs.Add(nameof(Wyslano)); }).
                 TransitionTo<Wyslane>();
 
             builder.
                 During<Wyslane>().
                 When<Dostarczono>().
-                Then(async ctx => { ctx.State.Logi.Add(nameof(Dostarczono)); }).
-                TransitionTo<Zakonczono>();
-
-            builder.
-                During<Wyslane>().
-                Then(async ctx => { ctx.State.Logi.Add(nameof(Wyslane)); }).
-                After(TimeSpan.FromDays(30)).
-                Then(async ctx => { ctx.State.Logi.Add("After"); }).
+                Then(async ctx => { ctx.State.Logs.Add(nameof(Dostarczono)); }).
                 TransitionTo<Zakonczono>();
 
             return builder.

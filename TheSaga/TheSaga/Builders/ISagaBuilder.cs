@@ -13,6 +13,8 @@ namespace TheSaga.Builders
         ISagaBuilderState<TSagaState> Start<TEvent>() where TEvent : IEvent;
         ISagaBuilderState<TSagaState> Start<TEvent, TEventHandler>() where TEvent : IEvent
            where TEventHandler : IEventHandler<TSagaState, TEvent>;
+        ISagaBuilderState<TSagaState> StartAsync<TEvent, TEventHandler>() where TEvent : IEvent
+           where TEventHandler : IEventHandler<TSagaState, TEvent>;
         ISagaModel<TSagaState> Build();
     }
 
@@ -24,6 +26,8 @@ namespace TheSaga.Builders
         ISagaBuilderState<TSagaState> Then(string stepName, ThenActionDelegate<TSagaState> action);
         ISagaBuilderState<TSagaState> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;
         ISagaBuilderState<TSagaState> Then<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaState>;
+        ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;
+        ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaState>;
         ISagaModel<TSagaState> Build();
         ISagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState;
     }
@@ -33,6 +37,8 @@ namespace TheSaga.Builders
     {
         ISagaBuilderState<TSagaState> When<TEvent>() where TEvent : IEvent;
         ISagaBuilderState<TSagaState> When<TEvent, TEventHandler>() where TEvent : IEvent
+           where TEventHandler : IEventHandler<TSagaState, TEvent>;
+        ISagaBuilderState<TSagaState> WhenAsync<TEvent, TEventHandler>() where TEvent : IEvent
            where TEventHandler : IEventHandler<TSagaState, TEvent>;
     }
 }

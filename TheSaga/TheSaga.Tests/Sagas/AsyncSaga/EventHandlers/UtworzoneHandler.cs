@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.Builders;
 using TheSaga.Coordinators;
-using TheSaga.Tests.Sagas.OrderTestSaga.Events;
+using TheSaga.Tests.Sagas.AsyncSaga.Events;
 
-namespace TheSaga.Tests.Sagas.OrderTestSaga.EventHandlers
+namespace TheSaga.Tests.Sagas.AsyncSaga.EventHandlers
 {
-    public class UtworzoneHandler : IEventHandler<OrderState, Utworzone>
+    public class UtworzoneHandler : IEventHandler<AsyncState, Utworzone>
     {
         private readonly ISagaCoordinator sagaCoordinator;
 
@@ -16,13 +16,13 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga.EventHandlers
             this.sagaCoordinator = sagaCoordinator;
         }
 
-        public Task Compensate(IEventContext<OrderState, Utworzone> context)
+        public Task Compensate(IEventContext<AsyncState, Utworzone> context)
         {
             context.State.Logs.Add($"{nameof(UtworzoneHandler)} compensation");
             return Task.CompletedTask;
         }
 
-        public Task Execute(IEventContext<OrderState, Utworzone> context)
+        public Task Execute(IEventContext<AsyncState, Utworzone> context)
         {
             context.State.Logs.Add(nameof(UtworzoneHandler));
             return Task.CompletedTask;

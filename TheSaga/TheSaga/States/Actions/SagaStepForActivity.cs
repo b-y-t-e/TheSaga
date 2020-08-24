@@ -16,11 +16,14 @@ namespace TheSaga.States.Actions
         private readonly IServiceProvider serviceProvider;
 
         public String StepName { get; private set; }
+        public bool Async { get; }
 
-        public SagaStepForActivity(String StepName, IServiceProvider serviceProvider)
+        public SagaStepForActivity(
+            String StepName, IServiceProvider serviceProvider, Boolean async)
         {
             this.StepName = StepName;
             this.serviceProvider = serviceProvider;
+            Async = async;
         }
 
         public async Task Execute(IInstanceContext context, IEvent @event)

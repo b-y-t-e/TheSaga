@@ -12,7 +12,7 @@ using TheSaga.States.Actions;
 
 namespace TheSaga.Builders
 {
-    public class SagaBuilder<TSagaState> : 
+    public class SagaBuilder<TSagaState> :
         ISagaBuilder<TSagaState>,
         ISagaBuilderDuringState<TSagaState>,
         ISagaBuilderState<TSagaState>
@@ -26,18 +26,24 @@ namespace TheSaga.Builders
 
         String currentState;
 
+        UniqueNameGenerator uniqueNameGenerator;
+
         public SagaBuilder(IServiceProvider serviceProvider)
         {
             model = new SagaModel<TSagaState>();
             this.serviceProvider = serviceProvider;
+            this.uniqueNameGenerator = new UniqueNameGenerator();
         }
 
         public ISagaBuilderState<TSagaState> After(TimeSpan time)
         {
+            throw new NotImplementedException();
+
             model.FindAction(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaState>(
-                    $"{currentState}_{nameof(After)}",
-                    ctx => Task.Delay(time)));
+                    uniqueNameGenerator.Generate(currentState, nameof(After)),
+                    ctx => Task.Delay(time),
+                    true));
 
             return this;
         }
@@ -81,8 +87,30 @@ namespace TheSaga.Builders
                 Steps = new List<ISagaStep>
                 {
                     new SagaStepForEventHandler<TSagaState, TEventHandler, TEvent>(
-                        $"{currentState}_{nameof(Start)}_{typeof(TEvent).Name}",
-                        serviceProvider)
+                        uniqueNameGenerator.Generate(currentState, nameof(Start), typeof(TEvent).Name),
+                        serviceProvider,
+                        false)
+                }
+            });
+            return this;
+        }
+
+        public ISagaBuilderState<TSagaState> StartAsync<TEvent, TEventHandler>()
+            where TEvent : IEvent
+            where TEventHandler : IEventHandler<TSagaState, TEvent>
+        {
+            currentState = null;
+            currentEvent = typeof(TEvent);
+            model.Actions.Add(new SagaAction<TSagaState>()
+            {
+                State = currentState,
+                Event = typeof(TEvent),
+                Steps = new List<ISagaStep>
+                {
+                    new SagaStepForEventHandler<TSagaState, TEventHandler, TEvent>(
+                        uniqueNameGenerator.Generate(currentState, nameof(StartAsync), typeof(TEvent).Name),
+                        serviceProvider,
+                        true)
                 }
             });
             return this;
@@ -92,7 +120,7 @@ namespace TheSaga.Builders
             where TSagaActivity : ISagaActivity<TSagaState>
         {
             return Then<TSagaActivity>(
-                $"{currentState}_{nameof(Then)}_{typeof(TSagaActivity).Name}");
+                uniqueNameGenerator.Generate(currentState, nameof(Then), typeof(TSagaActivity).Name));
         }
 
         public ISagaBuilderState<TSagaState> Then<TSagaActivity>(String stepName) where TSagaActivity : ISagaActivity<TSagaState>
@@ -100,7 +128,26 @@ namespace TheSaga.Builders
             model.FindAction(currentState, currentEvent).Steps.Add(
                 new SagaStepForActivity<TSagaState, TSagaActivity>(
                     stepName,
-                        serviceProvider));
+                    serviceProvider,
+                    false));
+
+            return this;
+        }
+
+        public ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>()
+            where TSagaActivity : ISagaActivity<TSagaState>
+        {
+            return ThenAsync<TSagaActivity>(
+                uniqueNameGenerator.Generate(currentState, nameof(ThenAsync), typeof(TSagaActivity).Name));
+        }
+
+        public ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>(String stepName) where TSagaActivity : ISagaActivity<TSagaState>
+        {
+            model.FindAction(currentState, currentEvent).Steps.Add(
+                new SagaStepForActivity<TSagaState, TSagaActivity>(
+                    stepName,
+                    serviceProvider,
+                    true));
 
             return this;
         }
@@ -108,7 +155,8 @@ namespace TheSaga.Builders
         public ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action)
         {
             return Then(
-                $"{currentState}_{nameof(Then)}_action", action);
+                uniqueNameGenerator.Generate(currentState, nameof(Then), "action"),
+                action);
         }
 
         public ISagaBuilderState<TSagaState> Then(String stepName, ThenActionDelegate<TSagaState> action)
@@ -116,7 +164,26 @@ namespace TheSaga.Builders
             model.FindAction(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaState>(
                     stepName,
-                    action));
+                    action,
+                    false));
+
+            return this;
+        }
+
+        public ISagaBuilderState<TSagaState> ThenAsync(ThenActionDelegate<TSagaState> action)
+        {
+            return ThenAsync(
+                uniqueNameGenerator.Generate(currentState, nameof(ThenAsync), "action"),
+                action);
+        }
+
+        public ISagaBuilderState<TSagaState> ThenAsync(String stepName, ThenActionDelegate<TSagaState> action)
+        {
+            model.FindAction(currentState, currentEvent).Steps.Add(
+                new SagaStepForInlineAction<TSagaState>(
+                    stepName,
+                    action,
+                    true));
 
             return this;
         }
@@ -125,12 +192,13 @@ namespace TheSaga.Builders
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaState>(
-                    $"{currentState}_{nameof(TransitionTo)}_{typeof(TState).Name}",
+                    uniqueNameGenerator.Generate(currentState, nameof(TransitionTo), typeof(TState).Name),
                     ctx =>
                     {
                         ctx.State.CurrentState = typeof(TState).Name;
                         return Task.CompletedTask;
-                    }));
+                    },
+                    false));
             return this;
         }
 
@@ -156,8 +224,28 @@ namespace TheSaga.Builders
                 Steps = new List<ISagaStep>
                 {
                     new SagaStepForEventHandler<TSagaState, TEventHandler, TEvent>(
-                        $"{currentState}_{nameof(When)}_{typeof(TEvent).Name}",
-                        serviceProvider)
+                        uniqueNameGenerator.Generate(currentState, nameof(When), typeof(TEvent).Name),
+                        serviceProvider,
+                        false)
+                }
+            });
+            return this;
+        }
+
+        public ISagaBuilderState<TSagaState> WhenAsync<TEvent, TEventHandler>() where TEvent : IEvent
+            where TEventHandler : IEventHandler<TSagaState, TEvent>
+        {
+            currentEvent = typeof(TEvent);
+            model.Actions.Add(new SagaAction<TSagaState>()
+            {
+                State = currentState,
+                Event = currentEvent,
+                Steps = new List<ISagaStep>
+                {
+                    new SagaStepForEventHandler<TSagaState, TEventHandler, TEvent>(
+                        uniqueNameGenerator.Generate(currentState, nameof(WhenAsync), typeof(TEvent).Name),
+                        serviceProvider,
+                        true)
                 }
             });
             return this;

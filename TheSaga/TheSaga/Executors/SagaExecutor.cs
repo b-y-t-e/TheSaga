@@ -46,18 +46,22 @@ namespace TheSaga.Executors
         }
 
         public async Task<ISagaState> ExecuteStep(
-            Guid correlationID, 
-            ISagaModel model, 
+            Guid correlationID,
+            ISagaModel model,
             IEvent @event)
         {
-            Type eventType = @event == null ? null : @event.GetType();
+            Type eventType = @event == null ?
+                null : @event.GetType();
 
             ISagaState state = await sagaPersistance.Get(correlationID);
             if (state == null)
                 throw new SagaInstanceNotFoundException(model.SagaStateType, correlationID);
 
-            IList<ISagaAction> actions = model.FindActions(state.CurrentState);
-            ISagaAction action = actions.FirstOrDefault(a => a.Event == eventType);
+            IList<ISagaAction> actions = model.
+                FindActions(state.CurrentState);
+            
+            ISagaAction action = actions.
+                FirstOrDefault(a => a.Event == eventType);
 
             if (action == null)
                 throw new SagaInvalidEventForStateException(state.CurrentState, eventType);

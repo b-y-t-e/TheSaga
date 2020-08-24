@@ -14,11 +14,14 @@ namespace TheSaga.States.Actions
         public String StepName { get; private set; }
 
         public ThenActionDelegate<TSagaState> Action { get; private set; }
+        public bool Async { get; }
 
-        public SagaStepForInlineAction(String StepName, ThenActionDelegate<TSagaState> Action)
+        public SagaStepForInlineAction(
+            String StepName, ThenActionDelegate<TSagaState> Action, Boolean async)
         {
             this.StepName = StepName;
             this.Action = Action;
+            Async = async;
         }
 
         public async Task Execute(IInstanceContext context, IEvent @event)

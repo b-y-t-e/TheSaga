@@ -17,11 +17,14 @@ namespace TheSaga.States.Actions
         private readonly IServiceProvider serviceProvider;
 
         public String StepName { get; private set; }
+        public bool Async { get; }
 
-        public SagaStepForEventHandler(String StepName, IServiceProvider serviceProvider)
+        public SagaStepForEventHandler(
+            String StepName, IServiceProvider serviceProvider, Boolean async)
         {
             this.StepName = StepName;
             this.serviceProvider = serviceProvider;
+            Async = async;
         }
 
         public async Task Execute(IInstanceContext context, IEvent @event)
@@ -34,7 +37,7 @@ namespace TheSaga.States.Actions
                 Event = (TEvent)@event,
                 State = contextForAction.State
             };
-            
+
             TEventHandler activity = (TEventHandler)ActivatorUtilities.
                 CreateInstance(serviceProvider, typeof(TEventHandler));
 

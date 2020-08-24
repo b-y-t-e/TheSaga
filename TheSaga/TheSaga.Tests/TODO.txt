@@ -1,8 +1,13 @@
 ﻿TODO:
+ + historia kroków
+ + metody / wołania asynchroniczne
  + unikatowe nazwy pod-stanów
  + obsługa kompensacji
  + sqlserver persistance
  + podpiecie sie do masstransit
+ + after
+ + startowy stan
+ + koncowy stan
  
 INNE:
  + podpiecie sie do convey-api
