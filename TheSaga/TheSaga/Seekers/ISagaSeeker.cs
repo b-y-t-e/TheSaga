@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using TheSaga.Instances;
 
-namespace TheSaga
+namespace TheSaga.Seekers
 {
     public interface ISagaSeeker
     {

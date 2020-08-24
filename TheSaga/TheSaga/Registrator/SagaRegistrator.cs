@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using TheSaga.Model;
+using System.Linq;
+using TheSaga.Interfaces;
+using TheSaga.Models;
 
-namespace TheSaga
+namespace TheSaga.Registrator
 {
     public class SagaRegistrator : ISagaRegistrator
     {
@@ -14,20 +16,19 @@ namespace TheSaga
             //models = new Dictionary<string, SagaModel>();
         }
 
-        /*public void Register<TSagaType, TState>(string sagaName) 
-            where TSagaType : ISaga<TState>
-            where TState : IData
+        public ISagaModel FindModel(IEvent @event)
         {
-            ISagaBuilder<TSagaType> sagaBuilder = new SagaBuilder();
-        }*/
+            return models.Values.
+                FirstOrDefault(v => v.SagaModel.ContainsEvent(@event.GetType()))?.
+                SagaModel;
+        }
 
-        public void Register<TSagaState>(string sagaName, SagaModel<TSagaState> model) where TSagaState : ISagaState
+        public void Register(string sagaName, ISagaModel model) 
         {
             models[sagaName] = new RegisteredSagaInfo()
             {
                 SagaModel = model,
-                SagaName = sagaName,
-                SagaStateType = typeof(TSagaState)
+                SagaName = sagaName
             };
         }
     }
@@ -37,7 +38,5 @@ namespace TheSaga
         internal string SagaName;
 
         internal ISagaModel SagaModel;
-
-        internal Type SagaStateType;
     }
 }

@@ -1,7 +1,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using TheSaga.Model;
+using TheSaga.Activities;
+using TheSaga.Builders;
+using TheSaga.Coordinators;
+using TheSaga.Interfaces;
+using TheSaga.Models;
+using TheSaga.Registrator;
+using TheSaga.Seekers;
+using TheSaga.States;
 using Xunit;
 using Xunit.Sdk;
 
@@ -12,9 +19,8 @@ namespace TheSaga.Tests
         [Fact]
         public void Test1()
         {
-            var sagaModel = OrderTestSaga.Create();
-            sagaModel = sagaModel;
-
+            ISagaModel sagaModel = OrderTestSaga.Create();
+            
             ISagaRegistrator sagaRegistrator = new SagaRegistrator();
             sagaRegistrator.Register("order-test", sagaModel);
 
@@ -36,7 +42,7 @@ namespace TheSaga.Tests
     {
         public static SagaModel<OrderState> Create()
         {
-            SagaBuilder<OrderState> builder = new SagaBuilder<OrderState>();
+            ISagaBuilder<OrderState> builder = new SagaBuilder<OrderState>();
 
             builder.
                 Start<Utworzone>().
@@ -87,12 +93,12 @@ namespace TheSaga.Tests
 
     internal class ZamowKuriera : ISagaActivity<OrderState>
     {
-        public Task Compensate(IContext<OrderState> context)
+        public Task Compensate(IInstanceContext<OrderState> context)
         {
             throw new NotImplementedException();
         }
 
-        public Task Execute(IContext<OrderState> context)
+        public Task Execute(IInstanceContext<OrderState> context)
         {
             throw new NotImplementedException();
         }
@@ -100,12 +106,12 @@ namespace TheSaga.Tests
 
     internal class WyslijWiadomoscDoKierownika : ISagaActivity<OrderState>
     {
-        public Task Compensate(IContext<OrderState> context)
+        public Task Compensate(IInstanceContext<OrderState> context)
         {
             throw new NotImplementedException();
         }
 
-        public Task Execute(IContext<OrderState> context)
+        public Task Execute(IInstanceContext<OrderState> context)
         {
             throw new NotImplementedException();
         }
@@ -113,12 +119,12 @@ namespace TheSaga.Tests
 
     internal class WyslijEmailDoKlienta : ISagaActivity<OrderState>
     {
-        public Task Compensate(IContext<OrderState> context)
+        public Task Compensate(IInstanceContext<OrderState> context)
         {
             throw new NotImplementedException();
         }
 
-        public Task Execute(IContext<OrderState> context)
+        public Task Execute(IInstanceContext<OrderState> context)
         {
             throw new NotImplementedException();
         }

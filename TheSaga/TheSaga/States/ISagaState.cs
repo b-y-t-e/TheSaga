@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheSaga
+namespace TheSaga.States
 {
     public interface ISagaState
     {

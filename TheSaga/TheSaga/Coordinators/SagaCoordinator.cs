@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TheSaga.Model;
+using TheSaga.Instances;
+using TheSaga.Interfaces;
+using TheSaga.Models;
+using TheSaga.Registrator;
+using TheSaga.Seekers;
+using TheSaga.States;
 
-namespace TheSaga
+namespace TheSaga.Coordinators
 {
     public class SagaCoordinator : ISagaCoordinator
     {
@@ -17,7 +22,7 @@ namespace TheSaga
         }
 
 
-        public async Task<Guid> Execute(IEvent @event)
+        public async Task<ISagaState> Execute(IEvent @event)
         {
             ISagaModel model = sagaRegistrator.FindModel(@event);
             if (model == null)
@@ -35,15 +40,15 @@ namespace TheSaga
 
             await sagaInstance.Push(@event);
 
-            return @event.CorrelationID;
+            return sagaInstance.State;
         }
 
-        private async Task<Guid> StartSaga(ISagaModel model)
+        public Task<ISagaState> Send(IEvent @event)
         {
             throw new NotImplementedException();
         }
 
-        Task ISagaCoordinator.Send(IEvent @event)
+        private async Task<ISagaState> StartSaga(ISagaModel model)
         {
             throw new NotImplementedException();
         }

@@ -4,12 +4,15 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
-using TheSaga.Model;
+using TheSaga.Activities;
+using TheSaga.Interfaces;
+using TheSaga.Models;
+using TheSaga.States;
+using TheSaga.States.Actions;
 
-namespace TheSaga
+namespace TheSaga.Builders
 {
-    public class SagaBuilder<TSagaState>
-            where TSagaState : ISagaState
+    public class SagaBuilder<TSagaState> : ISagaBuilder<TSagaState> where TSagaState : ISagaState
     {
         SagaModel<TSagaState> model;
 
@@ -40,10 +43,10 @@ namespace TheSaga
             return model;
         }
 
-        public SagaBuilder<TSagaState> During<TState_>()
-            where TState_ : IState
+        public SagaBuilder<TSagaState> During<TState>()
+            where TState : IState
         {
-            currentState = typeof(TState_);
+            currentState = typeof(TState);
             currentEvent = null;
             return this;
         }
@@ -98,11 +101,5 @@ namespace TheSaga
             });
             return this;
         }
-    }
-
-    public delegate Task ThenFunction<TState>(IContext<TState> context) where TState : ISagaState;
-    public interface IContext<TState> where TState : ISagaState
-    {
-        TState Data { get; }
     }
 }

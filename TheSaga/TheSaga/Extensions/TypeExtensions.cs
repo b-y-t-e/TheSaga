@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TheSaga.Helpers
+namespace TheSaga.Extensions
 {
    public static class TypeExtensions
     {

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TheSaga.Instances;
 
-namespace TheSaga.Tests
+namespace TheSaga.Seekers
 {
-    internal class InMemorySagaSeeker : ISagaSeeker
+    public class InMemorySagaSeeker : ISagaSeeker
     {
         Dictionary<Guid, ISagaInstance> instances;
 

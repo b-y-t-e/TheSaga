@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TheSaga.Builders;
 
-namespace TheSaga.Model
+namespace TheSaga.States.Actions
 {
     public class SagaActions<TSagaState> : List<SagaAction<TSagaState>>
         where TSagaState : ISagaState
@@ -30,21 +31,5 @@ namespace TheSaga.Model
         {
 
         }
-    }
-    public class SagaAction<TSagaState> where TSagaState : ISagaState
-    {
-        public Type State;
-
-        public Type Event;
-
-        public List<SagaStep<TSagaState>> Steps =
-            new List<SagaStep<TSagaState>>();
-    }
-
-    public class SagaStep<TSagaState> where TSagaState : ISagaState
-    {
-        public ThenFunction<TSagaState> Action;
-
-        public Type Activity;
     }
 }
