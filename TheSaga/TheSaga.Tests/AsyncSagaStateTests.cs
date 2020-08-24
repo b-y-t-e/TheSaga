@@ -47,8 +47,8 @@ namespace TheSaga.Tests
                 Get(sagaState.CorrelationID);
 
             persistedState.ShouldNotBeNull();
-            persistedState.CurrentStep.ShouldBe(null);
-            persistedState.CurrentState.ShouldBe(nameof(Nowe));
+            persistedState.CurrentStep.ShouldStartWith("~");
+            persistedState.CurrentState.ShouldBe("~");
             persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
             persistedState.Logs.ShouldContain(nameof(UtworzoneHandler));
             persistedState.Logs.Count.ShouldBe(1);

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TheSaga.Builders;
 using TheSaga.Exceptions;
 using TheSaga.Interfaces;
 using TheSaga.Models;
@@ -12,7 +11,7 @@ using TheSaga.States.Actions;
 
 namespace TheSaga.Executors
 {
-    public class SagaExecutor<TSagaState> : ISagaExecutor
+    internal class SagaExecutor<TSagaState> : ISagaExecutor
         where TSagaState : ISagaState
     {
         ISagaPersistance sagaPersistance;
@@ -29,26 +28,18 @@ namespace TheSaga.Executors
             bool isStartEvent = model.IsStartEvent(eventType);
             if (isStartEvent)
             {
-                if (correlationID == Guid.Empty)
-                    correlationID = Guid.NewGuid();
-
-                ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
-                newSagaState.CorrelationID = correlationID;
-                newSagaState.CurrentState = SagaStartState.Name;
-                newSagaState.CurrentStep = null;
-
-                await sagaPersistance.Set(newSagaState);
+                correlationID = await createNewSaga(correlationID, model);
             }
 
             while (true)
             {
-                ISagaState sagaState = await ExecuteStep(correlationID, model, @event);
-                if (sagaState.CurrentStep == null)
-                    return sagaState;
+                StepExecutionResult stepExecutionResult = await ExecuteStep(correlationID, model, @event);
+                if (stepExecutionResult.Async || stepExecutionResult.State?.CurrentStep == null)
+                    return stepExecutionResult.State;
             }
         }
 
-        public async Task<ISagaState> ExecuteStep(
+        async Task<StepExecutionResult> ExecuteStep(
             Guid correlationID,
             ISagaModel model,
             IEvent @event)
@@ -62,43 +53,42 @@ namespace TheSaga.Executors
 
             IList<ISagaAction> actions = model.
                 FindActions(state.CurrentState);
-            
+
             ISagaAction action = actions.
                 FirstOrDefault(a => a.Event == eventType);
 
             if (action == null)
                 throw new SagaInvalidEventForStateException(state.CurrentState, eventType);
 
-            ISagaStep step = action.FindStep(state.CurrentStep);
+            bool async = await new SagaStepExecutor<TSagaState>(sagaPersistance, @event, state, action).
+                Run();
 
-            try
+            return new StepExecutionResult()
             {
-                IInstanceContext context = new InstanceContext<TSagaState>()
-                {
-                    State = (TSagaState)state
-                };
-                await step.Execute(context, @event);
+                State = state,
+                Async = async
+            };
+        }
 
-                ISagaStep nextStep = action.
-                    FindNextAfter(step);
+        private async Task<Guid> createNewSaga(Guid correlationID, ISagaModel model)
+        {
+            if (correlationID == Guid.Empty)
+                correlationID = Guid.NewGuid();
 
-                if (nextStep != null)
-                {
-                    state.CurrentStep = nextStep.StepName;
-                }
-                else
-                {
-                    state.CurrentStep = null;
-                }
+            ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
+            newSagaState.CorrelationID = correlationID;
+            newSagaState.CurrentState = SagaStartState.Name;
+            newSagaState.CurrentStep = null;
 
-                await sagaPersistance.Set(state);
+            await sagaPersistance.Set(newSagaState);
+            return correlationID;
+        }
 
-                return state;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+        class StepExecutionResult
+        {
+            internal bool Async;
+
+            internal ISagaState State;
         }
     }
 }

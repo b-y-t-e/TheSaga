@@ -21,12 +21,12 @@ namespace TheSaga.Tests.Sagas.AsyncSaga
 
             builder.
                 Start<Utworzone, UtworzoneHandler>().
-                Then(ctx =>
+                ThenAsync(ctx =>
                 {
                     ctx.State.Logs.Add("1");
                     return Task.Delay(TimeSpan.FromSeconds(3));
                 }).
-                Then(ctx =>
+                ThenAsync(ctx =>
                 {
                     ctx.State.Logs.Add("2");
                     return Task.Delay(TimeSpan.FromSeconds(3));

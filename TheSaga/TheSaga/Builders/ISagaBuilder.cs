@@ -24,6 +24,8 @@ namespace TheSaga.Builders
         ISagaBuilderState<TSagaState> After(TimeSpan time);
         ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action);
         ISagaBuilderState<TSagaState> Then(string stepName, ThenActionDelegate<TSagaState> action);
+        ISagaBuilderState<TSagaState> ThenAsync(ThenActionDelegate<TSagaState> action);
+        ISagaBuilderState<TSagaState> ThenAsync(string stepName, ThenActionDelegate<TSagaState> action);
         ISagaBuilderState<TSagaState> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;
         ISagaBuilderState<TSagaState> Then<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaState>;
         ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;

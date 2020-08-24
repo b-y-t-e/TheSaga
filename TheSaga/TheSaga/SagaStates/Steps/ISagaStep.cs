@@ -9,6 +9,6 @@ namespace TheSaga.States.Actions
         bool Async { get; }
         string StepName { get; }
 
-        Task Execute(IInstanceContext context, IEvent @event);
+        Task Execute(IExecutionContext context, IEvent @event);
     }
 }
