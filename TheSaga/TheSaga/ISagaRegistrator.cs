@@ -7,5 +7,7 @@ namespace TheSaga
     {
         void Register<TSagaState>(string sagaName, SagaModel<TSagaState> model)
             where TSagaState : ISagaState;
+
+        ISagaModel FindModel(IEvent event);
     }
 }

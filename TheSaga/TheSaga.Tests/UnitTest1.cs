@@ -20,7 +20,7 @@ namespace TheSaga.Tests
 
             ISagaSeeker sagaSeeker = new InMemorySagaSeeker();
 
-            ISagaCoordinator sagaCoordinator = new SagaCoordinator(sagaSeeker);
+            ISagaCoordinator sagaCoordinator = new SagaCoordinator(sagaSeeker, sagaRegistrator);
             sagaCoordinator.Execute(new Utworzone());
         }
     }
