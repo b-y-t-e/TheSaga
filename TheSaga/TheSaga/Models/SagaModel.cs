@@ -7,61 +7,53 @@ using TheSaga.States.Actions;
 
 namespace TheSaga.Models
 {
-    public class SagaModel<TSagaState> : ISagaModel
+    public class SagaModel<TSagaState> : ISagaModel<TSagaState>
         where TSagaState : ISagaState
     {
         public Type SagaStateType { get; }
-        public List<Type> States { get; private set; }
-        public List<Type> StartEvents { get; private set; }
-        public List<Type> DuringEvents { get; private set; }
         public SagaActions<TSagaState> Actions { get; }
-
         public SagaModel()
         {
-            States = new List<Type>();
-            DuringEvents = new List<Type>();
-            StartEvents = new List<Type>();
             Actions = new SagaActions<TSagaState>();
             SagaStateType = typeof(TSagaState);
         }
 
-        internal void Build()
+        public ISagaAction FindAction(string state, Type eventType)
         {
+            SagaAction<TSagaState> action = this.Actions.
+                FindAction(state, eventType);
 
-            States = new List<Type>();
-            DuringEvents = new List<Type>();
-
-            foreach (var action in Actions)
+            if (action == null)
             {
-                if (action.Event != null)
+                action = new SagaAction<TSagaState>()
                 {
-                    if (action.State == null)
-                    {
-                        StartEvents.Add(action.Event);
-                    }
-                    else
-                    {
-                        DuringEvents.Add(action.Event);
-                    }
-                }
-
-                if (action.State != null)
-                {
-                    States.Add(action.State);
-                }
+                    Event = eventType,
+                    State = state
+                };
+                this.Actions.Add(action);
             }
+
+            return action;
+        }
+
+        public IList<ISagaAction> FindActions(string state)
+        {
+            return this.Actions.
+                 FindActions(state).
+                 Select(i => (ISagaAction)i).
+                 ToArray();
         }
 
         public bool IsStartEvent(Type type)
         {
-            return StartEvents.Contains(type);
+            return Actions.StartEvents.Contains(type);
         }
 
         public bool ContainsEvent(Type type)
         {
             return
-                StartEvents.Contains(type) ||
-                DuringEvents.Contains(type);
+                Actions.StartEvents.Contains(type) ||
+                Actions.DuringEvents.Contains(type);
         }
     }
 }

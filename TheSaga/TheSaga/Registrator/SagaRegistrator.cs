@@ -1,42 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TheSaga.Executors;
 using TheSaga.Interfaces;
 using TheSaga.Models;
+using TheSaga.Persistance;
+using TheSaga.States;
 
 namespace TheSaga.Registrator
 {
     public class SagaRegistrator : ISagaRegistrator
     {
-        Dictionary<string, RegisteredSagaInfo> models;
+        ISagaPersistance sagaPersistance;
+        List<ISagaModel> registeredModels;
+        Dictionary<Type, ISagaExecutor> registeredExecutors;
 
-        public SagaRegistrator()
+        public SagaRegistrator(ISagaPersistance sagaPersistance)
         {
-            models = new Dictionary<string, RegisteredSagaInfo>();
-            //models = new Dictionary<string, SagaModel>();
+            this.registeredExecutors = new Dictionary<Type, ISagaExecutor>();
+            this.registeredModels = new List<ISagaModel>();
+            this.sagaPersistance = sagaPersistance;
         }
 
-        public ISagaModel FindModel(IEvent @event)
+        public ISagaExecutor FindExecutorForStateType(Type stateType)
         {
-            return models.Values.
-                FirstOrDefault(v => v.SagaModel.ContainsEvent(@event.GetType()))?.
-                SagaModel;
+            ISagaExecutor sagaExecutor = null;
+            registeredExecutors.TryGetValue(stateType, out sagaExecutor);
+            return sagaExecutor;
         }
 
-        public void Register(string sagaName, ISagaModel model) 
+        public ISagaModel FindModelForEventType(Type eventType)
         {
-            models[sagaName] = new RegisteredSagaInfo()
-            {
-                SagaModel = model,
-                SagaName = sagaName
-            };
+            return registeredModels.
+                FirstOrDefault(v => v.ContainsEvent(eventType));
         }
-    }
 
-    internal class RegisteredSagaInfo
-    {
-        internal string SagaName;
-
-        internal ISagaModel SagaModel;
+        public void Register<TSagaState>(ISagaModel<TSagaState> model) 
+            where TSagaState : ISagaState
+        {
+            registeredModels.Add((ISagaModel)model);
+            registeredExecutors[typeof(TSagaState)] = new SagaExecutor<TSagaState>(sagaPersistance);
+        }
     }
 }

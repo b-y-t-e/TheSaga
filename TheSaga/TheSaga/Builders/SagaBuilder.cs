@@ -18,35 +18,32 @@ namespace TheSaga.Builders
 
         Type currentEvent;
 
-        Type currentState;
+        String currentState;
 
         public SagaBuilder()
         {
             model = new SagaModel<TSagaState>();
-
-            //var i = (TSagaType)Activator.CreateInstance<TSagaType>();
-            //i.Define(this);
         }
 
         public SagaBuilder<TSagaState> After(TimeSpan time)
         {
-            model.Actions.GetDuring(currentState, currentEvent).Steps.Add(new SagaStep<TSagaState>()
-            {
-                Action = ctx => Task.Delay(time)
-            });
+            model.FindAction(currentState, currentEvent).Steps.Add(
+                new SagaStep<TSagaState>(
+                    $"{currentState}_{nameof(After)}",
+                    ctx => Task.Delay(time)));
+
             return this;
         }
 
         public SagaModel<TSagaState> Build()
         {
-            model.Build();
             return model;
         }
 
         public SagaBuilder<TSagaState> During<TState>()
             where TState : IState
         {
-            currentState = typeof(TState);
+            currentState = typeof(TState).Name;
             currentEvent = null;
             return this;
         }
@@ -66,28 +63,54 @@ namespace TheSaga.Builders
 
         public SagaBuilder<TSagaState> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>
         {
-            model.Actions.GetDuring(currentState, currentEvent).Steps.Add(new SagaStep<TSagaState>()
-            {
-                Activity = typeof(TSagaActivity)
-            });
+            model.FindAction(currentState, currentEvent).Steps.Add(
+                new SagaStep<TSagaState>(
+                    $"{currentState}_{nameof(Then)}",
+                    typeof(TSagaActivity)));
+
             return this;
         }
 
-        public SagaBuilder<TSagaState> Then(ThenFunction<TSagaState> action)
+        public SagaBuilder<TSagaState> Then<TSagaActivity>(String stepName) where TSagaActivity : ISagaActivity<TSagaState>
         {
-            model.Actions.GetDuring(currentState, currentEvent).Steps.Add(new SagaStep<TSagaState>()
-            {
-                Action = action
-            });
+            model.FindAction(currentState, currentEvent).Steps.Add(
+                new SagaStep<TSagaState>(
+                    stepName,
+                    typeof(TSagaActivity)));
+
+            return this;
+        }
+
+        public SagaBuilder<TSagaState> Then(ThenActionDelegate<TSagaState> action)
+        {
+            model.FindAction(currentState, currentEvent).Steps.Add(
+                new SagaStep<TSagaState>(
+                    $"{currentState}_{nameof(Then)}",
+                    (ctx) => action((IInstanceContext<TSagaState>)ctx)));
+
+            return this;
+        }
+
+        public SagaBuilder<TSagaState> Then(String stepName, ThenActionDelegate<TSagaState> action)
+        {
+            model.FindAction(currentState, currentEvent).Steps.Add(
+                new SagaStep<TSagaState>(
+                    stepName,
+                    action));
+
             return this;
         }
 
         public SagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState
         {
-            model.Actions.GetDuring(currentState, currentEvent).Steps.Add(new SagaStep<TSagaState>()
-            {
-                Action = ctx => { ctx.Data.CurrentState = currentState.Name; return Task.FromResult(0); }
-            });
+            model.FindAction(currentState, currentEvent).Steps.Add(
+                new SagaStep<TSagaState>(
+                    $"{currentState}_{nameof(TransitionTo)}_{typeof(TState).Name}",
+                    ctx =>
+                    {
+                        ctx.State.CurrentState = typeof(TState).Name;
+                        return Task.CompletedTask;
+                    }));
             return this;
         }
 
@@ -99,6 +122,24 @@ namespace TheSaga.Builders
                 State = currentState,
                 Event = currentEvent
             });
+            return this;
+        }
+
+        public SagaBuilder<TSagaState> When<TEvent, TEventHandler>() where TEvent : IEvent
+            where TEventHandler : IEventHandler<TSagaState, TEvent>
+        {
+            currentEvent = typeof(TEvent);
+            model.Actions.Add(new SagaAction<TSagaState>()
+            {
+                State = currentState,
+                Event = currentEvent,
+                Steps = new List<ISagaStep>
+                {
+                    new SagaStep<TSagaState>(
+                        $"{currentState}_{nameof(When)}_{typeof(TEvent).Name}",
+                        typeof(TEventHandler))
+                }
+            }); ;
             return this;
         }
     }

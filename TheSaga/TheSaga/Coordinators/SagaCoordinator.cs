@@ -1,56 +1,50 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TheSaga.Instances;
+using TheSaga.Executors;
 using TheSaga.Interfaces;
 using TheSaga.Models;
 using TheSaga.Registrator;
-using TheSaga.Seekers;
+using TheSaga.Persistance;
 using TheSaga.States;
 
 namespace TheSaga.Coordinators
 {
     public class SagaCoordinator : ISagaCoordinator
     {
-        private readonly ISagaRegistrator sagaRegistrator;
+        ISagaRegistrator sagaRegistrator;
 
-        ISagaSeeker sagaSeeker { get; }
-
-        public SagaCoordinator(ISagaSeeker sagaSeeker, ISagaRegistrator sagaRegistrator)
+        public SagaCoordinator(ISagaRegistrator sagaRegistrator)
         {
-            this.sagaSeeker = sagaSeeker;
             this.sagaRegistrator = sagaRegistrator;
+            // this.sagaExecutor = sagaExecutor;
         }
 
-
-        public async Task<ISagaState> Execute(IEvent @event)
+        public async Task<ISagaState> Send(IEvent @event)
         {
-            ISagaModel model = sagaRegistrator.FindModel(@event);
-            if (model == null)
-                throw new Exception($"Event of type {@event.GetType().Name} is not registered");
+            Type eventType = @event.GetType();
 
-            bool isStartEvent = model.IsStartEvent(@event.GetType());
+            ISagaModel model = sagaRegistrator.FindModelForEventType(eventType);
+            if (model == null)
+                throw new Exception($"Event of type {eventType.Name} is not registered");
+
+            ISagaExecutor sagaExecutor = sagaRegistrator.
+                FindExecutorForStateType(model.SagaStateType);
+
+            bool isStartEvent = model.IsStartEvent(eventType);
             if (isStartEvent)
             {
-                return await StartSaga(model);
+                return await sagaExecutor.Start(model, @event);
             }
-
-            ISagaInstance sagaInstance = await sagaSeeker.Seek(@event.CorrelationID);
-            if (sagaInstance == null)
-                throw new Exception("saga not found");
-
-            await sagaInstance.Push(@event);
-
-            return sagaInstance.State;
+            else
+            {
+                return await sagaExecutor.Handle(model, @event);
+            }
         }
 
-        public Task<ISagaState> Send(IEvent @event)
+        public Task<ISagaState> Publish(IEvent @event)
         {
             throw new NotImplementedException();
         }
 
-        private async Task<ISagaState> StartSaga(ISagaModel model)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

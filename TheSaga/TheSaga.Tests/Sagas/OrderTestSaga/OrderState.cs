@@ -1,8 +1,9 @@
 ﻿using System;
+using TheSaga.States;
 
-namespace TheSaga.States
+namespace TheSaga.Tests.Sagas.OrderTestSaga
 {
-    public interface ISagaState
+    public class OrderState : ISagaState
     {
         public Guid CorrelationID { get; set; }
         public string CurrentState { get; set; }

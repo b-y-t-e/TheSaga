@@ -8,6 +8,6 @@ namespace TheSaga.Coordinators
     public interface ISagaCoordinator
     {
         Task<ISagaState> Send(IEvent @event);
-        Task<ISagaState> Execute(IEvent @event);
+        Task<ISagaState> Publish(IEvent @event);
     }
 }

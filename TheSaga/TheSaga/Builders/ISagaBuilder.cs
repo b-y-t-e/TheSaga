@@ -11,11 +11,15 @@ namespace TheSaga.Builders
     {
         SagaBuilder<TSagaState> After(TimeSpan time);
         SagaModel<TSagaState> Build();
-        SagaBuilder<TSagaState> During<TState_>() where TState_ : IState;
+        SagaBuilder<TSagaState> During<TState>() where TState : IState;
         SagaBuilder<TSagaState> Start<TEvent>() where TEvent : IEvent;
-        SagaBuilder<TSagaState> Then(ThenFunction<TSagaState> action);
+        SagaBuilder<TSagaState> Then( ThenActionDelegate<TSagaState> action);
+        SagaBuilder<TSagaState> Then(string stepName, ThenActionDelegate<TSagaState> action);
         SagaBuilder<TSagaState> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;
+        SagaBuilder<TSagaState> Then<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaState>;
         SagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState;
         SagaBuilder<TSagaState> When<TEvent>() where TEvent : IEvent;
+        SagaBuilder<TSagaState> When<TEvent, TEventHandler>() where TEvent : IEvent
+           where TEventHandler : IEventHandler<TSagaState, TEvent>;
     }
 }

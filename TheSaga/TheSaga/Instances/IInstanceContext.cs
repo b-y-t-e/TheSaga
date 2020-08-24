@@ -2,8 +2,17 @@
 
 namespace TheSaga.Builders
 {
-    public interface IInstanceContext<TState> where TState : ISagaState
+    public class InstanceContext<TState> : IInstanceContext<TState> where TState : ISagaState
     {
-        TState Data { get; }
+        public TState State { get; set; }
+    }
+
+    public interface IInstanceContext<TState> : IInstanceContext where TState : ISagaState
+    {
+        TState State { get; }
+    }
+
+    public interface IInstanceContext
+    {
     }
 }
