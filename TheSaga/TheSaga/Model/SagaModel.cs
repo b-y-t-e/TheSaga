@@ -45,5 +45,6 @@ namespace TheSaga.Model
 
     public interface ISagaModel
     {
+        bool IsStartEvent(Type type);
     }
 }
