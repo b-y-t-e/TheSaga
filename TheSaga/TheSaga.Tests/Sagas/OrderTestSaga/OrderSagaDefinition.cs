@@ -15,7 +15,7 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga
 
     public class OrderSagaDefinition : ISagaModelDefintion<OrderState>
     {
-        public SagaModel<OrderState> GetModel(IServiceProvider serviceProvider)
+        public ISagaModel<OrderState> GetModel(IServiceProvider serviceProvider)
         {
             ISagaBuilder<OrderState> builder = new SagaBuilder<OrderState>(serviceProvider);
 
@@ -49,7 +49,7 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga
                 During<Wyslane>().
                 Then(async ctx => { ctx.State.Logi.Add(nameof(Wyslane)); }).
                 After(TimeSpan.FromDays(30)).
-                Then(async ctx => { ctx.State.Logi.Add(nameof(builder.After)); }).
+                Then(async ctx => { ctx.State.Logi.Add("After"); }).
                 TransitionTo<Zakonczono>();
 
             return builder.

@@ -12,7 +12,10 @@ using TheSaga.States.Actions;
 
 namespace TheSaga.Builders
 {
-    public class SagaBuilder<TSagaState> : ISagaBuilder<TSagaState>
+    public class SagaBuilder<TSagaState> : 
+        ISagaBuilder<TSagaState>,
+        ISagaBuilderDuringState<TSagaState>,
+        ISagaBuilderState<TSagaState>
         where TSagaState : ISagaState
     {
         IServiceProvider serviceProvider;
@@ -29,7 +32,7 @@ namespace TheSaga.Builders
             this.serviceProvider = serviceProvider;
         }
 
-        public SagaBuilder<TSagaState> After(TimeSpan time)
+        public ISagaBuilderState<TSagaState> After(TimeSpan time)
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaState>(
@@ -39,12 +42,12 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public SagaModel<TSagaState> Build()
+        public ISagaModel<TSagaState> Build()
         {
             return model;
         }
 
-        public SagaBuilder<TSagaState> During<TState>()
+        public ISagaBuilderDuringState<TSagaState> During<TState>()
             where TState : IState
         {
             currentState = typeof(TState).Name;
@@ -52,7 +55,7 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public SagaBuilder<TSagaState> Start<TEvent>()
+        public ISagaBuilderState<TSagaState> Start<TEvent>()
             where TEvent : IEvent
         {
             currentState = null;
@@ -65,7 +68,7 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public SagaBuilder<TSagaState> Start<TEvent, TEventHandler>()
+        public ISagaBuilderState<TSagaState> Start<TEvent, TEventHandler>()
             where TEvent : IEvent
             where TEventHandler : IEventHandler<TSagaState, TEvent>
         {
@@ -85,14 +88,14 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public SagaBuilder<TSagaState> Then<TSagaActivity>()
+        public ISagaBuilderState<TSagaState> Then<TSagaActivity>()
             where TSagaActivity : ISagaActivity<TSagaState>
         {
             return Then<TSagaActivity>(
                 $"{currentState}_{nameof(Then)}_{typeof(TSagaActivity).Name}");
         }
 
-        public SagaBuilder<TSagaState> Then<TSagaActivity>(String stepName) where TSagaActivity : ISagaActivity<TSagaState>
+        public ISagaBuilderState<TSagaState> Then<TSagaActivity>(String stepName) where TSagaActivity : ISagaActivity<TSagaState>
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
                 new SagaStepForActivity<TSagaState, TSagaActivity>(
@@ -102,13 +105,13 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public SagaBuilder<TSagaState> Then(ThenActionDelegate<TSagaState> action)
+        public ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action)
         {
             return Then(
                 $"{currentState}_{nameof(Then)}_action", action);
         }
 
-        public SagaBuilder<TSagaState> Then(String stepName, ThenActionDelegate<TSagaState> action)
+        public ISagaBuilderState<TSagaState> Then(String stepName, ThenActionDelegate<TSagaState> action)
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaState>(
@@ -118,7 +121,7 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public SagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState
+        public ISagaBuilderState<TSagaState> TransitionTo<TState>() where TState : IState
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaState>(
@@ -131,7 +134,7 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public SagaBuilder<TSagaState> When<TEvent>() where TEvent : IEvent
+        public ISagaBuilderState<TSagaState> When<TEvent>() where TEvent : IEvent
         {
             currentEvent = typeof(TEvent);
             model.Actions.Add(new SagaAction<TSagaState>()
@@ -142,7 +145,7 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public SagaBuilder<TSagaState> When<TEvent, TEventHandler>() where TEvent : IEvent
+        public ISagaBuilderState<TSagaState> When<TEvent, TEventHandler>() where TEvent : IEvent
             where TEventHandler : IEventHandler<TSagaState, TEvent>
         {
             currentEvent = typeof(TEvent);

@@ -6,6 +6,6 @@ namespace TheSaga.Interfaces
 {
     public interface ISagaModelDefintion<TSagaState> where TSagaState : ISagaState
     {
-        SagaModel<TSagaState> GetModel(IServiceProvider serviceProvider);
+        ISagaModel<TSagaState> GetModel(IServiceProvider serviceProvider);
     }
 }

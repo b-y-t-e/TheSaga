@@ -9,19 +9,30 @@ namespace TheSaga.Builders
 {
     public interface ISagaBuilder<TSagaState> where TSagaState : ISagaState
     {
-        SagaBuilder<TSagaState> After(TimeSpan time);
-        SagaModel<TSagaState> Build();
-        SagaBuilder<TSagaState> During<TState>() where TState : IState;
-        SagaBuilder<TSagaState> Start<TEvent>() where TEvent : IEvent;
-        SagaBuilder<TSagaState> Start<TEvent, TEventHandler>() where TEvent : IEvent
+        ISagaBuilderDuringState<TSagaState> During<TState>() where TState : IState;
+        ISagaBuilderState<TSagaState> Start<TEvent>() where TEvent : IEvent;
+        ISagaBuilderState<TSagaState> Start<TEvent, TEventHandler>() where TEvent : IEvent
            where TEventHandler : IEventHandler<TSagaState, TEvent>;
-        SagaBuilder<TSagaState> Then( ThenActionDelegate<TSagaState> action);
-        SagaBuilder<TSagaState> Then(string stepName, ThenActionDelegate<TSagaState> action);
-        SagaBuilder<TSagaState> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;
-        SagaBuilder<TSagaState> Then<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaState>;
-        SagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState;
-        SagaBuilder<TSagaState> When<TEvent>() where TEvent : IEvent;
-        SagaBuilder<TSagaState> When<TEvent, TEventHandler>() where TEvent : IEvent
+        ISagaModel<TSagaState> Build();
+    }
+
+    public interface ISagaBuilderState<TSagaState> 
+        where TSagaState : ISagaState
+    {
+        ISagaBuilderState<TSagaState> After(TimeSpan time);
+        ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action);
+        ISagaBuilderState<TSagaState> Then(string stepName, ThenActionDelegate<TSagaState> action);
+        ISagaBuilderState<TSagaState> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;
+        ISagaBuilderState<TSagaState> Then<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaState>;
+        ISagaModel<TSagaState> Build();
+        ISagaBuilderState<TSagaState> TransitionTo<TState>() where TState : IState;
+    }
+
+    public interface ISagaBuilderDuringState<TSagaState> : ISagaBuilderState<TSagaState> 
+        where TSagaState : ISagaState
+    {
+        ISagaBuilderState<TSagaState> When<TEvent>() where TEvent : IEvent;
+        ISagaBuilderState<TSagaState> When<TEvent, TEventHandler>() where TEvent : IEvent
            where TEventHandler : IEventHandler<TSagaState, TEvent>;
     }
 }
