@@ -9,12 +9,14 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga.Activities
     {
         public Task Compensate(IInstanceContext<OrderState> context)
         {
-            throw new NotImplementedException();
+            context.State.Logi.Add($"{nameof(WyslijWiadomoscDoKierownika)} compensation");
+            return Task.CompletedTask;
         }
 
         public Task Execute(IInstanceContext<OrderState> context)
         {
-            throw new NotImplementedException();
+            context.State.Logi.Add($"{nameof(WyslijWiadomoscDoKierownika)}");
+            return Task.CompletedTask;
         }
     }
 }

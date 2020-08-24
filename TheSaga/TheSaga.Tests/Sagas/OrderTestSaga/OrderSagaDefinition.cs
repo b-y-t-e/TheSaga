@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using TheSaga.Builders;
 using TheSaga.Interfaces;
 using TheSaga.Models;
@@ -19,12 +20,13 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga
 
             builder.
                 Start<Utworzone>().
-                Then(async ctx => { }).
+                Then(async ctx => { ctx.State.Logi.Add(nameof(Utworzone)); }).
                 TransitionTo<Nowe>();
 
             builder.
                 During<Nowe>().
                 When<Skompletowano>().
+                Then(async ctx => { ctx.State.Logi.Add(nameof(Skompletowano)); }).
                 Then<WyslijEmailDoKlienta>("email").
                 Then<WyslijWiadomoscDoKierownika>().
                 Then<ZamowKuriera>().
@@ -33,19 +35,20 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga
             builder.
                 During<Skompletowane>().
                 When<Wyslano>().
-                Then(async ctx => { }).
+                Then(async ctx => { ctx.State.Logi.Add(nameof(Wyslano)); }).
                 TransitionTo<Wyslane>();
 
             builder.
                 During<Wyslane>().
                 When<Dostarczono>().
-                Then(async ctx => { }).
+                Then(async ctx => { ctx.State.Logi.Add(nameof(Dostarczono)); }).
                 TransitionTo<Zakonczono>();
 
             builder.
                 During<Wyslane>().
+                Then(async ctx => { ctx.State.Logi.Add(nameof(Wyslane)); }).
                 After(TimeSpan.FromDays(30)).
-                Then(async ctx => { }).
+                Then(async ctx => { ctx.State.Logi.Add(nameof(builder.After)); }).
                 TransitionTo<Zakonczono>();
 
             return builder.

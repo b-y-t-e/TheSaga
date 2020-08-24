@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TheSaga.States;
 
 namespace TheSaga.Tests.Sagas.OrderTestSaga
@@ -9,5 +10,10 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga
         public string CurrentState { get; set; }
         public string CurrentStep { get; set; }
         public bool IsCompensating { get; set; }
+        public List<String> Logi { get; set; }
+        public OrderState()
+        {
+            Logi = new List<string>();
+        }
     }
 }

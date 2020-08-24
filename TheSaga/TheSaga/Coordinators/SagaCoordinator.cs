@@ -20,7 +20,7 @@ namespace TheSaga.Coordinators
             // this.sagaExecutor = sagaExecutor;
         }
 
-        public async Task<ISagaState> Process(IEvent @event)
+        public async Task<ISagaState> Send(IEvent @event)
         {
             Type eventType = @event.GetType();
 

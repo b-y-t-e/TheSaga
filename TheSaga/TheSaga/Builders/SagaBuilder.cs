@@ -28,7 +28,7 @@ namespace TheSaga.Builders
         public SagaBuilder<TSagaState> After(TimeSpan time)
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
-                new SagaStep<TSagaState>(
+                new SagaStepInlineAction<TSagaState>(
                     $"{currentState}_{nameof(After)}",
                     ctx => Task.Delay(time)));
 
@@ -61,40 +61,32 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public SagaBuilder<TSagaState> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>
+        public SagaBuilder<TSagaState> Then<TSagaActivity>()
+            where TSagaActivity : ISagaActivity<TSagaState>
         {
-            model.FindAction(currentState, currentEvent).Steps.Add(
-                new SagaStep<TSagaState>(
-                    $"{currentState}_{nameof(Then)}",
-                    typeof(TSagaActivity)));
-
-            return this;
+            return Then<TSagaActivity>(
+                $"{currentState}_{nameof(Then)}_{typeof(TSagaActivity).Name}");
         }
 
         public SagaBuilder<TSagaState> Then<TSagaActivity>(String stepName) where TSagaActivity : ISagaActivity<TSagaState>
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
-                new SagaStep<TSagaState>(
-                    stepName,
-                    typeof(TSagaActivity)));
+                new SagaStepActivity<TSagaState, TSagaActivity>(
+                    stepName));
 
             return this;
         }
 
         public SagaBuilder<TSagaState> Then(ThenActionDelegate<TSagaState> action)
         {
-            model.FindAction(currentState, currentEvent).Steps.Add(
-                new SagaStep<TSagaState>(
-                    $"{currentState}_{nameof(Then)}",
-                    (ctx) => action((IInstanceContext<TSagaState>)ctx)));
-
-            return this;
+            return Then(
+                $"{currentState}_{nameof(Then)}_action", action);
         }
 
         public SagaBuilder<TSagaState> Then(String stepName, ThenActionDelegate<TSagaState> action)
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
-                new SagaStep<TSagaState>(
+                new SagaStepInlineAction<TSagaState>(
                     stepName,
                     action));
 
@@ -104,7 +96,7 @@ namespace TheSaga.Builders
         public SagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
-                new SagaStep<TSagaState>(
+                new SagaStepInlineAction<TSagaState>(
                     $"{currentState}_{nameof(TransitionTo)}_{typeof(TState).Name}",
                     ctx =>
                     {
@@ -135,9 +127,8 @@ namespace TheSaga.Builders
                 Event = currentEvent,
                 Steps = new List<ISagaStep>
                 {
-                    new SagaStep<TSagaState>(
-                        $"{currentState}_{nameof(When)}_{typeof(TEvent).Name}",
-                        typeof(TEventHandler))
+                    new SagaStepEventHandler<TSagaState, TEventHandler, TEvent>(
+                        $"{currentState}_{nameof(When)}_{typeof(TEvent).Name}")
                 }
             }); ;
             return this;

@@ -7,14 +7,14 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga.Activities
 {
     internal class WyslijEmailDoKlienta : ISagaActivity<OrderState>
     {
-        public Task Compensate(IInstanceContext<OrderState> context)
+        public async Task Compensate(IInstanceContext<OrderState> context)
         {
-            throw new NotImplementedException();
+            context.State.Logi.Add($"{nameof(WyslijEmailDoKlienta)} compensation");
         }
 
-        public Task Execute(IInstanceContext<OrderState> context)
+        public async Task Execute(IInstanceContext<OrderState> context)
         {
-            throw new NotImplementedException();
+            context.State.Logi.Add(nameof(WyslijEmailDoKlienta));
         }
     }
 }

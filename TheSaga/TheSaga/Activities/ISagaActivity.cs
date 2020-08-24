@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TheSaga.Builders;
+using TheSaga.Interfaces;
 using TheSaga.States;
 
 namespace TheSaga.Activities
 {
     public interface ISagaActivity<TSagaState> 
-            where TSagaState : ISagaState
+        where TSagaState : ISagaState
     {
         Task Execute(IInstanceContext<TSagaState> context);
 
