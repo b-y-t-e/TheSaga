@@ -4,6 +4,9 @@ using System.Text;
 using TheSaga.Builders;
 using TheSaga.Interfaces;
 using TheSaga.Models;
+using TheSaga.Tests.Sagas.OrderTestSaga.Activities;
+using TheSaga.Tests.Sagas.OrderTestSaga.Events;
+using TheSaga.Tests.Sagas.OrderTestSaga.States;
 
 namespace TheSaga.Tests.Sagas.OrderTestSaga
 {

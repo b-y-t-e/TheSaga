@@ -47,8 +47,10 @@ namespace TheSaga.Executors
         public async Task<ISagaState> ExecuteStep(Guid correlationID, ISagaModel model, IEvent @event)
         {
             ISagaState state = await sagaPersistance.Get(correlationID);
+            if (state == null)
+                throw new Exception($"Saga with correlationID {correlationID} not found!");
 
-            IList<ISagaAction> actions = model.FindActions(state.CurrentState);
+            IList <ISagaAction> actions = model.FindActions(state.CurrentState);
             ISagaAction action = actions.FirstOrDefault(a => a.Event == @event.GetType());
             ISagaStep step = action.FindStep(state.CurrentStep);
 

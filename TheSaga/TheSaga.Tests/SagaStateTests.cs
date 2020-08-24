@@ -15,6 +15,8 @@ using Xunit.Sdk;
 using TheSaga.Tests.Sagas.OrderTestSaga;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using TheSaga.Tests.Sagas.OrderTestSaga.Events;
+using TheSaga.Tests.Sagas.OrderTestSaga.States;
 
 namespace TheSaga.Tests
 {
@@ -22,9 +24,8 @@ namespace TheSaga.Tests
     {
         IServiceProvider serviceProvider;
 
-
         [Fact]
-        public async Task WHEN_startEventIsProcessed_THEN_sagaShouldBeCreated()
+        public async Task WHEN_startEvent_THEN_sagaShouldBeCreated()
         {
             // given
             ISagaCoordinator sagaCoordinator = serviceProvider.
@@ -48,6 +49,43 @@ namespace TheSaga.Tests
             // then
             var persistedState = await sagaPersistance.Get(sagaState.CorrelationID);
             persistedState.ShouldNotBeNull();
+            persistedState.CurrentStep.ShouldBe(null);
+            persistedState.CurrentState.ShouldBe(nameof(Nowe));
+            persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
+        }
+
+
+        [Fact]
+        public async Task WHEN_invalidEvent_THEN_sagaShouldIgnoreThatEvent()
+        {
+            // given
+            ISagaCoordinator sagaCoordinator = serviceProvider.
+                GetRequiredService<ISagaCoordinator>();
+
+            ISagaRegistrator sagaRegistrator = serviceProvider.
+                GetRequiredService<ISagaRegistrator>();
+
+            ISagaPersistance sagaPersistance = serviceProvider.
+                GetRequiredService<ISagaPersistance>();
+
+            sagaRegistrator.Register(
+                new OrderSagaDefinition().GetModel());
+
+            var newSataState = await sagaCoordinator.
+                Process(new Utworzone());
+
+            IEvent invalidEvent = new Wyslano()
+            {
+                CorrelationID = newSataState.CorrelationID
+            };
+
+            // when
+            ISagaState sagaState = await sagaCoordinator.
+                Process(invalidEvent);
+
+            // then
+            var persistedState = await sagaPersistance.Get(sagaState.CorrelationID);
+            persistedState.ShouldNotBeNull();
             persistedState.CurrentState.ShouldBe(nameof(Nowe));
             persistedState.CurrentStep.ShouldBe(null);
         }
@@ -58,7 +96,7 @@ namespace TheSaga.Tests
             IServiceCollection services = new ServiceCollection();
             services.AddScoped<ISagaPersistance, InMemorySagaPersistance>();
             services.AddScoped<ISagaRegistrator, SagaRegistrator>();
-            services.AddTransient<ISagaCoordinator, SagaCoordinator>();
+            services.AddScoped<ISagaCoordinator, SagaCoordinator>();
             serviceProvider = services.BuildServiceProvider();
         }
     }

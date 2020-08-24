@@ -1,7 +1,7 @@
 ﻿using System;
 using TheSaga.Interfaces;
 
-namespace TheSaga.Tests.Sagas.OrderTestSaga
+namespace TheSaga.Tests.Sagas.OrderTestSaga.Events
 {
     public class Dostarczono : IEvent
     {

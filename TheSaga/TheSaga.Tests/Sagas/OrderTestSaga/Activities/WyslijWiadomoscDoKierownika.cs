@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.Builders;
 
-namespace TheSaga.Tests.Sagas.OrderTestSaga
+namespace TheSaga.Tests.Sagas.OrderTestSaga.Activities
 {
     internal class WyslijWiadomoscDoKierownika : ISagaActivity<OrderState>
     {
