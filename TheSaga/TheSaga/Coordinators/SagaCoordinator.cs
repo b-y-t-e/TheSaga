@@ -6,6 +6,7 @@ using TheSaga.Models;
 using TheSaga.Registrator;
 using TheSaga.Persistance;
 using TheSaga.States;
+using TheSaga.Exceptions;
 
 namespace TheSaga.Coordinators
 {
@@ -25,7 +26,7 @@ namespace TheSaga.Coordinators
 
             ISagaModel model = sagaRegistrator.FindModelForEventType(eventType);
             if (model == null)
-                throw new Exception($"Event of type {eventType.Name} is not registered");
+                throw new SagaEventNotRegisteredException(eventType);
 
             ISagaExecutor sagaExecutor = sagaRegistrator.
                 FindExecutorForStateType(model.SagaStateType);

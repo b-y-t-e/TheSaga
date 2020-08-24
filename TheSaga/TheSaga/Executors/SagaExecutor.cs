@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TheSaga.Builders;
+using TheSaga.Exceptions;
 using TheSaga.Interfaces;
 using TheSaga.Models;
 using TheSaga.Persistance;
@@ -46,12 +47,18 @@ namespace TheSaga.Executors
 
         public async Task<ISagaState> ExecuteStep(Guid correlationID, ISagaModel model, IEvent @event)
         {
+            Type eventType = @event == null ? null : @event.GetType();
+
             ISagaState state = await sagaPersistance.Get(correlationID);
             if (state == null)
-                throw new Exception($"Saga with correlationID {correlationID} not found!");
+                throw new SagaInstanceNotFoundException(model.SagaStateType, correlationID);
 
-            IList <ISagaAction> actions = model.FindActions(state.CurrentState);
-            ISagaAction action = actions.FirstOrDefault(a => a.Event == @event.GetType());
+            IList<ISagaAction> actions = model.FindActions(state.CurrentState);
+            ISagaAction action = actions.FirstOrDefault(a => a.Event == eventType);
+
+            if (action == null)
+                throw new SagaInvalidEventForStateException(state.CurrentState, eventType);
+
             ISagaStep step = action.FindStep(state.CurrentStep);
 
             try

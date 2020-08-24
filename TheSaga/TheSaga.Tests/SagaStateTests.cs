@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using TheSaga.Tests.Sagas.OrderTestSaga.Events;
 using TheSaga.Tests.Sagas.OrderTestSaga.States;
+using TheSaga.Exceptions;
 
 namespace TheSaga.Tests
 {
@@ -79,12 +80,15 @@ namespace TheSaga.Tests
                 CorrelationID = newSataState.CorrelationID
             };
 
-            // when
-            ISagaState sagaState = await sagaCoordinator.
-                Process(invalidEvent);
+            // then
+            await Assert.ThrowsAsync<SagaInvalidEventForStateException>(() =>
+                // when
+                sagaCoordinator.
+                    Process(invalidEvent)
+            );
 
             // then
-            var persistedState = await sagaPersistance.Get(sagaState.CorrelationID);
+            var persistedState = await sagaPersistance.Get(newSataState.CorrelationID);
             persistedState.ShouldNotBeNull();
             persistedState.CurrentState.ShouldBe(nameof(Nowe));
             persistedState.CurrentStep.ShouldBe(null);
