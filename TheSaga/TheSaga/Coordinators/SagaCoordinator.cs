@@ -19,7 +19,7 @@ namespace TheSaga.Coordinators
             // this.sagaExecutor = sagaExecutor;
         }
 
-        public async Task<ISagaState> Send(IEvent @event)
+        public async Task<ISagaState> Process(IEvent @event)
         {
             Type eventType = @event.GetType();
 
@@ -33,11 +33,13 @@ namespace TheSaga.Coordinators
             bool isStartEvent = model.IsStartEvent(eventType);
             if (isStartEvent)
             {
-                return await sagaExecutor.Start(model, @event);
+                return await sagaExecutor.
+                    Start(model, @event);
             }
             else
             {
-                return await sagaExecutor.Handle(model, @event);
+                return await sagaExecutor.
+                    Handle(@event.CorrelationID, model, @event);
             }
         }
 

@@ -31,14 +31,14 @@ namespace TheSaga.Executors
             newSagaState.CorrelationID = correlationID;
             await sagaPersistance.Set(newSagaState);
 
-            return await Handle(model, @event);
+            return await Handle(correlationID, model, @event);
         }
 
-        public async Task<ISagaState> Handle(ISagaModel model, IEvent @event)
+        public async Task<ISagaState> Handle(Guid correlationID, ISagaModel model, IEvent @event)
         {
             while (true)
             {
-                ISagaState sagaState = await ExecuteStep(@event.CorrelationID, model, @event);
+                ISagaState sagaState = await ExecuteStep(correlationID, model, @event);
                 if (sagaState.CurrentStep == null)
                     return sagaState;
             }
