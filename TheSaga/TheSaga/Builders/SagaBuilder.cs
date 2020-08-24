@@ -121,7 +121,7 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public ISagaBuilderState<TSagaState> TransitionTo<TState>() where TState : IState
+        public ISagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaState>(

@@ -25,7 +25,7 @@ namespace TheSaga.Builders
         ISagaBuilderState<TSagaState> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;
         ISagaBuilderState<TSagaState> Then<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaState>;
         ISagaModel<TSagaState> Build();
-        ISagaBuilderState<TSagaState> TransitionTo<TState>() where TState : IState;
+        ISagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState;
     }
 
     public interface ISagaBuilderDuringState<TSagaState> : ISagaBuilderState<TSagaState> 

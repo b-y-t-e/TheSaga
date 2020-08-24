@@ -1,0 +1,8 @@
+﻿TODO:
+ + unikatowe nazwy pod-stanów
+ + obsługa kompensacji
+ + sqlserver persistance
+ + podpiecie sie do masstransit
+ 
+INNE:
+ + podpiecie sie do convey-api
