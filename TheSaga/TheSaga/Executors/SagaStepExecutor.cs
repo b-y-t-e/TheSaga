@@ -51,22 +51,23 @@ namespace TheSaga.Executors
         {
             try
             {
-                ISagaStep step = action.
+                ISagaStep sagaStep = action.
                     FindStep(state.CurrentStep);
                 
-                ISagaStep nextStep = action.
-                    FindNextAfter(step);
+                ISagaStep nextSagaStep = action.
+                    FindNextAfter(sagaStep);
 
                 IExecutionContext context = new ExecutionContext<TSagaState>()
                 {
                     State = (TSagaState)state
                 };
 
-                await step.Execute(context, @event);
+                await sagaStep.
+                    Run(context, @event);
 
-                if (nextStep != null)
+                if (nextSagaStep != null)
                 {
-                    state.CurrentStep = nextStep.StepName;
+                    state.CurrentStep = nextSagaStep.StepName;
                 }
                 else
                 {
@@ -74,6 +75,12 @@ namespace TheSaga.Executors
                 }
 
                 await sagaPersistance.Set(state);
+
+                if(sagaStep.Async)
+                {
+                    // zalowanie kolejnego kroku
+                    throw new NotImplementedException();
+                }
             }
             catch (Exception ex)
             {

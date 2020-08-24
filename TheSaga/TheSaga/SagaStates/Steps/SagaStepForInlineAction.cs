@@ -24,7 +24,7 @@ namespace TheSaga.States.Actions
             Async = async;
         }
 
-        public async Task Execute(IExecutionContext context, IEvent @event)
+        public async Task Run(IExecutionContext context, IEvent @event)
         {
             IInstanceContext<TSagaState> contextForAction =
                 (IInstanceContext<TSagaState>)context;
