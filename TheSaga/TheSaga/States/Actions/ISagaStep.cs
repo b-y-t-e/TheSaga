@@ -9,7 +9,5 @@ namespace TheSaga.States.Actions
         string StepName { get; }
 
         Task Execute(IInstanceContext context, IEvent @event);
-
-        Task Execute(IEventContext context, IEvent @event);
     }
 }

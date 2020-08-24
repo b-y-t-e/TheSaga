@@ -2,15 +2,18 @@
 using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.Builders;
+using TheSaga.Coordinators;
 using TheSaga.Tests.Sagas.OrderTestSaga.Events;
 
 namespace TheSaga.Tests.Sagas.OrderTestSaga.EventHandlers
 {
     public class UtworzoneHandler : IEventHandler<OrderState, Utworzone>
     {
-        public UtworzoneHandler()
-        {
+        private readonly ISagaCoordinator sagaCoordinator;
 
+        public UtworzoneHandler(ISagaCoordinator sagaCoordinator)
+        {
+            this.sagaCoordinator = sagaCoordinator;
         }
 
         public Task Compensate(IEventContext<OrderState, Utworzone> context)

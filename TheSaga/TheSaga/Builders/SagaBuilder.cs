@@ -12,24 +12,27 @@ using TheSaga.States.Actions;
 
 namespace TheSaga.Builders
 {
-    public class SagaBuilder<TSagaState> : ISagaBuilder<TSagaState> 
+    public class SagaBuilder<TSagaState> : ISagaBuilder<TSagaState>
         where TSagaState : ISagaState
     {
+        IServiceProvider serviceProvider;
+
         SagaModel<TSagaState> model;
 
         Type currentEvent;
 
         String currentState;
 
-        public SagaBuilder()
+        public SagaBuilder(IServiceProvider serviceProvider)
         {
             model = new SagaModel<TSagaState>();
+            this.serviceProvider = serviceProvider;
         }
 
         public SagaBuilder<TSagaState> After(TimeSpan time)
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
-                new SagaStepInlineAction<TSagaState>(
+                new SagaStepForInlineAction<TSagaState>(
                     $"{currentState}_{nameof(After)}",
                     ctx => Task.Delay(time)));
 
@@ -74,8 +77,9 @@ namespace TheSaga.Builders
                 Event = typeof(TEvent),
                 Steps = new List<ISagaStep>
                 {
-                    new SagaStepEventHandler<TSagaState, TEventHandler, TEvent>(
-                        $"{currentState}_{nameof(Start)}_{typeof(TEvent).Name}")
+                    new SagaStepForEventHandler<TSagaState, TEventHandler, TEvent>(
+                        $"{currentState}_{nameof(Start)}_{typeof(TEvent).Name}",
+                        serviceProvider)
                 }
             });
             return this;
@@ -91,8 +95,9 @@ namespace TheSaga.Builders
         public SagaBuilder<TSagaState> Then<TSagaActivity>(String stepName) where TSagaActivity : ISagaActivity<TSagaState>
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
-                new SagaStepActivity<TSagaState, TSagaActivity>(
-                    stepName));
+                new SagaStepForActivity<TSagaState, TSagaActivity>(
+                    stepName,
+                        serviceProvider));
 
             return this;
         }
@@ -106,7 +111,7 @@ namespace TheSaga.Builders
         public SagaBuilder<TSagaState> Then(String stepName, ThenActionDelegate<TSagaState> action)
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
-                new SagaStepInlineAction<TSagaState>(
+                new SagaStepForInlineAction<TSagaState>(
                     stepName,
                     action));
 
@@ -116,7 +121,7 @@ namespace TheSaga.Builders
         public SagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState
         {
             model.FindAction(currentState, currentEvent).Steps.Add(
-                new SagaStepInlineAction<TSagaState>(
+                new SagaStepForInlineAction<TSagaState>(
                     $"{currentState}_{nameof(TransitionTo)}_{typeof(TState).Name}",
                     ctx =>
                     {
@@ -147,10 +152,11 @@ namespace TheSaga.Builders
                 Event = currentEvent,
                 Steps = new List<ISagaStep>
                 {
-                    new SagaStepEventHandler<TSagaState, TEventHandler, TEvent>(
-                        $"{currentState}_{nameof(When)}_{typeof(TEvent).Name}")
+                    new SagaStepForEventHandler<TSagaState, TEventHandler, TEvent>(
+                        $"{currentState}_{nameof(When)}_{typeof(TEvent).Name}",
+                        serviceProvider)
                 }
-            }); 
+            });
             return this;
         }
     }

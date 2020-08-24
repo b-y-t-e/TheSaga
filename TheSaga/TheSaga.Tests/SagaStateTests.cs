@@ -54,7 +54,6 @@ namespace TheSaga.Tests
             persistedState.Logi.ShouldContain(nameof(Utworzone));
         }
 
-
         [Fact]
         public async Task WHEN_invalidEvent_THEN_sagaShouldIgnoreThatEvent()
         {
@@ -141,7 +140,7 @@ namespace TheSaga.Tests
                 GetRequiredService<ISagaRegistrator>();
 
             sagaRegistrator.Register(
-                new OrderSagaDefinition().GetModel());
+                new OrderSagaDefinition().GetModel(serviceProvider));
 
         }
     }

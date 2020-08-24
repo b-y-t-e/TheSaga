@@ -15,9 +15,9 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga
 
     public class OrderSagaDefinition : ISagaModelDefintion<OrderState>
     {
-        public SagaModel<OrderState> GetModel()
+        public SagaModel<OrderState> GetModel(IServiceProvider serviceProvider)
         {
-            ISagaBuilder<OrderState> builder = new SagaBuilder<OrderState>();
+            ISagaBuilder<OrderState> builder = new SagaBuilder<OrderState>(serviceProvider);
 
             builder.
                 Start<Utworzone, UtworzoneHandler>().

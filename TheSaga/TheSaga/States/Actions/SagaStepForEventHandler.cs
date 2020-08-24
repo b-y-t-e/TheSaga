@@ -9,16 +9,19 @@ using TheSaga.Interfaces;
 
 namespace TheSaga.States.Actions
 {
-    public class SagaStepEventHandler<TSagaState, TEventHandler, TEvent> : ISagaStep
+    public class SagaStepForEventHandler<TSagaState, TEventHandler, TEvent> : ISagaStep
         where TSagaState : ISagaState
         where TEventHandler : IEventHandler<TSagaState, TEvent>
         where TEvent : IEvent
     {
+        private readonly IServiceProvider serviceProvider;
+
         public String StepName { get; private set; }
 
-        public SagaStepEventHandler(String StepName)
+        public SagaStepForEventHandler(String StepName, IServiceProvider serviceProvider)
         {
             this.StepName = StepName;
+            this.serviceProvider = serviceProvider;
         }
 
         public async Task Execute(IInstanceContext context, IEvent @event)
@@ -31,17 +34,12 @@ namespace TheSaga.States.Actions
                 Event = (TEvent)@event,
                 State = contextForAction.State
             };
+            
+            TEventHandler activity = (TEventHandler)ActivatorUtilities.
+                CreateInstance(serviceProvider, typeof(TEventHandler));
 
-            // ActivatorUtilities.CreateInstance
-
-            TEventHandler activity = (TEventHandler)Activator.CreateInstance(typeof(TEventHandler));
             if (activity != null)
                 await activity.Execute(eventContext);
-        }
-
-        public Task Execute(IEventContext context, IEvent @event)
-        {
-            return Task.CompletedTask;
         }
     }
 

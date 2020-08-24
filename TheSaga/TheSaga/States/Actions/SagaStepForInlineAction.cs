@@ -8,14 +8,14 @@ using TheSaga.Interfaces;
 
 namespace TheSaga.States.Actions
 {
-    public class SagaStepInlineAction<TSagaState> : ISagaStep
+    public class SagaStepForInlineAction<TSagaState> : ISagaStep
         where TSagaState : ISagaState
     {
         public String StepName { get; private set; }
 
         public ThenActionDelegate<TSagaState> Action { get; private set; }
 
-        public SagaStepInlineAction(String StepName, ThenActionDelegate<TSagaState> Action)
+        public SagaStepForInlineAction(String StepName, ThenActionDelegate<TSagaState> Action)
         {
             this.StepName = StepName;
             this.Action = Action;
@@ -28,11 +28,6 @@ namespace TheSaga.States.Actions
 
             if (Action != null)            
                 await Action(contextForAction);            
-        }
-
-        public Task Execute(IEventContext context, IEvent @event)
-        {
-            return Task.CompletedTask;
         }
     }
 
