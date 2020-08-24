@@ -64,7 +64,7 @@ namespace TheSaga.Builders
         public ISagaBuilderState<TSagaState> Start<TEvent>()
             where TEvent : IEvent
         {
-            currentState = null;
+            currentState = SagaStartState.Name;
             currentEvent = typeof(TEvent);
             model.Actions.Add(new SagaAction<TSagaState>()
             {
@@ -78,7 +78,7 @@ namespace TheSaga.Builders
             where TEvent : IEvent
             where TEventHandler : IEventHandler<TSagaState, TEvent>
         {
-            currentState = null;
+            currentState = SagaStartState.Name;
             currentEvent = typeof(TEvent);
             model.Actions.Add(new SagaAction<TSagaState>()
             {
@@ -99,7 +99,7 @@ namespace TheSaga.Builders
             where TEvent : IEvent
             where TEventHandler : IEventHandler<TSagaState, TEvent>
         {
-            currentState = null;
+            currentState = SagaStartState.Name;
             currentEvent = typeof(TEvent);
             model.Actions.Add(new SagaAction<TSagaState>()
             {
@@ -248,6 +248,22 @@ namespace TheSaga.Builders
                         true)
                 }
             });
+            return this;
+        }
+
+        public ISagaBuilder<TSagaState> Finish()
+        {
+            model.FindAction(currentState, currentEvent).Steps.Add(
+                  new SagaStepForInlineAction<TSagaState>(
+                      uniqueNameGenerator.Generate(currentState, nameof(Finish)),
+                      ctx =>
+                      {
+                          ctx.State.CurrentState = SagaFinishState.Name;
+                          ctx.State.CurrentStep = null;
+                          ctx.State.IsCompensating = false;
+                          return Task.CompletedTask;
+                      },
+                      false));
             return this;
         }
     }

@@ -18,7 +18,7 @@ namespace TheSaga.Builders
         ISagaModel<TSagaState> Build();
     }
 
-    public interface ISagaBuilderState<TSagaState> 
+    public interface ISagaBuilderState<TSagaState>
         where TSagaState : ISagaState
     {
         ISagaBuilderState<TSagaState> After(TimeSpan time);
@@ -30,9 +30,10 @@ namespace TheSaga.Builders
         ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaState>;
         ISagaModel<TSagaState> Build();
         ISagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState;
+        ISagaBuilder<TSagaState> Finish();
     }
 
-    public interface ISagaBuilderDuringState<TSagaState> : ISagaBuilderState<TSagaState> 
+    public interface ISagaBuilderDuringState<TSagaState> : ISagaBuilderState<TSagaState>
         where TSagaState : ISagaState
     {
         ISagaBuilderState<TSagaState> When<TEvent>() where TEvent : IEvent;

@@ -22,21 +22,24 @@ namespace TheSaga.Executors
             this.sagaPersistance = sagaPersistance;
         }
 
-        public async Task<ISagaState> Start(ISagaModel model, IEvent @event)
-        {
-            Guid correlationID = @event.CorrelationID;
-            if (correlationID == Guid.Empty)
-                correlationID = Guid.NewGuid();
-
-            ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
-            newSagaState.CorrelationID = correlationID;
-            await sagaPersistance.Set(newSagaState);
-
-            return await Handle(correlationID, model, @event);
-        }
-
         public async Task<ISagaState> Handle(Guid correlationID, ISagaModel model, IEvent @event)
         {
+            Type eventType = @event.GetType();
+
+            bool isStartEvent = model.IsStartEvent(eventType);
+            if (isStartEvent)
+            {
+                if (correlationID == Guid.Empty)
+                    correlationID = Guid.NewGuid();
+
+                ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
+                newSagaState.CorrelationID = correlationID;
+                newSagaState.CurrentState = SagaStartState.Name;
+                newSagaState.CurrentStep = null;
+
+                await sagaPersistance.Set(newSagaState);
+            }
+
             while (true)
             {
                 ISagaState sagaState = await ExecuteStep(correlationID, model, @event);
