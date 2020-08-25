@@ -1,10 +1,10 @@
 ﻿TODO:
- + sprawdzanie unikatowosci nazw krokow
  + sqlserver persistance
  + podpiecie sie do masstransit
  + after
  
 DONE:
+ + sprawdzanie unikatowosci nazw krokow
  + historia kroków
  + obsługa kompensacji
  + startowy stan
