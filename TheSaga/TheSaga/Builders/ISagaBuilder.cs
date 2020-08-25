@@ -48,6 +48,10 @@ namespace TheSaga.Builders
 
         ISagaBuilderState<TSagaState> Then(string stepName, ThenActionDelegate<TSagaState> action);
 
+        ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation);
+
+        ISagaBuilderState<TSagaState> Then(string stepName, ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation);
+
         ISagaBuilderState<TSagaState> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;
 
         ISagaBuilderState<TSagaState> Then<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaState>;
@@ -55,6 +59,10 @@ namespace TheSaga.Builders
         ISagaBuilderState<TSagaState> ThenAsync(ThenActionDelegate<TSagaState> action);
 
         ISagaBuilderState<TSagaState> ThenAsync(string stepName, ThenActionDelegate<TSagaState> action);
+
+        ISagaBuilderState<TSagaState> ThenAsync(ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation);
+
+        ISagaBuilderState<TSagaState> ThenAsync(string stepName, ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation);
 
         ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;
 

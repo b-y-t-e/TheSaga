@@ -25,8 +25,4 @@
     <ProjectReference Include="..\TheSaga\TheSaga.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Sagas\AsyncSaga\States\" />
-  </ItemGroup>
-
 </Project>

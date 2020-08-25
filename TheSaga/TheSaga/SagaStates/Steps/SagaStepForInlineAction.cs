@@ -11,21 +11,28 @@ namespace TheSaga.SagaStates.Steps
     internal class SagaStepForInlineAction<TSagaState> : ISagaStep
             where TSagaState : ISagaState
     {
+        private ThenActionDelegate<TSagaState> compensation;
+
+        private ThenActionDelegate<TSagaState> action { get;  }
+        public bool Async { get; }
+        public String StepName { get; }
         public SagaStepForInlineAction(
-            String StepName, ThenActionDelegate<TSagaState> Action, Boolean async)
+            String stepName, ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation, Boolean async)
         {
-            this.StepName = StepName;
-            this.Action = Action;
+            this.StepName = stepName;
+            this.action = action;
+            this.compensation = compensation;
             Async = async;
         }
 
-        public ThenActionDelegate<TSagaState> Action { get; private set; }
-        public bool Async { get; }
-        public String StepName { get; private set; }
 
-        public Task Compensate(IExecutionContext context, IEvent @event)
+        public async Task Compensate(IExecutionContext context, IEvent @event)
         {
-            return Task.CompletedTask;
+            IExecutionContext<TSagaState> contextForAction =
+                (IExecutionContext<TSagaState>)context;
+
+            if (compensation != null)
+                await compensation(contextForAction);
         }
 
         public async Task Execute(IExecutionContext context, IEvent @event)
@@ -33,8 +40,8 @@ namespace TheSaga.SagaStates.Steps
             IExecutionContext<TSagaState> contextForAction =
                 (IExecutionContext<TSagaState>)context;
 
-            if (Action != null)
-                await Action(contextForAction);
+            if (action != null)
+                await action(contextForAction);
         }
     }
 }

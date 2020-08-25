@@ -34,24 +34,41 @@ namespace TheSaga.Execution
 
         public async Task<ISagaState> Handle(Guid correlationID, IEvent @event, Boolean @async)
         {
-            Type eventType = @event == null ?
-                null : @event.GetType();
-
-            if (eventType != null)
+            Boolean newSagaCreated = false;
+            try
             {
-                bool isStartEvent = model.IsStartEvent(eventType);
-                if (isStartEvent)
-                    correlationID = await CreateNewSaga(correlationID);
+                Type eventType = @event == null ?
+                    null : @event.GetType();
+
+                if (eventType != null)
+                {
+                    bool isStartEvent = model.IsStartEvent(eventType);
+                    if (isStartEvent)
+                    {
+                        correlationID = await CreateNewSaga(correlationID);
+                        newSagaCreated = true;
+                    }
+                }
+
+                SagaStepExecutor<TSagaState> stepExecutor =
+                    new SagaStepExecutor<TSagaState>(correlationID, async, @event, model, internalMessageBus, sagaPersistance);
+
+                StepExecutionResult stepExecutionResult = await stepExecutor.ExecuteStep();
+                if (stepExecutionResult.Async || stepExecutionResult.State?.CurrentStep == null)
+                    return stepExecutionResult.State;
+
+                return await Handle(correlationID, null, @async);
             }
+            catch
+            {
+                if (newSagaCreated)
+                {
+                    await sagaPersistance.
+                        Remove(correlationID);
+                }
 
-            SagaStepExecutor<TSagaState> stepExecutor =
-                new SagaStepExecutor<TSagaState>(correlationID, async, @event, model, internalMessageBus, sagaPersistance);
-
-            StepExecutionResult stepExecutionResult = await stepExecutor.ExecuteStep();
-            if (stepExecutionResult.Async || stepExecutionResult.State?.CurrentStep == null)
-                return stepExecutionResult.State;
-
-            return await Handle(correlationID, null, @async);
+                throw;
+            }
         }
 
         private async Task<Guid> CreateNewSaga(Guid correlationID)

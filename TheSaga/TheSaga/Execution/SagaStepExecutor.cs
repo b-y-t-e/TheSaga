@@ -169,54 +169,45 @@ namespace TheSaga.Execution
                     await sagaStep.
                         Execute(context, @event);
                 }
-
-                if (nextSagaStep != null)
-                {
-                    state.CurrentStep = nextSagaStep.StepName;
-                }
-                else
-                {
-                    state.IsCompensating = false;
-                    state.CurrentStep = null;
-                }
-
-                await sagaPersistance.
-                    Set(state);
-
-                if (prevState != state.CurrentState)
-                {
-                    internalMessageBus.Publish(
-                        new SagaStateChangedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
-                }
-
-                internalMessageBus.Publish(
-                    new SagaStepChangedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
-
-                if (@async)
-                {
-                    internalMessageBus.Publish(
-                        new SagaStepCompletedAsyncMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
-                }
             }
             catch (Exception ex)
             {
-                if (!state.IsCompensating)
-                {
-                    state.IsCompensating = true;
+                Console.WriteLine(ex.Message);
+                state.IsCompensating = true;
+                state.CurrentError = ex.Message;
+            }
 
-                    await sagaPersistance.
-                        Set(state);
+            if (nextSagaStep != null)
+            {
+                state.CurrentStep = nextSagaStep.StepName;
+            }
+            else
+            {
+                state.IsCompensating = false;
+                state.CurrentStep = null;
+            }
 
-                    internalMessageBus.Publish(
-                        new SagaStepCompletedAsyncMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
-                }
-                else
-                {
-                    Console.WriteLine(ex.Message);
+            await sagaPersistance.
+                Set(state);
 
-                    internalMessageBus.Publish(
-                        new SagaStepCompletedAsyncMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
-                }
+            if (prevState != state.CurrentState)
+            {
+                internalMessageBus.Publish(
+                    new SagaStateChangedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
+            }
+
+            internalMessageBus.Publish(
+                new SagaStepChangedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
+
+            if (@async)
+            {
+                internalMessageBus.Publish(
+                    new SagaStepCompletedAsyncMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
+            }
+            else
+            {
+                if (state.CurrentStep == null && !string.IsNullOrEmpty(state.CurrentError))
+                    throw new SagaStepException(state.CorrelationID, state.CurrentState, state.CurrentError);
             }
         }
     }

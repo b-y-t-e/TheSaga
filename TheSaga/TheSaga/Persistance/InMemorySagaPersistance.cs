@@ -19,7 +19,15 @@ namespace TheSaga.Persistance
         {
             string instance = null;
             instances.TryGetValue(correlationID, out instance);
+            if (instance == null)
+                return null;
             return (ISagaState)JsonConvert.DeserializeObject(instance, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All });
+        }
+
+        public Task Remove(Guid correlationID)
+        {
+            instances.Remove(correlationID);
+            return Task.CompletedTask;
         }
 
         public async Task Set(ISagaState sagaState)

@@ -1,4 +1,6 @@
 ﻿TODO:
+ + blad w kompensacji
+ + serializacja błędów
  + obsługa kompensacji
  + historia kroków
  + sqlserver persistance
