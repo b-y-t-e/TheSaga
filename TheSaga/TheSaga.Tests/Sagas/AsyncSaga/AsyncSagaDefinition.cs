@@ -18,12 +18,12 @@ namespace TheSaga.Tests.Sagas.AsyncSaga
                 ThenAsync(ctx =>
                 {
                     ctx.State.Logs.Add("1");
-                    return Task.Delay(TimeSpan.FromSeconds(3));
+                    return Task.Delay(TimeSpan.FromSeconds(1));
                 }).
                 ThenAsync(ctx =>
                 {
                     ctx.State.Logs.Add("2");
-                    return Task.Delay(TimeSpan.FromSeconds(3));
+                    return Task.Delay(TimeSpan.FromSeconds(1));
                 }).
                 Finish();
 

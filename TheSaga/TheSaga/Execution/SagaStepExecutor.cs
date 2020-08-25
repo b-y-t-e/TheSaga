@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TheSaga.Events;
+using TheSaga.Exceptions;
 using TheSaga.Execution.Context;
 using TheSaga.Messages;
 using TheSaga.Messages.MessageBus;
+using TheSaga.Models;
 using TheSaga.Persistance;
 using TheSaga.SagaStates;
 using TheSaga.SagaStates.Actions;
@@ -16,29 +20,84 @@ namespace TheSaga.Execution
     {
         private IEvent @event;
         private ISagaAction action;
+        private Guid correlationID;
         private IInternalMessageBus internalMessageBus;
+        private ISagaModel<TSagaState> model;
         private ISagaPersistance sagaPersistance;
         private ISagaState state;
 
         public SagaStepExecutor(
-            IInternalMessageBus internalMessageBus,
-            ISagaPersistance sagaPersistance,
+            Guid correlationID,
             IEvent @event,
-            ISagaState state,
-            ISagaAction action)
+            ISagaModel<TSagaState> model,
+            IInternalMessageBus internalMessageBus,
+            ISagaPersistance sagaPersistance)
         {
+            this.correlationID = correlationID;
+            this.@event = @event;
+            this.model = model;
             this.internalMessageBus = internalMessageBus;
             this.sagaPersistance = sagaPersistance;
-            this.@event = @event;
-            this.state = state;
-            this.action = action;
         }
 
-        public async Task<bool> Run()
+        internal async Task<StepExecutionResult> ExecuteStep()
         {
+            Type eventType = @event == null ?
+                null : @event.GetType();
+
+            this.state = await sagaPersistance.
+                Get(correlationID);
+
+            if (state == null)
+                throw new SagaInstanceNotFoundException(model.SagaStateType, correlationID);
+
+            IList<ISagaAction> actions = model.
+                FindActions(state.CurrentState);
+
+            this.action = null;
+
+            if (eventType != null)
+            {
+                action = actions.
+                    FirstOrDefault(a => a.Event == eventType);
+
+                if (action == null)
+                    throw new SagaInvalidEventForStateException(state.CurrentState, eventType);
+
+                if (state.CurrentStep != null)
+                    throw new SagaIsBusyHandlingStepException(state.CorrelationID, state.CurrentState, state.CurrentStep);
+
+                state.CurrentStep = action.Steps.First().StepName;
+
+                await sagaPersistance.
+                    Set(state);
+            }
+            else
+            {
+                action = actions.
+                    FirstOrDefault(a => a.FindStep(state.CurrentStep) != null);
+
+                if (action == null)
+                    throw new SagaStepNotRegisteredException(state.CurrentState, state.CurrentStep);
+            }
+
             ISagaStep step = action.
                 FindStep(state.CurrentStep);
 
+            if (step == null)
+                throw new SagaStepNotRegisteredException(state.CurrentState, state.CurrentStep);
+
+            bool async = await runStep(step);
+
+            return new StepExecutionResult()
+            {
+                State = state,
+                Async = async
+            };
+        }
+
+        private async Task<bool> runStep(ISagaStep step)
+        {
             if (step.Async)
             {
                 RunStepAsync();
@@ -107,5 +166,11 @@ namespace TheSaga.Execution
                 throw;
             }
         }
+    }
+    internal class StepExecutionResult
+    {
+        internal bool Async;
+
+        internal ISagaState State;
     }
 }

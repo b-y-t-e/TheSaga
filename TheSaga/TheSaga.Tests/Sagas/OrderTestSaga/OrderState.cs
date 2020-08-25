@@ -16,5 +16,6 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga
         public string CurrentStep { get; set; }
         public bool IsCompensating { get; set; }
         public List<String> Logs { get; set; }
+        public string CurrentError { get; set; }
     }
 }
