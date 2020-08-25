@@ -14,15 +14,13 @@ namespace TheSaga.Tests.Sagas.AsyncAndValid
             ISagaBuilder<AsyncState> builder = new SagaBuilder<AsyncState>(serviceProvider);
 
             builder.
-                Start<CreatedEvent, CreatedEventHandler>().
-                ThenAsync(ctx =>
+                Start<CreatedEvent, CreatedEventHandler>("CreatedEventStep0").
+                ThenAsync("CreatedEventStep1", ctx =>
                 {
-                    ctx.State.Logs.Add("1");
                     return Task.Delay(TimeSpan.FromSeconds(1));
                 }).
-                Then(ctx =>
+                Then("CreatedEventStep2", ctx =>
                 {
-                    ctx.State.Logs.Add("2");
                     return Task.Delay(TimeSpan.FromSeconds(1));
                 }).
                 Finish();

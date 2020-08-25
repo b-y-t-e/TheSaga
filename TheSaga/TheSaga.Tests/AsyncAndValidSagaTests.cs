@@ -32,11 +32,11 @@ namespace TheSaga.Tests
                 Get(sagaState.CorrelationID);
 
             persistedState.ShouldNotBeNull();
-            persistedState.CurrentStep.ShouldStartWith(new SagaStartState().Name);
+            persistedState.CurrentStep.ShouldStartWith("CreatedEventStep");
             persistedState.CurrentState.ShouldBe(new SagaStartState().Name);
             persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
-            persistedState.Logs.ShouldContain(nameof(CreatedEventHandler));
-            persistedState.Logs.Count.ShouldBe(1);
+            persistedState.History.ShouldContain(step => step.StepName == "CreatedEventStep0" && !step.IsCompensating);
+            persistedState.History.Count.ShouldBe(1);
         }
 
         [Fact]
@@ -60,8 +60,10 @@ namespace TheSaga.Tests
             persistedState.CurrentStep.ShouldBe(new SagaFinishState().Name);
             persistedState.CurrentState.ShouldBe(new SagaFinishState().Name);
             persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
-            persistedState.Logs.ShouldContain(nameof(CreatedEventHandler));
-            persistedState.Logs.Count.ShouldBe(3);
+            persistedState.History.ShouldContain(step => step.StepName == "CreatedEventStep0" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.History.ShouldContain(step => step.StepName == "CreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.History.ShouldContain(step => step.StepName == "CreatedEventStep2" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.History.Count.ShouldBe(4);
         }
 
         #region Arrange

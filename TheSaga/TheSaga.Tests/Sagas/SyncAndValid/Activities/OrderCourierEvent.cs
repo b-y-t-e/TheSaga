@@ -8,13 +8,11 @@ namespace TheSaga.Tests.Sagas.SyncAndValid.Activities
     {
         public Task Compensate(IExecutionContext<OrderState> context)
         {
-            context.State.Logs.Add($"{nameof(OrderCourierEvent)} compensation");
             return Task.CompletedTask;
         }
 
         public Task Execute(IExecutionContext<OrderState> context)
         {
-            context.State.Logs.Add($"{nameof(OrderCourierEvent)}");
             return Task.CompletedTask;
         }
     }

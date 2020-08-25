@@ -17,13 +17,11 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga.EventHandlers
 
         public Task Compensate(IEventContext<InvalidSagaState, ValidCreatedEvent> context)
         {
-            context.State.Logs.Add($"{nameof(ValidCreatedEventHandler)} compensation");
             return Task.CompletedTask;
         }
 
         public Task Execute(IEventContext<InvalidSagaState, ValidCreatedEvent> context)
         {
-            context.State.Logs.Add(nameof(ValidCreatedEventHandler));
             return Task.CompletedTask;
         }
     }

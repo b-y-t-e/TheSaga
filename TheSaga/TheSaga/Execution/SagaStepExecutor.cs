@@ -158,8 +158,8 @@ namespace TheSaga.Execution
             SagaStepLog stepLog = new SagaStepLog()
             {
                 Created = DateTime.Now,
-                State = state.CurrentState,
-                Step = state.CurrentStep,
+                StateName = state.CurrentState,
+                StepName = state.CurrentStep,
                 IsCompensating = state.IsCompensating,
                 Async = @async,
                 NextStepName = nextSagaStep == null ? null : nextSagaStep.StepName

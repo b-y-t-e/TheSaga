@@ -10,12 +10,12 @@ namespace TheSaga.Utils
         internal string Generate(params string[] names)
         {
             string baseName = String.Join("_", names);
-            string name = baseName;
             int index = 0;
+            string name = $"{baseName}_{index}";
             while (usedNames.Contains(name))
             {
                 index++;
-                name = $"{name}_{index}";
+                name = $"{baseName}_{index}";
             }
             usedNames.Add(name);
             return name;

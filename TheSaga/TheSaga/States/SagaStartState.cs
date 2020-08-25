@@ -2,6 +2,6 @@
 {
     public sealed class SagaStartState : IStateWithCustomName
     {
-        public string Name => "~";
+        public string Name => "@";
     }
 }

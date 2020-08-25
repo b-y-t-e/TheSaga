@@ -86,12 +86,24 @@ namespace TheSaga.Tests
             persistedState.CurrentState.ShouldBe(nameof(StateCreated));
             persistedState.CurrentError.ShouldNotBeNull();
             persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
-            persistedState.Logs.ShouldContain("execution3");
-            persistedState.Logs.ShouldContain("compensation3");
-            persistedState.Logs.ShouldContain("execution2");
-            persistedState.Logs.ShouldContain("compensation2");
-            persistedState.Logs.ShouldContain("execution1");
-            persistedState.Logs.ShouldContain("compensation1");
+
+            persistedState.History.ShouldContain(item =>
+                item.IsCompensating == true && item.StepName == "InvalidUpdateEvent1");
+
+            persistedState.History.ShouldContain(item =>
+                item.IsCompensating == false && item.StepName == "InvalidUpdateEvent1");
+
+            persistedState.History.ShouldContain(item =>
+                item.IsCompensating == true && item.StepName == "InvalidUpdateEvent2");
+
+            persistedState.History.ShouldContain(item =>
+                item.IsCompensating == false && item.StepName == "InvalidUpdateEvent2");
+
+            persistedState.History.ShouldContain(item =>
+                item.IsCompensating == true && item.StepName == "InvalidUpdateEvent3");
+
+            persistedState.History.ShouldContain(item =>
+                item.IsCompensating == false && item.StepName == "InvalidUpdateEvent3");
         }
 
         [Fact]
@@ -119,14 +131,25 @@ namespace TheSaga.Tests
             persistedState.CurrentState.ShouldBe(nameof(StateCreated));
             persistedState.CurrentError.ShouldNotBeNull();
             persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
-            persistedState.Logs.ShouldContain("execution3");
-            persistedState.Logs.ShouldContain("compensation3");
-            persistedState.Logs.ShouldContain("execution2");
-            persistedState.Logs.ShouldContain("compensation2");
-            persistedState.Logs.ShouldContain("execution1");
-            persistedState.Logs.ShouldContain("compensation1");
-        }
 
+            persistedState.History.ShouldContain(item =>
+                item.IsCompensating == true && item.StepName == "InvalidCompensationEventStep1");
+
+            persistedState.History.ShouldContain(item =>
+                item.IsCompensating == false && item.StepName == "InvalidCompensationEventStep1");
+
+            persistedState.History.ShouldContain(item =>
+                item.IsCompensating == true && item.StepName == "InvalidCompensationEventStep2");
+
+            persistedState.History.ShouldContain(item =>
+                item.IsCompensating == false && item.StepName == "InvalidCompensationEventStep2");
+
+            persistedState.History.ShouldContain(item =>
+                item.IsCompensating == true && item.StepName == "InvalidCompensationEventStep3");
+
+            persistedState.History.ShouldContain(item =>
+                item.IsCompensating == false && item.StepName == "InvalidCompensationEventStep3");            
+        }
 
         [Fact]
         public async Task WHEN_sendValidStateToSagaWithError_THEN_errorShouldBeNull()

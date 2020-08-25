@@ -1,4 +1,5 @@
 ﻿TODO:
+ + sprawdzanie  unikatowosci nazw krokow
  + historia kroków
  + sqlserver persistance
  + podpiecie sie do masstransit

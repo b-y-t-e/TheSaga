@@ -19,27 +19,13 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga
             builder.
                 Start<InvalidCreatedEvent, InvalidCreatedEventHandler>().
                 Then(
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("execution1");
-                        return Task.CompletedTask;
-                    },
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("compensation1");
-                        return Task.CompletedTask;
-                    }).
+                    "InvalidCreatedEvent1",
+                    ctx => Task.CompletedTask,
+                    ctx => Task.CompletedTask).
                Then(
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("execution2");
-                        throw new TestSagaException("error");
-                    },
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("compensation2");
-                        return Task.CompletedTask;
-                    }).
+                    "InvalidCreatedEvent2",
+                    ctx => throw new TestSagaException("error"),
+                    ctx => Task.CompletedTask).
                 Finish();
 
             builder.
@@ -50,76 +36,34 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga
                 During<StateCreated>().
                 When<InvalidUpdateEvent>().
                 Then(
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("execution1");
-                        return Task.CompletedTask;
-                    },
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("compensation1");
-                        return Task.CompletedTask;
-                    }).
+                    "InvalidUpdateEvent1",
+                    ctx => Task.CompletedTask,
+                    ctx => Task.CompletedTask).
                 Then(
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("execution2");
-                        return Task.CompletedTask;
-                    },
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("compensation2");
-                        return Task.CompletedTask;
-                    }).
+                    "InvalidUpdateEvent2",
+                    ctx => Task.CompletedTask,
+                    ctx => Task.CompletedTask).
                Then(
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("execution3");
-                        throw new TestSagaException("error");
-                    },
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("compensation3");
-                        return Task.CompletedTask;
-                    }).
+                    "InvalidUpdateEvent3",
+                    ctx => throw new TestSagaException("error"),
+                    ctx => Task.CompletedTask).
                 Finish();
 
             builder.
                 During<StateCreated>().
                 When<InvalidCompensationEvent>().
                 Then(
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("execution1");
-                        return Task.CompletedTask;
-                    },
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("compensation1");
-                        return Task.CompletedTask;
-                    }).
+                    "InvalidCompensationEventStep1",
+                    ctx => Task.CompletedTask,
+                    ctx => Task.CompletedTask).
                 Then(
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("execution2");
-                        return Task.CompletedTask;
-                    },
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("compensation2");
-                        return Task.CompletedTask;
-                    }).
-               Then(
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("execution3");
-                        throw new TestSagaException("error");
-                    },
-                    ctx =>
-                    {
-                        ctx.State.Logs.Add("compensation3");
-                        throw new TestCompensationException("compensation error");
-                    }).
+                    "InvalidCompensationEventStep2",
+                    ctx => Task.CompletedTask,
+                    ctx => Task.CompletedTask).
+                Then(
+                    "InvalidCompensationEventStep3",
+                    ctx => throw new TestSagaException("error"),
+                    ctx => throw new TestCompensationException("compensation error")).
                 Finish();
 
             builder.

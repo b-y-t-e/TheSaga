@@ -15,14 +15,14 @@ namespace TheSaga.SagaStates
 
     public class SagaStepLog
     {
-        public bool? HasSucceeded { get; internal set; }
-        public Exception Error { get; internal set; }
-        public string State { get; internal set; }
-        public string Step { get; internal set; }
-        public DateTime Created { get; internal set; }
-        public bool HasFinished { get; internal set; }
-        public string NextStepName { get; internal set; }
-        public bool IsCompensating { get; internal set; }
-        public bool Async { get; internal set; }
+        public bool HasSucceeded { get; set; }
+        public Exception Error { get; set; }
+        public string StateName { get; set; }
+        public string StepName { get; set; }
+        public DateTime Created { get; set; }
+        public bool HasFinished { get; set; }
+        public string NextStepName { get; set; }
+        public bool IsCompensating { get; set; }
+        public bool Async { get; set; }
     }
 }

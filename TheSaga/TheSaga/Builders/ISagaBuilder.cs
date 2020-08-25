@@ -21,6 +21,14 @@ namespace TheSaga.Builders
 
         ISagaBuilderState<TSagaState> StartAsync<TEvent, TEventHandler>() where TEvent : IEvent
            where TEventHandler : IEventHandler<TSagaState, TEvent>;
+
+        ISagaBuilderState<TSagaState> Start<TEvent>(string stepName) where TEvent : IEvent;
+
+        ISagaBuilderState<TSagaState> Start<TEvent, TEventHandler>(string stepName) where TEvent : IEvent
+           where TEventHandler : IEventHandler<TSagaState, TEvent>;
+
+        ISagaBuilderState<TSagaState> StartAsync<TEvent, TEventHandler>(string stepName) where TEvent : IEvent
+           where TEventHandler : IEventHandler<TSagaState, TEvent>;
     }
 
     public interface ISagaBuilderDuringState<TSagaState> : ISagaBuilderState<TSagaState>

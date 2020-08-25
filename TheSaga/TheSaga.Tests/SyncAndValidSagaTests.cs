@@ -45,8 +45,8 @@ namespace TheSaga.Tests
             persistedState.ShouldNotBeNull();
             persistedState.CurrentState.ShouldBe(nameof(StateCreated));
             persistedState.CurrentStep.ShouldBe(null);
-            persistedState.Logs.ShouldContain(nameof(OrderCreatedEvent));
-            persistedState.Logs.Count.ShouldBe(2);
+            persistedState.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.History.Count.ShouldBe(3);
         }
 
         [Fact]
@@ -72,13 +72,13 @@ namespace TheSaga.Tests
             persistedState.ShouldNotBeNull();
             persistedState.CurrentState.ShouldBe(nameof(StateCompleted));
             persistedState.CurrentStep.ShouldBe(null);
-            persistedState.Logs.ShouldContain(nameof(OrderCreatedEvent));
-            persistedState.Logs.ShouldContain(nameof(OrderCreatedEventHandler));
-            persistedState.Logs.ShouldContain(nameof(OrderCompletedEvent));
-            persistedState.Logs.ShouldContain(nameof(SendEmailToClientEvent));
-            persistedState.Logs.ShouldContain(nameof(SendMessageToTheManagerEvent));
-            persistedState.Logs.ShouldContain(nameof(OrderCourierEvent));
-            persistedState.Logs.Count.ShouldBe(6);
+            persistedState.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep0" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.History.ShouldContain(step => step.StepName == "OrderCompletedEventStep1" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.History.ShouldContain(step => step.StepName == "email" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.History.ShouldContain(step => step.StepName == "SendMessageToTheManagerEventStep" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.History.ShouldContain(step => step.StepName == "OrderCourierEventStep" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.History.Count.ShouldBe(9);
         }
 
         [Fact]
@@ -99,7 +99,7 @@ namespace TheSaga.Tests
             persistedState.CurrentStep.ShouldBe(null);
             persistedState.CurrentState.ShouldBe(nameof(StateCreated));
             persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
-            persistedState.Logs.ShouldContain(nameof(OrderCreatedEvent));
+            persistedState.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
         }
 
         #region Arrange

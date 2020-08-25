@@ -8,12 +8,12 @@ namespace TheSaga.Tests.Sagas.SyncAndValid.Activities
     {
         public async Task Compensate(IExecutionContext<OrderState> context)
         {
-            context.State.Logs.Add($"{nameof(SendEmailToClientEvent)} compensation");
+
         }
 
         public async Task Execute(IExecutionContext<OrderState> context)
         {
-            context.State.Logs.Add(nameof(SendEmailToClientEvent));
+
         }
     }
 }

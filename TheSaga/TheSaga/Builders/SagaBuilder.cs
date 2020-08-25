@@ -135,6 +135,66 @@ namespace TheSaga.Builders
             return this;
         }
 
+        public ISagaBuilderState<TSagaState> Start<TEvent>(string stepName)
+                    where TEvent : IEvent
+        {
+            currentState = new SagaStartState().GetStateName();
+            currentEvent = typeof(TEvent);
+            model.Actions.Add(new SagaAction<TSagaState>()
+            {
+                State = currentState,
+                Event = typeof(TEvent),
+                Steps = new List<ISagaStep>
+                {
+                    new SagaEmptyStep(
+                        stepName)
+                }
+            });
+            return this;
+        }
+
+        public ISagaBuilderState<TSagaState> Start<TEvent, TEventHandler>(string stepName)
+            where TEvent : IEvent
+            where TEventHandler : IEventHandler<TSagaState, TEvent>
+        {
+            currentState = new SagaStartState().GetStateName();
+            currentEvent = typeof(TEvent);
+            model.Actions.Add(new SagaAction<TSagaState>()
+            {
+                State = currentState,
+                Event = typeof(TEvent),
+                Steps = new List<ISagaStep>
+                {
+                    new SagaStepForEventHandler<TSagaState, TEventHandler, TEvent>(
+                        stepName,
+                        serviceProvider,
+                        false)
+                }
+            });
+            return this;
+        }
+
+        public ISagaBuilderState<TSagaState> StartAsync<TEvent, TEventHandler>(string stepName)
+            where TEvent : IEvent
+            where TEventHandler : IEventHandler<TSagaState, TEvent>
+        {
+            currentState = new SagaStartState().GetStateName();
+            currentEvent = typeof(TEvent);
+            model.Actions.Add(new SagaAction<TSagaState>()
+            {
+                State = currentState,
+                Event = typeof(TEvent),
+                Steps = new List<ISagaStep>
+                {
+                    new SagaStepForEventHandler<TSagaState, TEventHandler, TEvent>(
+                        stepName,
+                        serviceProvider,
+                        true)
+                }
+            });
+            return this;
+        }
+
         public ISagaBuilderState<TSagaState> Then<TSagaActivity>()
             where TSagaActivity : ISagaActivity<TSagaState>
         {
@@ -156,7 +216,7 @@ namespace TheSaga.Builders
         public ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action)
         {
             return Then(
-                uniqueNameGenerator.Generate(currentState, nameof(Then), "action"),
+                uniqueNameGenerator.Generate(currentState, nameof(Then)),
                 action);
         }
 
@@ -174,7 +234,7 @@ namespace TheSaga.Builders
         public ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation)
         {
             return Then(
-                uniqueNameGenerator.Generate(currentState, nameof(Then), "action"),
+                uniqueNameGenerator.Generate(currentState, nameof(Then)),
                 action,
                 compensation);
         }
@@ -212,7 +272,7 @@ namespace TheSaga.Builders
         public ISagaBuilderState<TSagaState> ThenAsync(ThenActionDelegate<TSagaState> action)
         {
             return ThenAsync(
-                uniqueNameGenerator.Generate(currentState, nameof(ThenAsync), "action"),
+                uniqueNameGenerator.Generate(currentState, nameof(ThenAsync)),
                 action);
         }
 
@@ -231,7 +291,7 @@ namespace TheSaga.Builders
         public ISagaBuilderState<TSagaState> ThenAsync(ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation)
         {
             return ThenAsync(
-                uniqueNameGenerator.Generate(currentState, nameof(ThenAsync), "action"),
+                uniqueNameGenerator.Generate(currentState, nameof(ThenAsync)),
                 action,
                 compensation);
         }
@@ -274,7 +334,7 @@ namespace TheSaga.Builders
                 Steps = new List<ISagaStep>
                 {
                     new SagaEmptyStep(
-                        uniqueNameGenerator.Generate(currentState, nameof(When), typeof(TEvent).Name)                      )
+                        uniqueNameGenerator.Generate(currentState, nameof(When), typeof(TEvent).Name))
                 }
             });
             return this;

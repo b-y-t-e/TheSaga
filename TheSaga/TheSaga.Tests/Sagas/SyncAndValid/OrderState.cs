@@ -8,7 +8,6 @@ namespace TheSaga.Tests.Sagas.SyncAndValid
     {
         public OrderState()
         {
-            Logs = new List<string>();
             History = new List<SagaStepLog>();
         }
 
@@ -16,7 +15,6 @@ namespace TheSaga.Tests.Sagas.SyncAndValid
         public string CurrentState { get; set; }
         public string CurrentStep { get; set; }
         public bool IsCompensating { get; set; }
-        public List<String> Logs { get; set; }
         public Exception CurrentError { get; set; }
         public IList<SagaStepLog> History { get; set; }
     }
