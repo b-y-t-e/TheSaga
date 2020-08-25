@@ -9,12 +9,12 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga.Activities
     {
         public async Task Compensate(IInstanceContext<OrderState> context)
         {
-            context.State.Logi.Add($"{nameof(WyslijEmailDoKlienta)} compensation");
+            context.State.Logs.Add($"{nameof(WyslijEmailDoKlienta)} compensation");
         }
 
         public async Task Execute(IInstanceContext<OrderState> context)
         {
-            context.State.Logi.Add(nameof(WyslijEmailDoKlienta));
+            context.State.Logs.Add(nameof(WyslijEmailDoKlienta));
         }
     }
 }

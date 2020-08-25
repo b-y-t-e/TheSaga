@@ -51,7 +51,7 @@ namespace TheSaga.Tests
             persistedState.CurrentStep.ShouldBe(null);
             persistedState.CurrentState.ShouldBe(nameof(Nowe));
             persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
-            persistedState.Logi.ShouldContain(nameof(Utworzone));
+            persistedState.Logs.ShouldContain(nameof(Utworzone));
         }
 
         [Fact]
@@ -86,8 +86,8 @@ namespace TheSaga.Tests
             persistedState.ShouldNotBeNull();
             persistedState.CurrentState.ShouldBe(nameof(Nowe));
             persistedState.CurrentStep.ShouldBe(null);
-            persistedState.Logi.ShouldContain(nameof(Utworzone));
-            persistedState.Logi.Count.ShouldBe(2);
+            persistedState.Logs.ShouldContain(nameof(Utworzone));
+            persistedState.Logs.Count.ShouldBe(2);
         }
 
         [Fact]
@@ -119,13 +119,13 @@ namespace TheSaga.Tests
             persistedState.ShouldNotBeNull();
             persistedState.CurrentState.ShouldBe(nameof(Skompletowane));
             persistedState.CurrentStep.ShouldBe(null);
-            persistedState.Logi.ShouldContain(nameof(Utworzone));
-            persistedState.Logi.ShouldContain(nameof(UtworzoneHandler));
-            persistedState.Logi.ShouldContain(nameof(Skompletowano));
-            persistedState.Logi.ShouldContain(nameof(WyslijEmailDoKlienta));
-            persistedState.Logi.ShouldContain(nameof(WyslijWiadomoscDoKierownika));
-            persistedState.Logi.ShouldContain(nameof(ZamowKuriera));
-            persistedState.Logi.Count.ShouldBe(6);
+            persistedState.Logs.ShouldContain(nameof(Utworzone));
+            persistedState.Logs.ShouldContain(nameof(UtworzoneHandler));
+            persistedState.Logs.ShouldContain(nameof(Skompletowano));
+            persistedState.Logs.ShouldContain(nameof(WyslijEmailDoKlienta));
+            persistedState.Logs.ShouldContain(nameof(WyslijWiadomoscDoKierownika));
+            persistedState.Logs.ShouldContain(nameof(ZamowKuriera));
+            persistedState.Logs.Count.ShouldBe(6);
         }
 
         public SagaStateTests()

@@ -6,8 +6,9 @@ namespace TheSaga.States.Actions
 {
     public interface ISagaStep
     {
+        bool Async { get; }
         string StepName { get; }
 
-        Task Execute(IInstanceContext context, IEvent @event);
+        Task Run(IExecutionContext context, IEvent @event);
     }
 }

@@ -31,17 +31,8 @@ namespace TheSaga.Coordinators
             ISagaExecutor sagaExecutor = sagaRegistrator.
                 FindExecutorForStateType(model.SagaStateType);
 
-            bool isStartEvent = model.IsStartEvent(eventType);
-            if (isStartEvent)
-            {
-                return await sagaExecutor.
-                    Start(model, @event);
-            }
-            else
-            {
-                return await sagaExecutor.
-                    Handle(@event.CorrelationID, model, @event);
-            }
+            return await sagaExecutor.
+                Handle(@event.CorrelationID, model, @event);
         }
 
         public Task<ISagaState> Publish(IEvent @event)

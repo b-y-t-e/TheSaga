@@ -9,13 +9,13 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga.Activities
     {
         public Task Compensate(IInstanceContext<OrderState> context)
         {
-            context.State.Logi.Add($"{nameof(ZamowKuriera)} compensation");
+            context.State.Logs.Add($"{nameof(ZamowKuriera)} compensation");
             return Task.CompletedTask;
         }
 
         public Task Execute(IInstanceContext<OrderState> context)
         {
-            context.State.Logi.Add($"{nameof(ZamowKuriera)}");
+            context.State.Logs.Add($"{nameof(ZamowKuriera)}");
             return Task.CompletedTask;
         }
     }

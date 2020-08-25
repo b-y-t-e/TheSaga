@@ -32,7 +32,7 @@ namespace TheSaga.States.Actions
             {
                 if (action.Event != null)
                 {
-                    if (action.State == null)
+                    if (action.State == SagaStartState.Name)
                     {
                         StartEvents.Add(action.Event);
                     }
@@ -42,7 +42,7 @@ namespace TheSaga.States.Actions
                     }
                 }
 
-                if (action.State != null)
+                if (action.State != SagaStartState.Name)
                 {
                     States.Add(action.State);
                 }
