@@ -2,9 +2,9 @@
 
 namespace TheSaga.Messages
 {
-    public class SagaAsyncStepCompletedMessage : IInternalMessage
+    public class SagaStepCompletedAsyncMessage : IInternalMessage
     {
-        public SagaAsyncStepCompletedMessage(Type sagaStateType, Guid correlationID, string currentState, string currentStep, bool isCompensating)
+        public SagaStepCompletedAsyncMessage(Type sagaStateType, Guid correlationID, string currentState, string currentStep, bool isCompensating)
         {
             SagaStateType = sagaStateType;
             CorrelationID = correlationID;

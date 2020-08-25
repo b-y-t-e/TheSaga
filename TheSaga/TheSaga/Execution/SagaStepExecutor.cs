@@ -158,7 +158,7 @@ namespace TheSaga.Execution
                 if (sagaStep.Async)
                 {
                     internalMessageBus.Publish(
-                        new SagaAsyncStepCompletedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
+                        new SagaStepCompletedAsyncMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
                 }
             }
             catch (Exception ex)

@@ -27,7 +27,9 @@ namespace TheSaga.Execution
             this.model = model;
             this.sagaPersistance = sagaPersistance;
             this.internalMessageBus = internalMessageBus;
-            this.internalMessageBus.Subscribe<SagaAsyncStepCompletedMessage>(this, HandleAsyncStepCompletedMessage);
+
+            new SagaAsyncStepHandler<TSagaState>(this, sagaPersistance, internalMessageBus).
+                Subscribe();
         }
 
         public async Task<ISagaState> Handle(Guid correlationID, IEvent @event)
@@ -50,36 +52,6 @@ namespace TheSaga.Execution
                 return stepExecutionResult.State;
 
             return await Handle(correlationID, null);
-        }
-
-        private Task HandleAsyncStepCompletedMessage(SagaAsyncStepCompletedMessage message)
-        {
-            if (message.SagaStateType != typeof(TSagaState))
-                return Task.CompletedTask;
-
-            Task.Run(async () =>
-            {
-                try
-                {
-                    await Handle(message.CorrelationID, null);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex);
-                    try
-                    {
-                        var sagaState = await sagaPersistance.Get(message.CorrelationID);
-                        sagaState.CurrentError = ex.Message;
-                        sagaPersistance.Set(sagaState);
-                    }
-                    catch
-                    {
-                        Console.WriteLine(ex);
-                    }
-                }
-            });
-
-            return Task.CompletedTask;
         }
 
         private async Task<Guid> CreateNewSaga(Guid correlationID)
