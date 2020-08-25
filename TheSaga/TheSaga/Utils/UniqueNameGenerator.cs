@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TheSaga.Exceptions;
 
 namespace TheSaga.Utils
 {
@@ -20,5 +21,14 @@ namespace TheSaga.Utils
             usedNames.Add(name);
             return name;
         }
+
+        internal void ThrowIfNotUnique(string name)
+        {
+            if (usedNames.Contains(name))
+                throw new NotUniqueStepNameException();
+
+            usedNames.Add(name);
+        }
     }
+
 }
