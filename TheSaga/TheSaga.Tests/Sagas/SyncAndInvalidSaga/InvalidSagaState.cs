@@ -6,10 +6,10 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga
 {
     public class InvalidSagaState : ISagaState
     {
-        public InvalidSagaState 
-()
+        public InvalidSagaState()
         {
             Logs = new List<string>();
+            History = new List<SagaStepLog>();
         }
 
         public Guid CorrelationID { get; set; }
@@ -18,5 +18,6 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga
         public bool IsCompensating { get; set; }
         public List<String> Logs { get; set; }
         public Exception CurrentError { get; set; }
+        public IList<SagaStepLog> History { get; set; }
     }
 }

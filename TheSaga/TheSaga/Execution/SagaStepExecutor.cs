@@ -149,20 +149,29 @@ namespace TheSaga.Execution
                 nextSagaStep = action.FindNextAfter(sagaStep);
             }
 
+            if (!state.IsCompensating &&
+                sagaStep == action.Steps.First())
+            {
+                state.CurrentError = null;
+            }
+
+            SagaStepLog stepLog = new SagaStepLog()
+            {
+                Created = DateTime.Now,
+                State = state.CurrentState,
+                Step = state.CurrentStep,
+                NextStep = nextSagaStep == null ? null : nextSagaStep.StepName
+            };
+            state.History.Add(stepLog);
+
+            await sagaPersistance.
+                Set(state);
+
             try
             {
 #if DEBUG
                 Console.WriteLine($"state: {state.CurrentState}; step: {state.CurrentStep}; action: {(state.IsCompensating ? "Compensate" : "Execute")}");
 #endif
-                if (!state.IsCompensating &&
-                    sagaStep == action.Steps.First() &&
-                    state.CurrentError != null)
-                {
-                    state.CurrentError = null;
-
-                    await sagaPersistance.
-                        Set(state);
-                }
 
                 IExecutionContext context = new ExecutionContext<TSagaState>()
                 {
@@ -179,12 +188,21 @@ namespace TheSaga.Execution
                     await sagaStep.
                         Execute(context, @event);
                 }
+
+                stepLog.HasSucceeded = true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 state.IsCompensating = true;
                 state.CurrentError = ex.ToSagaStepException();
+
+                stepLog.HasSucceeded = false;
+                stepLog.Error = ex.ToSagaStepException();
+            }
+            finally
+            {
+                stepLog.HasFinished = true;
             }
 
             if (nextSagaStep != null)

@@ -1,19 +1,19 @@
 ﻿TODO:
- + blad w kompensacji
- + serializacja błędów
- + obsługa kompensacji
  + historia kroków
  + sqlserver persistance
  + podpiecie sie do masstransit
  + after
- + co w przypadku bledow podczas kompensacji?
- + obsluga bledow
  
 DONE:
+ + obsługa kompensacji
  + startowy stan
  + koncowy stan
  + unikatowe nazwy pod-stanów
  + metody / wołania asynchroniczne
+ + blad w kompensacji
+ + serializacja błędów
+ + co w przypadku bledow podczas kompensacji?
+ + obsluga bledow
 
 INNE:
  + podpiecie sie do convey-api
