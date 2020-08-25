@@ -1,4 +1,6 @@
 ﻿TODO:
+ + dodanie metody BusSend
+ + dodanie metody Publish
  + sqlserver persistance
  + podpiecie sie do masstransit
  + after
