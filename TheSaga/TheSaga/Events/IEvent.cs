@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheSaga.Interfaces
+namespace TheSaga.Events
 {
     public interface IEvent
     {

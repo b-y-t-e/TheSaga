@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TheSaga.SagaStates.Steps;
 
-namespace TheSaga.States.Actions
+namespace TheSaga.SagaStates.Actions
 {
     public class SagaAction<TSagaState> : ISagaAction
         where TSagaState : ISagaState

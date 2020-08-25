@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.Builders;
 using TheSaga.Coordinators;
+using TheSaga.Events;
+using TheSaga.Execution.Context;
 using TheSaga.Tests.Sagas.OrderTestSaga.Events;
 
 namespace TheSaga.Tests.Sagas.OrderTestSaga.EventHandlers

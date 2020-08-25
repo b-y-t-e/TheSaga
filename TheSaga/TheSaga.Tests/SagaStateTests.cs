@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.Builders;
 using TheSaga.Coordinators;
-using TheSaga.Executors;
-using TheSaga.Interfaces;
 using TheSaga.Models;
 using TheSaga.Registrator;
 using TheSaga.Persistance;
@@ -20,6 +18,8 @@ using TheSaga.Tests.Sagas.OrderTestSaga.States;
 using TheSaga.Exceptions;
 using TheSaga.Tests.Sagas.OrderTestSaga.Activities;
 using TheSaga.Tests.Sagas.OrderTestSaga.EventHandlers;
+using TheSaga.SagaStates;
+using TheSaga.Events;
 
 namespace TheSaga.Tests
 {

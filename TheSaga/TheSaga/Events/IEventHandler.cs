@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TheSaga.Builders;
-using TheSaga.Interfaces;
+using TheSaga.Events;
+using TheSaga.Execution.Context;
+using TheSaga.SagaStates;
 using TheSaga.States;
 
-namespace TheSaga.Activities
+namespace TheSaga.Events
 {
     public interface IEventHandler<TSagaState, TEvent> 
         where TSagaState : ISagaState

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using TheSaga.SagaStates;
+using TheSaga.SagaStates.Actions;
 using TheSaga.States;
-using TheSaga.States.Actions;
 
 namespace TheSaga.Models
 {

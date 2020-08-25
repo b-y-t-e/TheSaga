@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TheSaga.Executors;
-using TheSaga.Interfaces;
 using TheSaga.Models;
 using TheSaga.Registrator;
 using TheSaga.Persistance;
 using TheSaga.States;
 using TheSaga.Exceptions;
+using TheSaga.SagaStates;
+using TheSaga.Events;
+using TheSaga.Execution;
 
 namespace TheSaga.Coordinators
 {

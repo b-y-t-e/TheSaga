@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TheSaga.Interfaces;
+using TheSaga.Events;
 using TheSaga.Models;
+using TheSaga.SagaStates;
 using TheSaga.States;
 
-namespace TheSaga.Executors
+namespace TheSaga.Execution
 {
     public interface ISagaExecutor
     {

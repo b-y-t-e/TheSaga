@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TheSaga.Builders
+namespace TheSaga.Utils
 {
     internal class UniqueNameGenerator
     {

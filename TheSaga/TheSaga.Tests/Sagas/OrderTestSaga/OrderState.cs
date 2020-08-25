@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TheSaga.SagaStates;
 using TheSaga.States;
 
 namespace TheSaga.Tests.Sagas.OrderTestSaga

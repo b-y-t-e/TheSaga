@@ -1,8 +1,9 @@
 ﻿using System.Threading.Tasks;
 using TheSaga.Builders;
-using TheSaga.Interfaces;
+using TheSaga.Events;
+using TheSaga.Execution.Context;
 
-namespace TheSaga.States.Actions
+namespace TheSaga.SagaStates.Steps
 {
     public interface ISagaStep
     {

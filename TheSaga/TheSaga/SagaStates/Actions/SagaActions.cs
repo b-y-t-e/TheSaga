@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using TheSaga.Builders;
+using TheSaga.States;
 
-namespace TheSaga.States.Actions
+namespace TheSaga.SagaStates.Actions
 {
     public class SagaActions<TSagaState>
         where TSagaState : ISagaState

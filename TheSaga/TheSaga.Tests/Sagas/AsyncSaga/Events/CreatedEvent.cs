@@ -1,5 +1,5 @@
 ﻿using System;
-using TheSaga.Interfaces;
+using TheSaga.Events;
 
 namespace TheSaga.Tests.Sagas.AsyncSaga.Events
 {

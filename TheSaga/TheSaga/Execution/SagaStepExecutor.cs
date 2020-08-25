@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TheSaga.Builders;
-using TheSaga.Interfaces;
+using TheSaga.Events;
+using TheSaga.Execution.Context;
 using TheSaga.Persistance;
+using TheSaga.SagaStates;
+using TheSaga.SagaStates.Actions;
+using TheSaga.SagaStates.Steps;
 using TheSaga.States;
-using TheSaga.States.Actions;
 
-namespace TheSaga.Executors
+namespace TheSaga.Execution
 {
     internal class SagaStepExecutor<TSagaState>
         where TSagaState : ISagaState

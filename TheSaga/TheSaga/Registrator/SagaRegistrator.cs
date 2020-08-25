@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using TheSaga.Executors;
-using TheSaga.Interfaces;
+using TheSaga.Execution;
 using TheSaga.Models;
 using TheSaga.Persistance;
+using TheSaga.SagaStates;
 using TheSaga.States;
 
 namespace TheSaga.Registrator

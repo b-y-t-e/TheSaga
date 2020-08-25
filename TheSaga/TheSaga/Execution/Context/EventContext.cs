@@ -1,7 +1,8 @@
-﻿using TheSaga.Interfaces;
+﻿using TheSaga.Events;
+using TheSaga.SagaStates;
 using TheSaga.States;
 
-namespace TheSaga.Builders
+namespace TheSaga.Execution.Context
 {
     public class EventContext<TSagaState, TEvent> : IEventContext<TSagaState, TEvent>
         where TSagaState : ISagaState

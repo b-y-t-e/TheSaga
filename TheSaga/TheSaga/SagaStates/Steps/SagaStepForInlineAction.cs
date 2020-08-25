@@ -4,9 +4,10 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.Builders;
-using TheSaga.Interfaces;
+using TheSaga.Events;
+using TheSaga.Execution.Context;
 
-namespace TheSaga.States.Actions
+namespace TheSaga.SagaStates.Steps
 {
     public class SagaStepForInlineAction<TSagaState> : ISagaStep
         where TSagaState : ISagaState
@@ -26,14 +27,14 @@ namespace TheSaga.States.Actions
 
         public async Task Run(IExecutionContext context, IEvent @event)
         {
-            IInstanceContext<TSagaState> contextForAction =
-                (IInstanceContext<TSagaState>)context;
+            IExecutionContext<TSagaState> contextForAction =
+                (IExecutionContext<TSagaState>)context;
 
             if (Action != null)            
                 await Action(contextForAction);            
         }
     }
 
-    public delegate Task ThenActionDelegate<TSagaState>(IInstanceContext<TSagaState> context)
+    public delegate Task ThenActionDelegate<TSagaState>(IExecutionContext<TSagaState> context)
         where TSagaState : ISagaState;
 }

@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.Builders;
 using TheSaga.Coordinators;
-using TheSaga.Executors;
-using TheSaga.Interfaces;
 using TheSaga.Models;
 using TheSaga.Registrator;
 using TheSaga.Persistance;
@@ -17,8 +15,9 @@ using Shouldly;
 using TheSaga.Exceptions;
 using TheSaga.Tests.Sagas.AsyncSaga;
 using TheSaga.Tests.Sagas.AsyncSaga.Events;
-using TheSaga.Tests.Sagas.AsyncSaga.States;
 using TheSaga.Tests.Sagas.AsyncSaga.EventHandlers;
+using TheSaga.SagaStates;
+using TheSaga.Events;
 
 namespace TheSaga.Tests
 {

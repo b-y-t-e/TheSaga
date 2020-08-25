@@ -1,7 +1,7 @@
 ﻿using System;
-using TheSaga.Executors;
-using TheSaga.Interfaces;
+using TheSaga.Execution;
 using TheSaga.Models;
+using TheSaga.SagaStates;
 using TheSaga.States;
 
 namespace TheSaga.Registrator

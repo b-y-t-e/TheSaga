@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TheSaga.Interfaces;
+using TheSaga.Events;
+using TheSaga.SagaStates;
 using TheSaga.States;
 
 namespace TheSaga.Coordinators

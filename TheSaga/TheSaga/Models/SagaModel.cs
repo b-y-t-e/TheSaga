@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using TheSaga.SagaStates;
+using TheSaga.SagaStates.Actions;
 using TheSaga.States;
-using TheSaga.States.Actions;
 
 namespace TheSaga.Models
 {

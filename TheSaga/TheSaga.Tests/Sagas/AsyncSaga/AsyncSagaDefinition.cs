@@ -4,11 +4,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TheSaga.Builders;
-using TheSaga.Interfaces;
 using TheSaga.Models;
 using TheSaga.Tests.Sagas.AsyncSaga.EventHandlers;
 using TheSaga.Tests.Sagas.AsyncSaga.Events;
-using TheSaga.Tests.Sagas.AsyncSaga.States;
 
 namespace TheSaga.Tests.Sagas.AsyncSaga
 {

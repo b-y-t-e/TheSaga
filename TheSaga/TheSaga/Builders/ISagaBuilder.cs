@@ -1,9 +1,10 @@
 ﻿using System;
 using TheSaga.Activities;
-using TheSaga.Interfaces;
+using TheSaga.Events;
 using TheSaga.Models;
+using TheSaga.SagaStates;
+using TheSaga.SagaStates.Steps;
 using TheSaga.States;
-using TheSaga.States.Actions;
 
 namespace TheSaga.Builders
 {

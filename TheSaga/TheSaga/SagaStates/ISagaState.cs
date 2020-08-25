@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TheSaga.States
+namespace TheSaga.SagaStates
 {
     public interface ISagaState
     {

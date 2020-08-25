@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using TheSaga.Builders;
-using TheSaga.Interfaces;
 using TheSaga.Models;
 using TheSaga.Tests.Sagas.OrderTestSaga.Activities;
 using TheSaga.Tests.Sagas.OrderTestSaga.EventHandlers;
