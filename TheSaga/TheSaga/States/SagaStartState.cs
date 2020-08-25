@@ -1,7 +1,7 @@
 ﻿namespace TheSaga.States
 {
-    internal sealed class SagaStartState : IState
+    public sealed class SagaStartState : IStateWithCustomName
     {
-        internal const string Name = "~";
+        public string Name => "~";
     }
 }

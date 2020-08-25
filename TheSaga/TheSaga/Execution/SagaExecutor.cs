@@ -47,7 +47,7 @@ namespace TheSaga.Execution
 
             ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
             newSagaState.CorrelationID = correlationID;
-            newSagaState.CurrentState = SagaStartState.Name;
+            newSagaState.CurrentState = Extensions.GetStateName<SagaStartState>();
             newSagaState.CurrentStep = null;
 
             await sagaPersistance.Set(newSagaState);
@@ -62,7 +62,9 @@ namespace TheSaga.Execution
             Type eventType = @event == null ?
                 null : @event.GetType();
 
-            ISagaState state = await sagaPersistance.Get(correlationID);
+            ISagaState state = await sagaPersistance.
+                Get(correlationID);
+
             if (state == null)
                 throw new SagaInstanceNotFoundException(model.SagaStateType, correlationID);
 

@@ -7,6 +7,7 @@ using TheSaga.Events;
 using TheSaga.Persistance;
 using TheSaga.Registrator;
 using TheSaga.SagaStates;
+using TheSaga.States;
 using TheSaga.Tests.Sagas.AsyncSaga;
 using TheSaga.Tests.Sagas.AsyncSaga.EventHandlers;
 using TheSaga.Tests.Sagas.AsyncSaga.Events;
@@ -44,9 +45,12 @@ namespace TheSaga.Tests
             // given
             IEvent startEvent = new CreatedEvent();
 
-            // when
             ISagaState sagaState = await sagaCoordinator.
                 Send(startEvent);
+
+            // when
+            await sagaCoordinator.
+                WaitForState<SagaFinishState>(sagaState.CorrelationID);
 
             // then
             AsyncState persistedState = (AsyncState)await sagaPersistance.

@@ -4,19 +4,23 @@ using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Execution;
 using TheSaga.Models;
+using TheSaga.Options;
+using TheSaga.Persistance;
 using TheSaga.Registrator;
 using TheSaga.SagaStates;
+using TheSaga.States;
 
 namespace TheSaga.Coordinators
 {
     public class SagaCoordinator : ISagaCoordinator
     {
         private ISagaRegistrator sagaRegistrator;
+        private ISagaPersistance sagaPersistance;
 
-        public SagaCoordinator(ISagaRegistrator sagaRegistrator)
+        public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance)
         {
             this.sagaRegistrator = sagaRegistrator;
-            // this.sagaExecutor = sagaExecutor;
+            this.sagaPersistance = sagaPersistance;
         }
 
         public Task<ISagaState> Publish(IEvent @event)
@@ -37,6 +41,30 @@ namespace TheSaga.Coordinators
 
             return await sagaExecutor.
                 Handle(@event.CorrelationID, model, @event);
+        }
+
+        public async Task WaitForEvent<TSagaEvent>(Guid correlationID, SagaWaitOptions waitOptions = null) 
+            where TSagaEvent : IEvent
+        {
+            ISagaState state = await sagaPersistance.
+                Get(correlationID);
+
+            if (state == null)
+                throw new SagaInstanceNotFoundException(correlationID);
+
+        }
+
+        public async Task WaitForState<TState>(Guid correlationID, SagaWaitOptions waitOptions = null)
+            where TState : IState
+        {
+            ISagaState state = await sagaPersistance.
+                Get(correlationID);
+
+            if (state == null)
+                throw new SagaInstanceNotFoundException(correlationID);
+
+            // state.CurrentState
+
         }
     }
 }

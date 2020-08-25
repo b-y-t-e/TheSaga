@@ -51,7 +51,7 @@ namespace TheSaga.SagaStates.Actions
             {
                 if (action.Event != null)
                 {
-                    if (action.State == SagaStartState.Name)
+                    if (action.State == Extensions.GetStateName<SagaStartState>())
                     {
                         StartEvents.Add(action.Event);
                     }
@@ -61,7 +61,7 @@ namespace TheSaga.SagaStates.Actions
                     }
                 }
 
-                if (action.State != SagaStartState.Name)
+                if (action.State != Extensions.GetStateName<SagaStartState>())
                 {
                     States.Add(action.State);
                 }

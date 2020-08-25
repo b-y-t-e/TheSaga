@@ -12,11 +12,6 @@ namespace TheSaga.Registrator
         ISagaModel FindModelForEventType(Type eventType);
 
         void Register<TSagaState>(ISagaModel<TSagaState> model)
-                            where TSagaState : ISagaState;
-
-        /*void Register<TSagaState, TSagaModel>(TSagaModel model)
-           where TSagaState : ISagaState
-           where TSagaModel : ISagaModel<TSagaState>;
-        */
+            where TSagaState : ISagaState;
     }
 }

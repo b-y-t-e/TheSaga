@@ -10,9 +10,9 @@ namespace TheSaga.Registrator
 {
     public class SagaRegistrator : ISagaRegistrator
     {
-        private Dictionary<Type, ISagaExecutor> registeredExecutors;
-        private List<ISagaModel> registeredModels;
-        private ISagaPersistance sagaPersistance;
+        Dictionary<Type, ISagaExecutor> registeredExecutors;
+        List<ISagaModel> registeredModels;
+        ISagaPersistance sagaPersistance;
 
         public SagaRegistrator(ISagaPersistance sagaPersistance)
         {
