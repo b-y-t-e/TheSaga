@@ -1,24 +1,27 @@
 ﻿using System;
 using System.Threading.Tasks;
+using TheSaga.Events;
+using TheSaga.Exceptions;
+using TheSaga.Execution;
 using TheSaga.Models;
 using TheSaga.Registrator;
-using TheSaga.Persistance;
-using TheSaga.States;
-using TheSaga.Exceptions;
 using TheSaga.SagaStates;
-using TheSaga.Events;
-using TheSaga.Execution;
 
 namespace TheSaga.Coordinators
 {
     public class SagaCoordinator : ISagaCoordinator
     {
-        ISagaRegistrator sagaRegistrator;
+        private ISagaRegistrator sagaRegistrator;
 
         public SagaCoordinator(ISagaRegistrator sagaRegistrator)
         {
             this.sagaRegistrator = sagaRegistrator;
             // this.sagaExecutor = sagaExecutor;
+        }
+
+        public Task<ISagaState> Publish(IEvent @event)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<ISagaState> Send(IEvent @event)
@@ -35,11 +38,5 @@ namespace TheSaga.Coordinators
             return await sagaExecutor.
                 Handle(@event.CorrelationID, model, @event);
         }
-
-        public Task<ISagaState> Publish(IEvent @event)
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }

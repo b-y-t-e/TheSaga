@@ -1,10 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using TheSaga.Activities;
-using TheSaga.Builders;
 using TheSaga.Events;
 using TheSaga.Execution.Context;
 
@@ -17,9 +13,6 @@ namespace TheSaga.SagaStates.Steps
     {
         private readonly IServiceProvider serviceProvider;
 
-        public String StepName { get; private set; }
-        public bool Async { get; }
-
         public SagaStepForEventHandler(
             String StepName, IServiceProvider serviceProvider, Boolean async)
         {
@@ -27,6 +20,9 @@ namespace TheSaga.SagaStates.Steps
             this.serviceProvider = serviceProvider;
             Async = async;
         }
+
+        public bool Async { get; }
+        public String StepName { get; private set; }
 
         public async Task Run(IExecutionContext context, IEvent @event)
         {
@@ -46,5 +42,4 @@ namespace TheSaga.SagaStates.Steps
                 await activity.Execute(eventContext);
         }
     }
-
 }

@@ -6,14 +6,12 @@ namespace TheSaga.SagaStates.Actions
 {
     public interface ISagaAction
     {
-        String State { get; }
-
         Type Event { get; }
-
+        String State { get; }
         List<ISagaStep> Steps { get; }
 
-        ISagaStep FindStep(string stepName);
-
         ISagaStep FindNextAfter(ISagaStep step);
+
+        ISagaStep FindStep(string stepName);
     }
 }

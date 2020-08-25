@@ -5,15 +5,14 @@ using TheSaga.Execution;
 using TheSaga.Models;
 using TheSaga.Persistance;
 using TheSaga.SagaStates;
-using TheSaga.States;
 
 namespace TheSaga.Registrator
 {
     public class SagaRegistrator : ISagaRegistrator
     {
-        ISagaPersistance sagaPersistance;
-        List<ISagaModel> registeredModels;
-        Dictionary<Type, ISagaExecutor> registeredExecutors;
+        private Dictionary<Type, ISagaExecutor> registeredExecutors;
+        private List<ISagaModel> registeredModels;
+        private ISagaPersistance sagaPersistance;
 
         public SagaRegistrator(ISagaPersistance sagaPersistance)
         {
@@ -35,7 +34,7 @@ namespace TheSaga.Registrator
                 FirstOrDefault(v => v.ContainsEvent(eventType));
         }
 
-        public void Register<TSagaState>(ISagaModel<TSagaState> model) 
+        public void Register<TSagaState>(ISagaModel<TSagaState> model)
             where TSagaState : ISagaState
         {
             registeredModels.Add((ISagaModel)model);

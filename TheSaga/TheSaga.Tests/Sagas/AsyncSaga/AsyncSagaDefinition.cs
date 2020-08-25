@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using TheSaga.Builders;
 using TheSaga.Models;
@@ -10,7 +7,6 @@ using TheSaga.Tests.Sagas.AsyncSaga.Events;
 
 namespace TheSaga.Tests.Sagas.AsyncSaga
 {
-
     public class AsyncSagaDefinition : ISagaModelDefintion<AsyncState>
     {
         public ISagaModel<AsyncState> GetModel(IServiceProvider serviceProvider)

@@ -15,7 +15,7 @@ namespace TheSaga.Execution
     internal class SagaExecutor<TSagaState> : ISagaExecutor
         where TSagaState : ISagaState
     {
-        ISagaPersistance sagaPersistance;
+        private ISagaPersistance sagaPersistance;
 
         public SagaExecutor(ISagaPersistance sagaPersistance)
         {
@@ -40,8 +40,22 @@ namespace TheSaga.Execution
             }
         }
 
-        async Task<StepExecutionResult> ExecuteStep(
-            Guid correlationID,
+        private async Task<Guid> createNewSaga(Guid correlationID, ISagaModel model)
+        {
+            if (correlationID == Guid.Empty)
+                correlationID = Guid.NewGuid();
+
+            ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
+            newSagaState.CorrelationID = correlationID;
+            newSagaState.CurrentState = SagaStartState.Name;
+            newSagaState.CurrentStep = null;
+
+            await sagaPersistance.Set(newSagaState);
+            return correlationID;
+        }
+
+        private async Task<StepExecutionResult> ExecuteStep(
+                    Guid correlationID,
             ISagaModel model,
             IEvent @event)
         {
@@ -71,21 +85,7 @@ namespace TheSaga.Execution
             };
         }
 
-        private async Task<Guid> createNewSaga(Guid correlationID, ISagaModel model)
-        {
-            if (correlationID == Guid.Empty)
-                correlationID = Guid.NewGuid();
-
-            ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
-            newSagaState.CorrelationID = correlationID;
-            newSagaState.CurrentState = SagaStartState.Name;
-            newSagaState.CurrentStep = null;
-
-            await sagaPersistance.Set(newSagaState);
-            return correlationID;
-        }
-
-        class StepExecutionResult
+        private class StepExecutionResult
         {
             internal bool Async;
 

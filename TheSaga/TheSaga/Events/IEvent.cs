@@ -6,5 +6,4 @@ namespace TheSaga.Events
     {
         Guid CorrelationID { get; }
     }
-
 }

@@ -8,15 +8,27 @@ namespace TheSaga.SagaStates.Actions
     public class SagaAction<TSagaState> : ISagaAction
         where TSagaState : ISagaState
     {
-        public String State { get; set; }
-
-        public Type Event { get; set; }
-
-        public List<ISagaStep> Steps { get; set; }
-
         public SagaAction()
         {
             Steps = new List<ISagaStep>();
+        }
+
+        public Type Event { get; set; }
+        public String State { get; set; }
+        public List<ISagaStep> Steps { get; set; }
+
+        public ISagaStep FindNextAfter(ISagaStep step)
+        {
+            bool stepFound = false;
+            foreach (ISagaStep curStep in this.Steps)
+            {
+                if (stepFound)
+                    return curStep;
+
+                if (curStep == step)
+                    stepFound = true;
+            }
+            return null;
         }
 
         public ISagaStep FindStep(string stepName)
@@ -28,20 +40,6 @@ namespace TheSaga.SagaStates.Actions
                 step = Steps.FirstOrDefault();
 
             return step;
-        }
-
-        public ISagaStep FindNextAfter(ISagaStep step)
-        {
-            bool stepFound = false;
-            foreach(ISagaStep curStep in this.Steps )
-            {
-                if (stepFound)
-                    return curStep;
-
-                if (curStep == step)
-                    stepFound = true;
-            }
-            return null;
         }
     }
 }

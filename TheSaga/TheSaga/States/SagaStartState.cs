@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TheSaga.States
+﻿namespace TheSaga.States
 {
     internal sealed class SagaStartState : IState
     {

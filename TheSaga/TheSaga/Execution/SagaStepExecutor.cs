@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TheSaga.Builders;
 using TheSaga.Events;
 using TheSaga.Execution.Context;
 using TheSaga.Persistance;
 using TheSaga.SagaStates;
 using TheSaga.SagaStates.Actions;
 using TheSaga.SagaStates.Steps;
-using TheSaga.States;
 
 namespace TheSaga.Execution
 {
     internal class SagaStepExecutor<TSagaState>
         where TSagaState : ISagaState
     {
-        ISagaPersistance sagaPersistance;
-        IEvent @event;
-        ISagaState state;
-        ISagaAction action;
+        private IEvent @event;
+        private ISagaAction action;
+        private ISagaPersistance sagaPersistance;
+        private ISagaState state;
 
         public SagaStepExecutor(
             ISagaPersistance sagaPersistance, IEvent @event, ISagaState state, ISagaAction action)
@@ -56,7 +54,7 @@ namespace TheSaga.Execution
             {
                 ISagaStep sagaStep = action.
                     FindStep(state.CurrentStep);
-                
+
                 ISagaStep nextSagaStep = action.
                     FindNextAfter(sagaStep);
 
@@ -79,7 +77,7 @@ namespace TheSaga.Execution
 
                 await sagaPersistance.Set(state);
 
-                if(sagaStep.Async)
+                if (sagaStep.Async)
                 {
                     // zalowanie kolejnego kroku
                     throw new NotImplementedException();

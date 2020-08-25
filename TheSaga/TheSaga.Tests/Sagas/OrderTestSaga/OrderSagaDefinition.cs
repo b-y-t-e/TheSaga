@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using TheSaga.Builders;
 using TheSaga.Models;
 using TheSaga.Tests.Sagas.OrderTestSaga.Activities;
@@ -11,7 +8,6 @@ using TheSaga.Tests.Sagas.OrderTestSaga.States;
 
 namespace TheSaga.Tests.Sagas.OrderTestSaga
 {
-
     public class OrderSagaDefinition : ISagaModelDefintion<OrderState>
     {
         public ISagaModel<OrderState> GetModel(IServiceProvider serviceProvider)

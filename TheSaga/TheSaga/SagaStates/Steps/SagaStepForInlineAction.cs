@@ -1,22 +1,16 @@
 ﻿using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using TheSaga.Activities;
-using TheSaga.Builders;
 using TheSaga.Events;
 using TheSaga.Execution.Context;
 
 namespace TheSaga.SagaStates.Steps
 {
+    public delegate Task ThenActionDelegate<TSagaState>(IExecutionContext<TSagaState> context)
+        where TSagaState : ISagaState;
+
     public class SagaStepForInlineAction<TSagaState> : ISagaStep
-        where TSagaState : ISagaState
+            where TSagaState : ISagaState
     {
-        public String StepName { get; private set; }
-
-        public ThenActionDelegate<TSagaState> Action { get; private set; }
-        public bool Async { get; }
-
         public SagaStepForInlineAction(
             String StepName, ThenActionDelegate<TSagaState> Action, Boolean async)
         {
@@ -25,16 +19,17 @@ namespace TheSaga.SagaStates.Steps
             Async = async;
         }
 
+        public ThenActionDelegate<TSagaState> Action { get; private set; }
+        public bool Async { get; }
+        public String StepName { get; private set; }
+
         public async Task Run(IExecutionContext context, IEvent @event)
         {
             IExecutionContext<TSagaState> contextForAction =
                 (IExecutionContext<TSagaState>)context;
 
-            if (Action != null)            
-                await Action(contextForAction);            
+            if (Action != null)
+                await Action(contextForAction);
         }
     }
-
-    public delegate Task ThenActionDelegate<TSagaState>(IExecutionContext<TSagaState> context)
-        where TSagaState : ISagaState;
 }

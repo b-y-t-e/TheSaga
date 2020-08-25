@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.Events;
@@ -21,15 +18,11 @@ namespace TheSaga.Builders
         ISagaBuilderState<TSagaState>
         where TSagaState : ISagaState
     {
-        IServiceProvider serviceProvider;
-
-        SagaModel<TSagaState> model;
-
-        Type currentEvent;
-
-        String currentState;
-
-        UniqueNameGenerator uniqueNameGenerator;
+        private Type currentEvent;
+        private String currentState;
+        private SagaModel<TSagaState> model;
+        private IServiceProvider serviceProvider;
+        private UniqueNameGenerator uniqueNameGenerator;
 
         public SagaBuilder(IServiceProvider serviceProvider)
         {
@@ -64,8 +57,24 @@ namespace TheSaga.Builders
             return this;
         }
 
+        public ISagaBuilder<TSagaState> Finish()
+        {
+            model.FindAction(currentState, currentEvent).Steps.Add(
+                  new SagaStepForInlineAction<TSagaState>(
+                      uniqueNameGenerator.Generate(currentState, nameof(Finish)),
+                      ctx =>
+                      {
+                          ctx.State.CurrentState = SagaFinishState.Name;
+                          ctx.State.CurrentStep = null;
+                          ctx.State.IsCompensating = false;
+                          return Task.CompletedTask;
+                      },
+                      false));
+            return this;
+        }
+
         public ISagaBuilderState<TSagaState> Start<TEvent>()
-            where TEvent : IEvent
+                    where TEvent : IEvent
         {
             currentState = SagaStartState.Name;
             currentEvent = typeof(TEvent);
@@ -137,24 +146,6 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>()
-            where TSagaActivity : ISagaActivity<TSagaState>
-        {
-            return ThenAsync<TSagaActivity>(
-                uniqueNameGenerator.Generate(currentState, nameof(ThenAsync), typeof(TSagaActivity).Name));
-        }
-
-        public ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>(String stepName) where TSagaActivity : ISagaActivity<TSagaState>
-        {
-            model.FindAction(currentState, currentEvent).Steps.Add(
-                new SagaStepForActivity<TSagaState, TSagaActivity>(
-                    stepName,
-                    serviceProvider,
-                    true));
-
-            return this;
-        }
-
         public ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action)
         {
             return Then(
@@ -169,6 +160,24 @@ namespace TheSaga.Builders
                     stepName,
                     action,
                     false));
+
+            return this;
+        }
+
+        public ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>()
+                            where TSagaActivity : ISagaActivity<TSagaState>
+        {
+            return ThenAsync<TSagaActivity>(
+                uniqueNameGenerator.Generate(currentState, nameof(ThenAsync), typeof(TSagaActivity).Name));
+        }
+
+        public ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>(String stepName) where TSagaActivity : ISagaActivity<TSagaState>
+        {
+            model.FindAction(currentState, currentEvent).Steps.Add(
+                new SagaStepForActivity<TSagaState, TSagaActivity>(
+                    stepName,
+                    serviceProvider,
+                    true));
 
             return this;
         }
@@ -251,22 +260,6 @@ namespace TheSaga.Builders
                         true)
                 }
             });
-            return this;
-        }
-
-        public ISagaBuilder<TSagaState> Finish()
-        {
-            model.FindAction(currentState, currentEvent).Steps.Add(
-                  new SagaStepForInlineAction<TSagaState>(
-                      uniqueNameGenerator.Generate(currentState, nameof(Finish)),
-                      ctx =>
-                      {
-                          ctx.State.CurrentState = SagaFinishState.Name;
-                          ctx.State.CurrentStep = null;
-                          ctx.State.IsCompensating = false;
-                          return Task.CompletedTask;
-                      },
-                      false));
             return this;
         }
     }

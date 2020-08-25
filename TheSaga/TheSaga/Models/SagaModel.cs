@@ -1,22 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using TheSaga.SagaStates;
 using TheSaga.SagaStates.Actions;
-using TheSaga.States;
 
 namespace TheSaga.Models
 {
     public class SagaModel<TSagaState> : ISagaModel<TSagaState>
         where TSagaState : ISagaState
     {
-        public Type SagaStateType { get; }
-        public SagaActions<TSagaState> Actions { get; }
         public SagaModel()
         {
             Actions = new SagaActions<TSagaState>();
             SagaStateType = typeof(TSagaState);
+        }
+
+        public SagaActions<TSagaState> Actions { get; }
+        public Type SagaStateType { get; }
+
+        public bool ContainsEvent(Type type)
+        {
+            return
+                Actions.StartEvents.Contains(type) ||
+                Actions.DuringEvents.Contains(type);
         }
 
         public ISagaAction FindAction(string state, Type eventType)
@@ -48,13 +54,6 @@ namespace TheSaga.Models
         public bool IsStartEvent(Type type)
         {
             return Actions.StartEvents.Contains(type);
-        }
-
-        public bool ContainsEvent(Type type)
-        {
-            return
-                Actions.StartEvents.Contains(type) ||
-                Actions.DuringEvents.Contains(type);
         }
     }
 }

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TheSaga.Activities;
-using TheSaga.Builders;
 using TheSaga.Execution.Context;
 
 namespace TheSaga.Tests.Sagas.OrderTestSaga.Activities

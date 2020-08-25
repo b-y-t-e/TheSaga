@@ -1,51 +1,24 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using TheSaga.Activities;
-using TheSaga.Builders;
-using TheSaga.Coordinators;
-using TheSaga.Models;
-using TheSaga.Registrator;
-using TheSaga.Persistance;
-using TheSaga.States;
-using Xunit;
-using Xunit.Sdk;
-using TheSaga.Tests.Sagas.OrderTestSaga;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using TheSaga.Tests.Sagas.OrderTestSaga.Events;
-using TheSaga.Tests.Sagas.OrderTestSaga.States;
+using System;
+using System.Threading.Tasks;
+using TheSaga.Coordinators;
+using TheSaga.Events;
 using TheSaga.Exceptions;
+using TheSaga.Persistance;
+using TheSaga.Registrator;
+using TheSaga.SagaStates;
+using TheSaga.Tests.Sagas.OrderTestSaga;
 using TheSaga.Tests.Sagas.OrderTestSaga.Activities;
 using TheSaga.Tests.Sagas.OrderTestSaga.EventHandlers;
-using TheSaga.SagaStates;
-using TheSaga.Events;
+using TheSaga.Tests.Sagas.OrderTestSaga.Events;
+using TheSaga.Tests.Sagas.OrderTestSaga.States;
+using Xunit;
 
 namespace TheSaga.Tests
 {
     public class SagaStateTests
     {
-        [Fact]
-        public async Task WHEN_startEvent_THEN_sagaShouldBeCreated()
-        {
-            // given
-            IEvent startEvent = new OrderCreatedEvent();
-
-            // when
-            ISagaState sagaState = await sagaCoordinator.
-                Send(startEvent);
-
-            // then
-            OrderState persistedState = (OrderState)await sagaPersistance.
-                Get(sagaState.CorrelationID);
-
-            persistedState.ShouldNotBeNull();
-            persistedState.CurrentStep.ShouldBe(null);
-            persistedState.CurrentState.ShouldBe(nameof(StateCreated));
-            persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
-            persistedState.Logs.ShouldContain(nameof(OrderCreatedEvent));
-        }
-
         [Fact]
         public async Task WHEN_invalidEvent_THEN_sagaShouldIgnoreThatEvent()
         {
@@ -108,12 +81,33 @@ namespace TheSaga.Tests
             persistedState.Logs.Count.ShouldBe(6);
         }
 
+        [Fact]
+        public async Task WHEN_startEvent_THEN_sagaShouldBeCreated()
+        {
+            // given
+            IEvent startEvent = new OrderCreatedEvent();
+
+            // when
+            ISagaState sagaState = await sagaCoordinator.
+                Send(startEvent);
+
+            // then
+            OrderState persistedState = (OrderState)await sagaPersistance.
+                Get(sagaState.CorrelationID);
+
+            persistedState.ShouldNotBeNull();
+            persistedState.CurrentStep.ShouldBe(null);
+            persistedState.CurrentState.ShouldBe(nameof(StateCreated));
+            persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
+            persistedState.Logs.ShouldContain(nameof(OrderCreatedEvent));
+        }
+
         #region Arrange
 
-        IServiceProvider serviceProvider;
-        ISagaRegistrator sagaRegistrator;
-        ISagaPersistance sagaPersistance;
-        ISagaCoordinator sagaCoordinator;
+        private ISagaCoordinator sagaCoordinator;
+        private ISagaPersistance sagaPersistance;
+        private ISagaRegistrator sagaRegistrator;
+        private IServiceProvider serviceProvider;
 
         public SagaStateTests()
         {
@@ -134,10 +128,8 @@ namespace TheSaga.Tests
 
             sagaRegistrator.Register(
                 new OrderSagaDefinition().GetModel(serviceProvider));
-
         }
 
-        #endregion
+        #endregion Arrange
     }
-
 }

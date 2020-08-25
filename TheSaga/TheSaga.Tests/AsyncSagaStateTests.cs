@@ -1,50 +1,21 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using TheSaga.Activities;
-using TheSaga.Builders;
-using TheSaga.Coordinators;
-using TheSaga.Models;
-using TheSaga.Registrator;
-using TheSaga.Persistance;
-using TheSaga.States;
-using Xunit;
-using Xunit.Sdk;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using TheSaga.Exceptions;
-using TheSaga.Tests.Sagas.AsyncSaga;
-using TheSaga.Tests.Sagas.AsyncSaga.Events;
-using TheSaga.Tests.Sagas.AsyncSaga.EventHandlers;
-using TheSaga.SagaStates;
+using System;
+using System.Threading.Tasks;
+using TheSaga.Coordinators;
 using TheSaga.Events;
+using TheSaga.Persistance;
+using TheSaga.Registrator;
+using TheSaga.SagaStates;
+using TheSaga.Tests.Sagas.AsyncSaga;
+using TheSaga.Tests.Sagas.AsyncSaga.EventHandlers;
+using TheSaga.Tests.Sagas.AsyncSaga.Events;
+using Xunit;
 
 namespace TheSaga.Tests
 {
     public class AsyncSagaStateTests
     {
-        [Fact]
-        public async Task WHEN_sagaContainsAsyncMethods_THEN_stepsShouldBeExecutedAsync()
-        {
-            // given
-            IEvent startEvent = new CreatedEvent();
-
-            // when
-            ISagaState sagaState = await sagaCoordinator.
-                Send(startEvent);
-
-            // then
-            AsyncState persistedState = (AsyncState)await sagaPersistance.
-                Get(sagaState.CorrelationID);
-
-            persistedState.ShouldNotBeNull();
-            persistedState.CurrentStep.ShouldStartWith("~");
-            persistedState.CurrentState.ShouldBe("~");
-            persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
-            persistedState.Logs.ShouldContain(nameof(CreatedEventHandler));
-            persistedState.Logs.Count.ShouldBe(1);
-        }
-
         [Fact]
         public async Task WHEN_abc_THEN_def()
         {
@@ -67,13 +38,34 @@ namespace TheSaga.Tests
             persistedState.Logs.Count.ShouldBe(1);
         }
 
+        [Fact]
+        public async Task WHEN_sagaContainsAsyncMethods_THEN_stepsShouldBeExecutedAsync()
+        {
+            // given
+            IEvent startEvent = new CreatedEvent();
+
+            // when
+            ISagaState sagaState = await sagaCoordinator.
+                Send(startEvent);
+
+            // then
+            AsyncState persistedState = (AsyncState)await sagaPersistance.
+                Get(sagaState.CorrelationID);
+
+            persistedState.ShouldNotBeNull();
+            persistedState.CurrentStep.ShouldStartWith("~");
+            persistedState.CurrentState.ShouldBe("~");
+            persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
+            persistedState.Logs.ShouldContain(nameof(CreatedEventHandler));
+            persistedState.Logs.Count.ShouldBe(1);
+        }
 
         #region Arrange
 
-        IServiceProvider serviceProvider;
-        ISagaRegistrator sagaRegistrator;
-        ISagaPersistance sagaPersistance;
-        ISagaCoordinator sagaCoordinator;
+        private ISagaCoordinator sagaCoordinator;
+        private ISagaPersistance sagaPersistance;
+        private ISagaRegistrator sagaRegistrator;
+        private IServiceProvider serviceProvider;
 
         public AsyncSagaStateTests()
         {
@@ -94,10 +86,8 @@ namespace TheSaga.Tests
 
             sagaRegistrator.Register(
                 new AsyncSagaDefinition().GetModel(serviceProvider));
-
         }
 
-        #endregion
+        #endregion Arrange
     }
-
 }
