@@ -1,4 +1,5 @@
 ﻿TODO:
+ + locki
  + dodanie metody BusSend
  + dodanie metody Publish
  + sqlserver persistance
