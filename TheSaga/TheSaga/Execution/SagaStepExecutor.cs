@@ -160,7 +160,9 @@ namespace TheSaga.Execution
                 Created = DateTime.Now,
                 State = state.CurrentState,
                 Step = state.CurrentStep,
-                NextStep = nextSagaStep == null ? null : nextSagaStep.StepName
+                IsCompensating = state.IsCompensating,
+                Async = @async,
+                NextStepName = nextSagaStep == null ? null : nextSagaStep.StepName
             };
             state.History.Add(stepLog);
 

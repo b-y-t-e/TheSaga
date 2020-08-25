@@ -21,6 +21,8 @@ namespace TheSaga.SagaStates
         public string Step { get; internal set; }
         public DateTime Created { get; internal set; }
         public bool HasFinished { get; internal set; }
-        public string NextStep { get; internal set; }
+        public string NextStepName { get; internal set; }
+        public bool IsCompensating { get; internal set; }
+        public bool Async { get; internal set; }
     }
 }
