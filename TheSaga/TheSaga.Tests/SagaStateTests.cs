@@ -25,18 +25,10 @@ namespace TheSaga.Tests
 {
     public class SagaStateTests
     {
-        IServiceProvider serviceProvider;
-
         [Fact]
         public async Task WHEN_startEvent_THEN_sagaShouldBeCreated()
         {
             // given
-            ISagaPersistance sagaPersistance = serviceProvider.
-                GetRequiredService<ISagaPersistance>();
-
-            ISagaCoordinator sagaCoordinator = serviceProvider.
-                GetRequiredService<ISagaCoordinator>();
-
             IEvent startEvent = new OrderCreatedEvent();
 
             // when
@@ -58,12 +50,6 @@ namespace TheSaga.Tests
         public async Task WHEN_invalidEvent_THEN_sagaShouldIgnoreThatEvent()
         {
             // given
-            ISagaPersistance sagaPersistance = serviceProvider.
-                GetRequiredService<ISagaPersistance>();
-
-            ISagaCoordinator sagaCoordinator = serviceProvider.
-                GetRequiredService<ISagaCoordinator>();
-
             ISagaState newSagaState = await sagaCoordinator.
                 Send(new OrderCreatedEvent());
 
@@ -94,13 +80,7 @@ namespace TheSaga.Tests
         public async Task WHEN_someNextEvent_THEN_sagaShouldBeInValidState()
         {
             // given
-            ISagaPersistance sagaPersistance = serviceProvider.
-                GetRequiredService<ISagaPersistance>();
-
-            ISagaCoordinator sagaCoordinator = serviceProvider.
-                GetRequiredService<ISagaCoordinator>();
-
-            var newSagaState = await sagaCoordinator.
+            ISagaState newSagaState = await sagaCoordinator.
                 Send(new OrderCreatedEvent());
 
             IEvent skompletowanoEvent = new OrderCompletedEvent()
@@ -128,6 +108,13 @@ namespace TheSaga.Tests
             persistedState.Logs.Count.ShouldBe(6);
         }
 
+        #region Arrange
+
+        IServiceProvider serviceProvider;
+        ISagaRegistrator sagaRegistrator;
+        ISagaPersistance sagaPersistance;
+        ISagaCoordinator sagaCoordinator;
+
         public SagaStateTests()
         {
             IServiceCollection services = new ServiceCollection();
@@ -136,13 +123,21 @@ namespace TheSaga.Tests
             services.AddScoped<ISagaCoordinator, SagaCoordinator>();
             serviceProvider = services.BuildServiceProvider();
 
-            ISagaRegistrator sagaRegistrator = serviceProvider.
+            sagaRegistrator = serviceProvider.
                 GetRequiredService<ISagaRegistrator>();
+
+            sagaPersistance = serviceProvider.
+                GetRequiredService<ISagaPersistance>();
+
+            sagaCoordinator = serviceProvider.
+                GetRequiredService<ISagaCoordinator>();
 
             sagaRegistrator.Register(
                 new OrderSagaDefinition().GetModel(serviceProvider));
 
         }
+
+        #endregion
     }
 
 }

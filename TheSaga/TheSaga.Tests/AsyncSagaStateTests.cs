@@ -24,18 +24,10 @@ namespace TheSaga.Tests
 {
     public class AsyncSagaStateTests
     {
-        IServiceProvider serviceProvider;
-
         [Fact]
         public async Task WHEN_sagaContainsAsyncMethods_THEN_stepsShouldBeExecutedAsync()
         {
             // given
-            ISagaPersistance sagaPersistance = serviceProvider.
-                GetRequiredService<ISagaPersistance>();
-
-            ISagaCoordinator sagaCoordinator = serviceProvider.
-                GetRequiredService<ISagaCoordinator>();
-
             IEvent startEvent = new CreatedEvent();
 
             // when
@@ -58,12 +50,6 @@ namespace TheSaga.Tests
         public async Task WHEN_abc_THEN_def()
         {
             // given
-            ISagaPersistance sagaPersistance = serviceProvider.
-                GetRequiredService<ISagaPersistance>();
-
-            ISagaCoordinator sagaCoordinator = serviceProvider.
-                GetRequiredService<ISagaCoordinator>();
-
             IEvent startEvent = new CreatedEvent();
 
             // when
@@ -82,6 +68,14 @@ namespace TheSaga.Tests
             persistedState.Logs.Count.ShouldBe(1);
         }
 
+
+        #region Arrange
+
+        IServiceProvider serviceProvider;
+        ISagaRegistrator sagaRegistrator;
+        ISagaPersistance sagaPersistance;
+        ISagaCoordinator sagaCoordinator;
+
         public AsyncSagaStateTests()
         {
             IServiceCollection services = new ServiceCollection();
@@ -97,6 +91,8 @@ namespace TheSaga.Tests
                 new AsyncSagaDefinition().GetModel(serviceProvider));
 
         }
+
+        #endregion
     }
 
 }
