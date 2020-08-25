@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.Exceptions;
+using TheSaga.Execution.Actions;
+using TheSaga.Execution.AsyncHandlers;
 using TheSaga.Messages;
 using TheSaga.Messages.MessageBus;
 using TheSaga.Models;
@@ -22,17 +24,23 @@ namespace TheSaga.Execution
         private ISagaPersistance sagaPersistance;
         private IInternalMessageBus internalMessageBus;
 
-        public SagaExecutor(ISagaModel<TSagaState> model, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
+        public SagaExecutor(
+            ISagaModel<TSagaState> model,
+            ISagaPersistance sagaPersistance,
+            IInternalMessageBus internalMessageBus)
         {
             this.model = model;
             this.sagaPersistance = sagaPersistance;
             this.internalMessageBus = internalMessageBus;
 
-            new SagaAsyncStepHandler<TSagaState>(this, sagaPersistance, internalMessageBus).
+            new SagaAsyncHandler<TSagaState>(this, sagaPersistance, internalMessageBus).
                 Subscribe();
         }
 
-        public async Task<ISagaState> Handle(Guid correlationID, IEvent @event, Boolean @async)
+        public async Task<ISagaState> Handle(
+            Guid correlationID,
+            IEvent @event,
+            Boolean @async)
         {
             Boolean newSagaCreated = false;
             try
@@ -40,21 +48,20 @@ namespace TheSaga.Execution
                 Type eventType = @event == null ?
                     null : @event.GetType();
 
-                if (eventType != null)
+                Guid? newCorrelationID = await CreateNewSagaIfRequired(correlationID, eventType);
+                if (newCorrelationID != null)
                 {
-                    bool isStartEvent = model.IsStartEvent(eventType);
-                    if (isStartEvent)
-                    {
-                        correlationID = await CreateNewSaga(correlationID);
-                        newSagaCreated = true;
-                    }
+                    correlationID = newCorrelationID.Value;
+                    newSagaCreated = true;
                 }
 
-                SagaStepExecutor<TSagaState> stepExecutor =
-                    new SagaStepExecutor<TSagaState>(correlationID, async, @event, model, internalMessageBus, sagaPersistance);
+                SagaActionExecutor<TSagaState> stepExecutor =
+                    new SagaActionExecutor<TSagaState>(correlationID, async, @event, model, internalMessageBus, sagaPersistance);
 
-                StepExecutionResult stepExecutionResult = await stepExecutor.ExecuteStep();
-                if (stepExecutionResult.Async || stepExecutionResult.State?.CurrentStep == null)
+                ActionExecutionResult stepExecutionResult = await stepExecutor.
+                    ExecuteStep();
+
+                if (stepExecutionResult.IsProcessingComplete)
                     return stepExecutionResult.State;
 
                 return await Handle(correlationID, null, @async);
@@ -71,6 +78,21 @@ namespace TheSaga.Execution
             }
         }
 
+        private async Task<Guid?> CreateNewSagaIfRequired(Guid correlationID, Type eventType)
+        {
+            if (eventType != null)
+            {
+                bool isStartEvent = model.IsStartEvent(eventType);
+                if (isStartEvent)
+                {
+                    correlationID = await CreateNewSaga(correlationID);
+                    return correlationID;
+                }
+            }
+
+            return null;
+        }
+
         private async Task<Guid> CreateNewSaga(Guid correlationID)
         {
             if (correlationID == Guid.Empty)
@@ -81,7 +103,9 @@ namespace TheSaga.Execution
             newSagaState.CurrentState = new SagaStartState().GetStateName();
             newSagaState.CurrentStep = null;
 
-            await sagaPersistance.Set(newSagaState);
+            await sagaPersistance.
+                Set(newSagaState);
+
             return correlationID;
         }
     }

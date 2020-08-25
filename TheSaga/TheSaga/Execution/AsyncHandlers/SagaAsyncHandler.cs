@@ -14,16 +14,16 @@ using TheSaga.SagaStates.Steps;
 using TheSaga.States;
 using TheSaga.Utils;
 
-namespace TheSaga.Execution
+namespace TheSaga.Execution.AsyncHandlers
 {
-    internal class SagaAsyncStepHandler<TSagaState>
+    internal class SagaAsyncHandler<TSagaState>
         where TSagaState : ISagaState
     {
         private ISagaExecutor sagaExecutor;
         private ISagaPersistance sagaPersistance;
         private IInternalMessageBus internalMessageBus;
 
-        public SagaAsyncStepHandler(ISagaExecutor sagaExecutor, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
+        public SagaAsyncHandler(ISagaExecutor sagaExecutor, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
         {
             this.sagaExecutor = sagaExecutor;
             this.sagaPersistance = sagaPersistance;
