@@ -84,8 +84,14 @@ namespace TheSaga.Tests
             services.AddScoped<ISagaCoordinator, SagaCoordinator>();
             serviceProvider = services.BuildServiceProvider();
 
-            ISagaRegistrator sagaRegistrator = serviceProvider.
+            sagaRegistrator = serviceProvider.
                 GetRequiredService<ISagaRegistrator>();
+
+            sagaPersistance = serviceProvider.
+                GetRequiredService<ISagaPersistance>();
+
+            sagaCoordinator = serviceProvider.
+                GetRequiredService<ISagaCoordinator>();
 
             sagaRegistrator.Register(
                 new AsyncSagaDefinition().GetModel(serviceProvider));
