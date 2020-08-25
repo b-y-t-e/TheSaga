@@ -1,14 +1,15 @@
 ﻿TODO:
- + locki
+ + sqlserver persistance
+ + wznawianie sag po restarcie
  + dodanie metody BusSend
  + dodanie metody Publish
- + sqlserver persistance
  + podpiecie sie do masstransit
  + after
- + wznawianie sag po restarcie
  + retry
+ + sprawdzenie lockow
  
 DONE:
+ + locki
  + sprawdzanie unikatowosci nazw krokow
  + historia kroków
  + obsługa kompensacji
