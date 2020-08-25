@@ -9,6 +9,7 @@ namespace TheSaga.SagaStates.Steps
         bool Async { get; }
         string StepName { get; }
 
-        Task Run(IExecutionContext context, IEvent @event);
+        Task Execute(IExecutionContext context, IEvent @event);
+        Task Compensate(IExecutionContext context, IEvent @event);
     }
 }

@@ -150,13 +150,25 @@ namespace TheSaga.Execution
 
             try
             {
+#if DEBUG
+                Console.WriteLine($"state: {state.CurrentState}; step: {state.CurrentStep}; action: {(state.IsCompensating ? "Compensate" : "Execute")}");
+#endif
+
                 IExecutionContext context = new ExecutionContext<TSagaState>()
                 {
                     State = (TSagaState)state
                 };
 
-                await sagaStep.
-                    Run(context, @event);
+                if (state.IsCompensating)
+                {
+                    await sagaStep.
+                        Compensate(context, @event);
+                }
+                else
+                {
+                    await sagaStep.
+                        Execute(context, @event);
+                }
 
                 if (nextSagaStep != null)
                 {

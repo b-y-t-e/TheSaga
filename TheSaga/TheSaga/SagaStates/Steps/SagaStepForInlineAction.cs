@@ -23,7 +23,12 @@ namespace TheSaga.SagaStates.Steps
         public bool Async { get; }
         public String StepName { get; private set; }
 
-        public async Task Run(IExecutionContext context, IEvent @event)
+        public Task Compensate(IExecutionContext context, IEvent @event)
+        {
+            return Task.CompletedTask;
+        }
+
+        public async Task Execute(IExecutionContext context, IEvent @event)
         {
             IExecutionContext<TSagaState> contextForAction =
                 (IExecutionContext<TSagaState>)context;

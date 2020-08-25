@@ -20,7 +20,7 @@ namespace TheSaga.Tests.Sagas.AsyncSaga
                     ctx.State.Logs.Add("1");
                     return Task.Delay(TimeSpan.FromSeconds(1));
                 }).
-                ThenAsync(ctx =>
+                Then(ctx =>
                 {
                     ctx.State.Logs.Add("2");
                     return Task.Delay(TimeSpan.FromSeconds(1));

@@ -24,7 +24,19 @@ namespace TheSaga.SagaStates.Steps
         public bool Async { get; }
         public String StepName { get; private set; }
 
-        public async Task Run(IExecutionContext context, IEvent @event)
+        public async Task Compensate(IExecutionContext context, IEvent @event)
+        {
+            IExecutionContext<TSagaState> contextForAction =
+                (IExecutionContext<TSagaState>)context;
+
+            TSagaActivity activity = (TSagaActivity)ActivatorUtilities.
+                CreateInstance(serviceProvider, typeof(TSagaActivity));
+
+            if (activity != null)
+                await activity.Compensate(contextForAction);
+        }
+
+        public async Task Execute(IExecutionContext context, IEvent @event)
         {
             IExecutionContext<TSagaState> contextForAction =
                 (IExecutionContext<TSagaState>)context;
