@@ -9,7 +9,7 @@ using TheSaga.SagaStates;
 
 namespace TheSaga.Registrator
 {
-    internal class SagaRegistrator : ISagaRegistrator
+    public class SagaRegistrator : ISagaRegistrator
     {
         Dictionary<Type, ISagaExecutor> registeredExecutors;
         List<ISagaModel> registeredModels;

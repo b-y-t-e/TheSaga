@@ -13,10 +13,10 @@ namespace TheSaga
     {
         public static IServiceCollection AddTheSaga(this IServiceCollection services)
         {
-            services.AddScoped<ISagaPersistance, InMemorySagaPersistance>();
+            services.AddSingleton<IInternalMessageBus, InternalMessageBus>();
+            services.AddSingleton<ISagaPersistance, InMemorySagaPersistance>();
             services.AddScoped<ISagaRegistrator, SagaRegistrator>();
             services.AddScoped<ISagaCoordinator, SagaCoordinator>();
-            services.AddScoped<IInternalMessageBus, InternalMessageBus>();
 
             return services;
         }

@@ -13,7 +13,7 @@ using TheSaga.States;
 
 namespace TheSaga.Coordinators
 {
-    internal class SagaCoordinator : ISagaCoordinator
+    public class SagaCoordinator : ISagaCoordinator
     {
         private ISagaRegistrator sagaRegistrator;
         private ISagaPersistance sagaPersistance;
