@@ -7,24 +7,24 @@ using TheSaga.Tests.Sagas.AsyncSaga.Events;
 
 namespace TheSaga.Tests.Sagas.AsyncSaga.EventHandlers
 {
-    public class UtworzoneHandler : IEventHandler<AsyncState, Utworzone>
+    public class CreatedEventHandler : IEventHandler<AsyncState, CreatedEvent>
     {
         private readonly ISagaCoordinator sagaCoordinator;
 
-        public UtworzoneHandler(ISagaCoordinator sagaCoordinator)
+        public CreatedEventHandler(ISagaCoordinator sagaCoordinator)
         {
             this.sagaCoordinator = sagaCoordinator;
         }
 
-        public Task Compensate(IEventContext<AsyncState, Utworzone> context)
+        public Task Compensate(IEventContext<AsyncState, CreatedEvent> context)
         {
-            context.State.Logs.Add($"{nameof(UtworzoneHandler)} compensation");
+            context.State.Logs.Add($"{nameof(CreatedEventHandler)} compensation");
             return Task.CompletedTask;
         }
 
-        public Task Execute(IEventContext<AsyncState, Utworzone> context)
+        public Task Execute(IEventContext<AsyncState, CreatedEvent> context)
         {
-            context.State.Logs.Add(nameof(UtworzoneHandler));
+            context.State.Logs.Add(nameof(CreatedEventHandler));
             return Task.CompletedTask;
         }
     }

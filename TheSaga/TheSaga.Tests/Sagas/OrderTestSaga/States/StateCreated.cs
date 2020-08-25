@@ -2,5 +2,5 @@
 
 namespace TheSaga.Tests.Sagas.OrderTestSaga.States
 {
-    internal class Wyslane : IState { }
+    internal class StateCreated : IState { }
 }

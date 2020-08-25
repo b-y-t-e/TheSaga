@@ -20,30 +20,30 @@ namespace TheSaga.Tests.Sagas.OrderTestSaga
             ISagaBuilder<OrderState> builder = new SagaBuilder<OrderState>(serviceProvider);
 
             builder.
-                Start<Utworzone, UtworzoneHandler>().
-                Then(async ctx => { ctx.State.Logs.Add(nameof(Utworzone)); }).
-                TransitionTo<Nowe>();
+                Start<OrderCreatedEvent, OrderCreatedEventHandler>().
+                Then(async ctx => { ctx.State.Logs.Add(nameof(OrderCreatedEvent)); }).
+                TransitionTo<StateCreated>();
 
             builder.
-                During<Nowe>().
-                When<Skompletowano>().
-                Then(async ctx => { ctx.State.Logs.Add(nameof(Skompletowano)); }).
-                Then<WyslijEmailDoKlienta>("email").
-                Then<WyslijWiadomoscDoKierownika>().
-                Then<ZamowKuriera>().
-                TransitionTo<Skompletowane>();
+                During<StateCreated>().
+                When<OrderCompletedEvent>().
+                Then(async ctx => { ctx.State.Logs.Add(nameof(OrderCompletedEvent)); }).
+                Then<SendEmailToClientEvent>("email").
+                Then<SendMessageToTheManagerEvent>().
+                Then<OrderCourierEvent>().
+                TransitionTo<StateCompleted>();
 
             builder.
-                During<Skompletowane>().
-                When<Wyslano>().
-                Then(async ctx => { ctx.State.Logs.Add(nameof(Wyslano)); }).
-                TransitionTo<Wyslane>();
+                During<StateCompleted>().
+                When<OrderSendEvent>().
+                Then(async ctx => { ctx.State.Logs.Add(nameof(OrderSendEvent)); }).
+                TransitionTo<StateOrderSend>();
 
             builder.
-                During<Wyslane>().
-                When<Dostarczono>().
-                Then(async ctx => { ctx.State.Logs.Add(nameof(Dostarczono)); }).
-                TransitionTo<Zakonczono>();
+                During<StateOrderSend>().
+                When<DeliveredEvent>().
+                Then(async ctx => { ctx.State.Logs.Add(nameof(DeliveredEvent)); }).
+                Finish();
 
             return builder.
                 Build();

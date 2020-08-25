@@ -27,7 +27,7 @@ namespace TheSaga.Tests
         IServiceProvider serviceProvider;
 
         [Fact]
-        public async Task WHEN_startEvent_THEN_sagaShouldBeCreated()
+        public async Task WHEN_sagaContainsAsyncMethods_THEN_stepsShouldBeExecutedAsync()
         {
             // given
             ISagaPersistance sagaPersistance = serviceProvider.
@@ -36,7 +36,7 @@ namespace TheSaga.Tests
             ISagaCoordinator sagaCoordinator = serviceProvider.
                 GetRequiredService<ISagaCoordinator>();
 
-            IEvent startEvent = new Utworzone();
+            IEvent startEvent = new CreatedEvent();
 
             // when
             ISagaState sagaState = await sagaCoordinator.
@@ -50,7 +50,35 @@ namespace TheSaga.Tests
             persistedState.CurrentStep.ShouldStartWith("~");
             persistedState.CurrentState.ShouldBe("~");
             persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
-            persistedState.Logs.ShouldContain(nameof(UtworzoneHandler));
+            persistedState.Logs.ShouldContain(nameof(CreatedEventHandler));
+            persistedState.Logs.Count.ShouldBe(1);
+        }
+
+        [Fact]
+        public async Task WHEN_abc_THEN_def()
+        {
+            // given
+            ISagaPersistance sagaPersistance = serviceProvider.
+                GetRequiredService<ISagaPersistance>();
+
+            ISagaCoordinator sagaCoordinator = serviceProvider.
+                GetRequiredService<ISagaCoordinator>();
+
+            IEvent startEvent = new CreatedEvent();
+
+            // when
+            ISagaState sagaState = await sagaCoordinator.
+                Send(startEvent);
+
+            // then
+            AsyncState persistedState = (AsyncState)await sagaPersistance.
+                Get(sagaState.CorrelationID);
+
+            persistedState.ShouldNotBeNull();
+            persistedState.CurrentStep.ShouldStartWith("~");
+            persistedState.CurrentState.ShouldBe("~");
+            persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
+            persistedState.Logs.ShouldContain(nameof(CreatedEventHandler));
             persistedState.Logs.Count.ShouldBe(1);
         }
 

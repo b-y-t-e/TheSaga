@@ -37,7 +37,7 @@ namespace TheSaga.Tests
             ISagaCoordinator sagaCoordinator = serviceProvider.
                 GetRequiredService<ISagaCoordinator>();
 
-            IEvent startEvent = new Utworzone();
+            IEvent startEvent = new OrderCreatedEvent();
 
             // when
             ISagaState sagaState = await sagaCoordinator.
@@ -49,9 +49,9 @@ namespace TheSaga.Tests
 
             persistedState.ShouldNotBeNull();
             persistedState.CurrentStep.ShouldBe(null);
-            persistedState.CurrentState.ShouldBe(nameof(Nowe));
+            persistedState.CurrentState.ShouldBe(nameof(StateCreated));
             persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
-            persistedState.Logs.ShouldContain(nameof(Utworzone));
+            persistedState.Logs.ShouldContain(nameof(OrderCreatedEvent));
         }
 
         [Fact]
@@ -65,9 +65,9 @@ namespace TheSaga.Tests
                 GetRequiredService<ISagaCoordinator>();
 
             ISagaState newSagaState = await sagaCoordinator.
-                Send(new Utworzone());
+                Send(new OrderCreatedEvent());
 
-            IEvent invalidEvent = new Wyslano()
+            IEvent invalidEvent = new OrderSendEvent()
             {
                 CorrelationID = newSagaState.CorrelationID
             };
@@ -84,9 +84,9 @@ namespace TheSaga.Tests
                 Get(newSagaState.CorrelationID);
 
             persistedState.ShouldNotBeNull();
-            persistedState.CurrentState.ShouldBe(nameof(Nowe));
+            persistedState.CurrentState.ShouldBe(nameof(StateCreated));
             persistedState.CurrentStep.ShouldBe(null);
-            persistedState.Logs.ShouldContain(nameof(Utworzone));
+            persistedState.Logs.ShouldContain(nameof(OrderCreatedEvent));
             persistedState.Logs.Count.ShouldBe(2);
         }
 
@@ -101,9 +101,9 @@ namespace TheSaga.Tests
                 GetRequiredService<ISagaCoordinator>();
 
             var newSagaState = await sagaCoordinator.
-                Send(new Utworzone());
+                Send(new OrderCreatedEvent());
 
-            IEvent skompletowanoEvent = new Skompletowano()
+            IEvent skompletowanoEvent = new OrderCompletedEvent()
             {
                 CorrelationID = newSagaState.CorrelationID
             };
@@ -117,14 +117,14 @@ namespace TheSaga.Tests
                 Get(newSagaState.CorrelationID);
 
             persistedState.ShouldNotBeNull();
-            persistedState.CurrentState.ShouldBe(nameof(Skompletowane));
+            persistedState.CurrentState.ShouldBe(nameof(StateCompleted));
             persistedState.CurrentStep.ShouldBe(null);
-            persistedState.Logs.ShouldContain(nameof(Utworzone));
-            persistedState.Logs.ShouldContain(nameof(UtworzoneHandler));
-            persistedState.Logs.ShouldContain(nameof(Skompletowano));
-            persistedState.Logs.ShouldContain(nameof(WyslijEmailDoKlienta));
-            persistedState.Logs.ShouldContain(nameof(WyslijWiadomoscDoKierownika));
-            persistedState.Logs.ShouldContain(nameof(ZamowKuriera));
+            persistedState.Logs.ShouldContain(nameof(OrderCreatedEvent));
+            persistedState.Logs.ShouldContain(nameof(OrderCreatedEventHandler));
+            persistedState.Logs.ShouldContain(nameof(OrderCompletedEvent));
+            persistedState.Logs.ShouldContain(nameof(SendEmailToClientEvent));
+            persistedState.Logs.ShouldContain(nameof(SendMessageToTheManagerEvent));
+            persistedState.Logs.ShouldContain(nameof(OrderCourierEvent));
             persistedState.Logs.Count.ShouldBe(6);
         }
 

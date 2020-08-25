@@ -2,5 +2,5 @@
 
 namespace TheSaga.Tests.Sagas.OrderTestSaga.States
 {
-    internal class Nowe : IState { }
+    internal class StateOrderSend : IState { }
 }

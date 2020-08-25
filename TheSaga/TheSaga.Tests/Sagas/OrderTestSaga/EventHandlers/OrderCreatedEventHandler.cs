@@ -7,24 +7,24 @@ using TheSaga.Tests.Sagas.OrderTestSaga.Events;
 
 namespace TheSaga.Tests.Sagas.OrderTestSaga.EventHandlers
 {
-    public class UtworzoneHandler : IEventHandler<OrderState, Utworzone>
+    public class OrderCreatedEventHandler : IEventHandler<OrderState, OrderCreatedEvent>
     {
         private readonly ISagaCoordinator sagaCoordinator;
 
-        public UtworzoneHandler(ISagaCoordinator sagaCoordinator)
+        public OrderCreatedEventHandler(ISagaCoordinator sagaCoordinator)
         {
             this.sagaCoordinator = sagaCoordinator;
         }
 
-        public Task Compensate(IEventContext<OrderState, Utworzone> context)
+        public Task Compensate(IEventContext<OrderState, OrderCreatedEvent> context)
         {
-            context.State.Logs.Add($"{nameof(UtworzoneHandler)} compensation");
+            context.State.Logs.Add($"{nameof(OrderCreatedEventHandler)} compensation");
             return Task.CompletedTask;
         }
 
-        public Task Execute(IEventContext<OrderState, Utworzone> context)
+        public Task Execute(IEventContext<OrderState, OrderCreatedEvent> context)
         {
-            context.State.Logs.Add(nameof(UtworzoneHandler));
+            context.State.Logs.Add(nameof(OrderCreatedEventHandler));
             return Task.CompletedTask;
         }
     }

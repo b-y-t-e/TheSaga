@@ -20,7 +20,7 @@ namespace TheSaga.Tests.Sagas.AsyncSaga
             ISagaBuilder<AsyncState> builder = new SagaBuilder<AsyncState>(serviceProvider);
 
             builder.
-                Start<Utworzone, UtworzoneHandler>().
+                Start<CreatedEvent, CreatedEventHandler>().
                 ThenAsync(ctx =>
                 {
                     ctx.State.Logs.Add("1");
@@ -31,7 +31,7 @@ namespace TheSaga.Tests.Sagas.AsyncSaga
                     ctx.State.Logs.Add("2");
                     return Task.Delay(TimeSpan.FromSeconds(3));
                 }).
-                TransitionTo<Nowe>();
+                Finish();
 
             return builder.
                 Build();
