@@ -74,9 +74,6 @@ namespace TheSaga.Coordinators
             }
             catch
             {
-                CorrelationIdLock.
-                    Banish(correlationID);
-
                 if (newSagaCreated)
                 {
                     await sagaPersistance.
