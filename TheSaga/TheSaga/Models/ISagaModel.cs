@@ -16,7 +16,7 @@ namespace TheSaga.Models
 
         bool ContainsEvent(Type type);
 
-        ISagaAction FindAction(string state, Type eventType);
+        ISagaAction FindActionOrCreate(string state, Type eventType);
 
         IList<ISagaAction> FindActions(string state);
 

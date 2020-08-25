@@ -25,7 +25,7 @@ namespace TheSaga.Models
                 Actions.DuringEvents.Contains(type);
         }
 
-        public ISagaAction FindAction(string state, Type eventType)
+        public ISagaAction FindActionOrCreate(string state, Type eventType)
         {
             SagaAction<TSagaState> action = this.Actions.
                 FindAction(state, eventType);

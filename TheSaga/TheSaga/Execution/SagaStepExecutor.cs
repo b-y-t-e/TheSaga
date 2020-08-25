@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.Execution.Context;
+using TheSaga.Messages;
+using TheSaga.Messages.MessageBus;
 using TheSaga.Persistance;
 using TheSaga.SagaStates;
 using TheSaga.SagaStates.Actions;
@@ -14,12 +16,18 @@ namespace TheSaga.Execution
     {
         private IEvent @event;
         private ISagaAction action;
+        private IInternalMessageBus internalMessageBus;
         private ISagaPersistance sagaPersistance;
         private ISagaState state;
 
         public SagaStepExecutor(
-            ISagaPersistance sagaPersistance, IEvent @event, ISagaState state, ISagaAction action)
+            IInternalMessageBus internalMessageBus,
+            ISagaPersistance sagaPersistance,
+            IEvent @event,
+            ISagaState state,
+            ISagaAction action)
         {
+            this.internalMessageBus = internalMessageBus;
             this.sagaPersistance = sagaPersistance;
             this.@event = @event;
             this.state = state;
@@ -52,6 +60,9 @@ namespace TheSaga.Execution
         {
             try
             {
+                string prevState = state.CurrentState;
+                string prevStep = state.CurrentStep;
+
                 ISagaStep sagaStep = action.
                     FindStep(state.CurrentStep);
 
@@ -75,12 +86,20 @@ namespace TheSaga.Execution
                     state.CurrentStep = null;
                 }
 
-                await sagaPersistance.Set(state);
+                await sagaPersistance.
+                    Set(state);
+
+                if (prevState != state.CurrentState)
+                    internalMessageBus.Publish(
+                        new SagaStateChangedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
+
+                internalMessageBus.Publish(
+                    new SagaStepChangedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
 
                 if (sagaStep.Async)
                 {
-                    // zalowanie kolejnego kroku
-                    throw new NotImplementedException();
+                    internalMessageBus.Publish(
+                        new SagaAsyncStepCompletedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
                 }
             }
             catch (Exception ex)

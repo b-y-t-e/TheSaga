@@ -33,11 +33,16 @@ namespace TheSaga.SagaStates.Actions
 
         public ISagaStep FindStep(string stepName)
         {
+            //if (stepName == null)
+            //    return Steps.FirstOrDefault();
+
             ISagaStep step = Steps.
                 FirstOrDefault(s => s.StepName == stepName);
 
             if (step == null)
-                step = Steps.FirstOrDefault();
+            {
+
+            }
 
             return step;
         }

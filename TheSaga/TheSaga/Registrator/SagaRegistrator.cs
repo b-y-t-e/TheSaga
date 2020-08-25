@@ -43,7 +43,7 @@ namespace TheSaga.Registrator
             registeredModels.Add((ISagaModel)model);
 
             registeredExecutors[typeof(TSagaState)] =
-                new SagaExecutor<TSagaState>(sagaPersistance, internalMessageBus);
+                new SagaExecutor<TSagaState>(model, sagaPersistance, internalMessageBus);
         }
     }
 }

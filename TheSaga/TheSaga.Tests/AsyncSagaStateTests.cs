@@ -18,7 +18,7 @@ namespace TheSaga.Tests
     public class AsyncSagaStateTests
     {
         [Fact]
-        public async Task WHEN_abc_THEN_def()
+        public async Task WHEN_sagaRunAsyncMethods_THEN_sagaShouldBeInIntermediateState()
         {
             // given
             IEvent startEvent = new CreatedEvent();
@@ -32,15 +32,15 @@ namespace TheSaga.Tests
                 Get(sagaState.CorrelationID);
 
             persistedState.ShouldNotBeNull();
-            persistedState.CurrentStep.ShouldStartWith("~");
-            persistedState.CurrentState.ShouldBe("~");
+            persistedState.CurrentStep.ShouldStartWith(new SagaStartState().Name);
+            persistedState.CurrentState.ShouldBe(new SagaStartState().Name);
             persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
             persistedState.Logs.ShouldContain(nameof(CreatedEventHandler));
             persistedState.Logs.Count.ShouldBe(1);
         }
 
         [Fact]
-        public async Task WHEN_sagaContainsAsyncMethods_THEN_stepsShouldBeExecutedAsync()
+        public async Task WHEN_sagaWaitForAllAsyncMethods_THEN_sagaShouldBeCompleted()
         {
             // given
             IEvent startEvent = new CreatedEvent();
@@ -57,11 +57,11 @@ namespace TheSaga.Tests
                 Get(sagaState.CorrelationID);
 
             persistedState.ShouldNotBeNull();
-            persistedState.CurrentStep.ShouldStartWith("~");
-            persistedState.CurrentState.ShouldBe("~");
+            persistedState.CurrentStep.ShouldBe(new SagaFinishState().Name);
+            persistedState.CurrentState.ShouldBe(new SagaFinishState().Name);
             persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
             persistedState.Logs.ShouldContain(nameof(CreatedEventHandler));
-            persistedState.Logs.Count.ShouldBe(1);
+            persistedState.Logs.Count.ShouldBe(3);
         }
 
         #region Arrange
