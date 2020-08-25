@@ -16,7 +16,7 @@ namespace TheSaga.Registrator
         ISagaPersistance sagaPersistance;
         IInternalMessageBus internalMessageBus;
 
-        internal SagaRegistrator(ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
+        public SagaRegistrator(ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
         {
             this.registeredExecutors = new Dictionary<Type, ISagaExecutor>();
             this.registeredModels = new List<ISagaModel>();

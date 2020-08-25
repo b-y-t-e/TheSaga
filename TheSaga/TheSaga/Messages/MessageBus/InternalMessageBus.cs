@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TheSaga.Messages.MessageBus
 {
-    internal class InternalMessageBus : IInternalMessageBus
+    public class InternalMessageBus : IInternalMessageBus
     {
     }
 }
