@@ -12,6 +12,7 @@ using TheSaga.Persistance;
 using TheSaga.Registrator;
 using TheSaga.SagaStates;
 using TheSaga.States;
+using TheSaga.Utils;
 
 namespace TheSaga.Coordinators
 {
@@ -26,21 +27,64 @@ namespace TheSaga.Coordinators
             this.sagaRegistrator = sagaRegistrator;
             this.sagaPersistance = sagaPersistance;
             this.internalMessageBus = internalMessageBus;
+
+            this.internalMessageBus.Subscribe<SagaProcessingStart>(this, msg =>
+            {
+                if (!CorrelationIdLock.Acquire(msg.CorrelationID))
+                    throw new SagaIsBusyException(msg.CorrelationID);
+
+                return Task.CompletedTask;
+            });
+
+            this.internalMessageBus.Subscribe<SagaProcessingEnd>(this, msg =>
+            {
+                if (!CorrelationIdLock.Banish(msg.CorrelationID))
+                {
+
+                }
+
+                return Task.CompletedTask;
+            });
         }
 
         public async Task<ISagaState> Send(IEvent @event)
         {
             Type eventType = @event.GetType();
+            Guid correlationID = @event.CorrelationID;
+            Boolean newSagaCreated = false;
 
             ISagaModel model = sagaRegistrator.FindModelForEventType(eventType);
             if (model == null)
                 throw new SagaEventNotRegisteredException(eventType);
 
-            ISagaExecutor sagaExecutor = sagaRegistrator.
-                FindExecutorForStateType(model.SagaStateType);
+            Guid? newCorrelationID = await CreateNewSagaIfRequired(model, correlationID, eventType);
+            if (newCorrelationID != null)
+            {
+                correlationID = newCorrelationID.Value;
+                newSagaCreated = true;
+            }
 
-            return await sagaExecutor.
-                Handle(@event.CorrelationID, @event, false);
+            try
+            {
+                ISagaExecutor sagaExecutor = sagaRegistrator.
+                    FindExecutorForStateType(model.SagaStateType);
+
+                return await sagaExecutor.
+                    Handle(correlationID, @event, false);
+            }
+            catch
+            {
+                CorrelationIdLock.
+                    Banish(correlationID);
+
+                if (newSagaCreated)
+                {
+                    await sagaPersistance.
+                        Remove(correlationID);
+                }
+
+                throw;
+            }
         }
 
         public async Task WaitForState<TState>(Guid correlationID, SagaWaitOptions waitOptions = null)
@@ -84,6 +128,37 @@ namespace TheSaga.Coordinators
             {
                 internalMessageBus.Unsubscribe<SagaStateChangedMessage>(this);
             }
+        }
+
+        private async Task<Guid?> CreateNewSagaIfRequired(ISagaModel model, Guid correlationID, Type eventType)
+        {
+            if (eventType != null)
+            {
+                bool isStartEvent = model.IsStartEvent(eventType);
+                if (isStartEvent)
+                {
+                    correlationID = await CreateNewSaga(model, correlationID);
+                    return correlationID;
+                }
+            }
+
+            return null;
+        }
+
+        private async Task<Guid> CreateNewSaga(ISagaModel model, Guid correlationID)
+        {
+            if (correlationID == Guid.Empty)
+                correlationID = Guid.NewGuid();
+
+            ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
+            newSagaState.CorrelationID = correlationID;
+            newSagaState.CurrentState = new SagaStartState().GetStateName();
+            newSagaState.CurrentStep = null;
+
+            await sagaPersistance.
+                Set(newSagaState);
+
+            return correlationID;
         }
     }
 }

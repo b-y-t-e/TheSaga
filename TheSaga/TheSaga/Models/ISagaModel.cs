@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TheSaga.SagaStates;
 using TheSaga.SagaStates.Actions;
+using TheSaga.SagaStates.Steps;
 
 namespace TheSaga.Models
 {
@@ -16,9 +17,11 @@ namespace TheSaga.Models
 
         bool ContainsEvent(Type type);
 
-        ISagaAction FindActionOrCreate(string state, Type eventType);
+        ISagaAction FindActionOrCreateForStateAndEvent(string state, Type eventType);
 
-        IList<ISagaAction> FindActions(string state);
+        IList<ISagaAction> FindActionsForState(string state);
+
+        ISagaAction FindActionForStep(ISagaStep sagaStep);
 
         bool IsStartEvent(Type type);
     }

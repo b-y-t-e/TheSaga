@@ -5,6 +5,8 @@
  + sqlserver persistance
  + podpiecie sie do masstransit
  + after
+ + wznawianie sag po restarcie
+ + retry
  
 DONE:
  + sprawdzanie unikatowosci nazw krokow

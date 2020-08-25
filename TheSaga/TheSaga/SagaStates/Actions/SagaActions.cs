@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
+using TheSaga.SagaStates.Steps;
 using TheSaga.States;
 
 namespace TheSaga.SagaStates.Actions
@@ -33,6 +34,12 @@ namespace TheSaga.SagaStates.Actions
         {
             return this.items.
                 FirstOrDefault(s => s.State == state && s.Event == eventType);
+        }
+
+        internal SagaAction<TSagaState> FindAction(ISagaStep sagaStep)
+        {
+            return this.items.
+                FirstOrDefault(s => s.Steps.Contains(sagaStep));
         }
 
         internal IList<SagaAction<TSagaState>> FindActions(string state)

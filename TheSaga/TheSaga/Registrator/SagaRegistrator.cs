@@ -24,14 +24,14 @@ namespace TheSaga.Registrator
             this.internalMessageBus = internalMessageBus;
         }
 
-        public ISagaExecutor FindExecutorForStateType(Type stateType)
+        ISagaExecutor ISagaRegistrator.FindExecutorForStateType(Type stateType)
         {
             ISagaExecutor sagaExecutor = null;
             registeredExecutors.TryGetValue(stateType, out sagaExecutor);
             return sagaExecutor;
         }
 
-        public ISagaModel FindModelForEventType(Type eventType)
+        ISagaModel ISagaRegistrator.FindModelForEventType(Type eventType)
         {
             return registeredModels.
                 FirstOrDefault(v => v.ContainsEvent(eventType));
@@ -45,5 +45,6 @@ namespace TheSaga.Registrator
             registeredExecutors[typeof(TSagaState)] =
                 new SagaExecutor<TSagaState>(model, sagaPersistance, internalMessageBus);
         }
+
     }
 }
