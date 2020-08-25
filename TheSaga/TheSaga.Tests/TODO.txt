@@ -4,6 +4,8 @@
  + sqlserver persistance
  + podpiecie sie do masstransit
  + after
+ + co w przypadku bledow podczas kompensacji?
+ + obsluga bledow
  
 DONE:
  + startowy stan

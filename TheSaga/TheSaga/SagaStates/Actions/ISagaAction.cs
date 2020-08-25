@@ -12,6 +12,8 @@ namespace TheSaga.SagaStates.Actions
 
         ISagaStep FindNextAfter(ISagaStep step);
 
+        ISagaStep FindPrevBefore(ISagaStep step);
+
         ISagaStep FindStep(string stepName);
     }
 }

@@ -31,6 +31,14 @@ namespace TheSaga.SagaStates.Actions
             return null;
         }
 
+        public ISagaStep FindPrevBefore(ISagaStep step)
+        {
+            int stepIndex = this.Steps.IndexOf(step);  
+            if (stepIndex > 0)
+                return this.Steps[stepIndex - 1];
+            return null;
+        }
+
         public ISagaStep FindStep(string stepName)
         {
             //if (stepName == null)

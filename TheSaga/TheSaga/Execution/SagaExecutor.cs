@@ -32,7 +32,7 @@ namespace TheSaga.Execution
                 Subscribe();
         }
 
-        public async Task<ISagaState> Handle(Guid correlationID, IEvent @event)
+        public async Task<ISagaState> Handle(Guid correlationID, IEvent @event, Boolean @async)
         {
             Type eventType = @event == null ?
                 null : @event.GetType();
@@ -45,13 +45,13 @@ namespace TheSaga.Execution
             }
 
             SagaStepExecutor<TSagaState> stepExecutor =
-                new SagaStepExecutor<TSagaState>(correlationID, @event, model, internalMessageBus, sagaPersistance);
+                new SagaStepExecutor<TSagaState>(correlationID, async, @event, model, internalMessageBus, sagaPersistance);
 
             StepExecutionResult stepExecutionResult = await stepExecutor.ExecuteStep();
             if (stepExecutionResult.Async || stepExecutionResult.State?.CurrentStep == null)
                 return stepExecutionResult.State;
 
-            return await Handle(correlationID, null);
+            return await Handle(correlationID, null, @async);
         }
 
         private async Task<Guid> CreateNewSaga(Guid correlationID)

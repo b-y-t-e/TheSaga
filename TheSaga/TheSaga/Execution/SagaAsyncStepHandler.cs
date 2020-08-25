@@ -44,7 +44,7 @@ namespace TheSaga.Execution
             {
                 try
                 {
-                    await sagaExecutor.Handle(message.CorrelationID, null);
+                    await sagaExecutor.Handle(message.CorrelationID, null, true);
                 }
                 catch (Exception ex)
                 {

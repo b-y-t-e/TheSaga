@@ -45,7 +45,7 @@ namespace TheSaga.Coordinators
                 FindExecutorForStateType(model.SagaStateType);
 
             return await sagaExecutor.
-                Handle(@event.CorrelationID, @event);
+                Handle(@event.CorrelationID, @event, false);
         }
 
         public async Task WaitForEvent<TSagaEvent>(Guid correlationID, SagaWaitOptions waitOptions = null)

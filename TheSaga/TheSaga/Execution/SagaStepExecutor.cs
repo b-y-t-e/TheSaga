@@ -21,6 +21,7 @@ namespace TheSaga.Execution
         private IEvent @event;
         private ISagaAction action;
         private Guid correlationID;
+        private bool @async;
         private IInternalMessageBus internalMessageBus;
         private ISagaModel<TSagaState> model;
         private ISagaPersistance sagaPersistance;
@@ -28,12 +29,14 @@ namespace TheSaga.Execution
 
         public SagaStepExecutor(
             Guid correlationID,
+            Boolean async,
             IEvent @event,
             ISagaModel<TSagaState> model,
             IInternalMessageBus internalMessageBus,
             ISagaPersistance sagaPersistance)
         {
             this.correlationID = correlationID;
+            this.@async = async;
             this.@event = @event;
             this.model = model;
             this.internalMessageBus = internalMessageBus;
@@ -74,6 +77,15 @@ namespace TheSaga.Execution
             }
             else
             {
+                if (state.CurrentStep == null)
+                {
+                    return new StepExecutionResult()
+                    {
+                        Async = false,
+                        State = state
+                    };
+                }
+
                 action = actions.
                     FirstOrDefault(a => a.FindStep(state.CurrentStep) != null);
 
@@ -87,18 +99,21 @@ namespace TheSaga.Execution
             if (step == null)
                 throw new SagaStepNotRegisteredException(state.CurrentState, state.CurrentStep);
 
-            bool async = await runStep(step);
+            if (step.Async)
+                async = true;
+
+            await runStep();
 
             return new StepExecutionResult()
             {
                 State = state,
-                Async = async
+                Async = @async
             };
         }
 
-        private async Task<bool> runStep(ISagaStep step)
+        private async Task<bool> runStep()
         {
-            if (step.Async)
+            if (@async)
             {
                 RunStepAsync();
                 return true;
@@ -117,17 +132,24 @@ namespace TheSaga.Execution
 
         private async Task RunStepSync()
         {
+            string prevState = state.CurrentState;
+            string prevStep = state.CurrentStep;
+
+            ISagaStep sagaStep = action.
+                FindStep(state.CurrentStep);
+
+            ISagaStep nextSagaStep = null;
+            if (state.IsCompensating)
+            {
+                nextSagaStep = action.FindPrevBefore(sagaStep);
+            }
+            else
+            {
+                nextSagaStep = action.FindNextAfter(sagaStep);
+            }
+
             try
             {
-                string prevState = state.CurrentState;
-                string prevStep = state.CurrentStep;
-
-                ISagaStep sagaStep = action.
-                    FindStep(state.CurrentStep);
-
-                ISagaStep nextSagaStep = action.
-                    FindNextAfter(sagaStep);
-
                 IExecutionContext context = new ExecutionContext<TSagaState>()
                 {
                     State = (TSagaState)state
@@ -142,6 +164,7 @@ namespace TheSaga.Execution
                 }
                 else
                 {
+                    state.IsCompensating = false;
                     state.CurrentStep = null;
                 }
 
@@ -149,13 +172,15 @@ namespace TheSaga.Execution
                     Set(state);
 
                 if (prevState != state.CurrentState)
+                {
                     internalMessageBus.Publish(
                         new SagaStateChangedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
+                }
 
                 internalMessageBus.Publish(
                     new SagaStepChangedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
 
-                if (sagaStep.Async)
+                if (@async)
                 {
                     internalMessageBus.Publish(
                         new SagaStepCompletedAsyncMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
@@ -163,7 +188,23 @@ namespace TheSaga.Execution
             }
             catch (Exception ex)
             {
-                throw;
+                if (!state.IsCompensating)
+                {
+                    state.IsCompensating = true;
+
+                    await sagaPersistance.
+                        Set(state);
+
+                    internalMessageBus.Publish(
+                        new SagaStepCompletedAsyncMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
+                }
+                else
+                {
+                    Console.WriteLine(ex.Message);
+
+                    internalMessageBus.Publish(
+                        new SagaStepCompletedAsyncMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
+                }
             }
         }
     }

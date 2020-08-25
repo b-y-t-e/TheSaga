@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.Models;
@@ -8,6 +9,6 @@ namespace TheSaga.Execution
 {
     public interface ISagaExecutor
     {
-        Task<ISagaState> Handle(Guid correlationID, IEvent @event);
+        Task<ISagaState> Handle(Guid correlationID, IEvent @event, Boolean async);
     }
 }
