@@ -2,23 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using TheSaga.Execution;
+using TheSaga.Messages.MessageBus;
 using TheSaga.Models;
 using TheSaga.Persistance;
 using TheSaga.SagaStates;
 
 namespace TheSaga.Registrator
 {
-    public class SagaRegistrator : ISagaRegistrator
+    internal class SagaRegistrator : ISagaRegistrator
     {
         Dictionary<Type, ISagaExecutor> registeredExecutors;
         List<ISagaModel> registeredModels;
         ISagaPersistance sagaPersistance;
+        IInternalMessageBus internalMessageBus;
 
-        public SagaRegistrator(ISagaPersistance sagaPersistance)
+        internal SagaRegistrator(ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
         {
             this.registeredExecutors = new Dictionary<Type, ISagaExecutor>();
             this.registeredModels = new List<ISagaModel>();
             this.sagaPersistance = sagaPersistance;
+            this.internalMessageBus = internalMessageBus;
         }
 
         public ISagaExecutor FindExecutorForStateType(Type stateType)
@@ -38,7 +41,9 @@ namespace TheSaga.Registrator
             where TSagaState : ISagaState
         {
             registeredModels.Add((ISagaModel)model);
-            registeredExecutors[typeof(TSagaState)] = new SagaExecutor<TSagaState>(sagaPersistance);
+
+            registeredExecutors[typeof(TSagaState)] =
+                new SagaExecutor<TSagaState>(sagaPersistance, internalMessageBus);
         }
     }
 }

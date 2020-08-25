@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using TheSaga.States;
 
 namespace TheSaga.SagaStates.Actions
@@ -51,7 +52,7 @@ namespace TheSaga.SagaStates.Actions
             {
                 if (action.Event != null)
                 {
-                    if (action.State == Extensions.GetStateName<SagaStartState>())
+                    if (action.State == new SagaStartState().GetStateName())
                     {
                         StartEvents.Add(action.Event);
                     }
@@ -61,7 +62,7 @@ namespace TheSaga.SagaStates.Actions
                     }
                 }
 
-                if (action.State != Extensions.GetStateName<SagaStartState>())
+                if (action.State != new SagaStartState().GetStateName())
                 {
                     States.Add(action.State);
                 }

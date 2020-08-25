@@ -8,7 +8,7 @@ namespace TheSaga.SagaStates.Steps
     public delegate Task ThenActionDelegate<TSagaState>(IExecutionContext<TSagaState> context)
         where TSagaState : ISagaState;
 
-    public class SagaStepForInlineAction<TSagaState> : ISagaStep
+    internal class SagaStepForInlineAction<TSagaState> : ISagaStep
             where TSagaState : ISagaState
     {
         public SagaStepForInlineAction(

@@ -6,7 +6,7 @@ using TheSaga.SagaStates.Actions;
 
 namespace TheSaga.Models
 {
-    public class SagaModel<TSagaState> : ISagaModel<TSagaState>
+    internal class SagaModel<TSagaState> : ISagaModel<TSagaState>
         where TSagaState : ISagaState
     {
         public SagaModel()

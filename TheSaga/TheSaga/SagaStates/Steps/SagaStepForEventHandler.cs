@@ -6,7 +6,7 @@ using TheSaga.Execution.Context;
 
 namespace TheSaga.SagaStates.Steps
 {
-    public class SagaStepForEventHandler<TSagaState, TEventHandler, TEvent> : ISagaStep
+    internal class SagaStepForEventHandler<TSagaState, TEventHandler, TEvent> : ISagaStep
         where TSagaState : ISagaState
         where TEventHandler : IEventHandler<TSagaState, TEvent>
         where TEvent : IEvent

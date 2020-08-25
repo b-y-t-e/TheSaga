@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.Exceptions;
@@ -12,7 +13,7 @@ using TheSaga.States;
 
 namespace TheSaga.Coordinators
 {
-    public class SagaCoordinator : ISagaCoordinator
+    internal class SagaCoordinator : ISagaCoordinator
     {
         private ISagaRegistrator sagaRegistrator;
         private ISagaPersistance sagaPersistance;
@@ -55,16 +56,31 @@ namespace TheSaga.Coordinators
         }
 
         public async Task WaitForState<TState>(Guid correlationID, SagaWaitOptions waitOptions = null)
-            where TState : IState
+            where TState : IState, new()
         {
+            if (waitOptions == null)
+                waitOptions = new SagaWaitOptions();
+
             ISagaState state = await sagaPersistance.
                 Get(correlationID);
 
             if (state == null)
                 throw new SagaInstanceNotFoundException(correlationID);
 
-            // state.CurrentState
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            while (true)
+            {
+                await Task.Delay(250);
+                
+                state = await sagaPersistance.
+                    Get(correlationID);
+                
+                if (state.CurrentState == new TState().GetStateName())
+                    break;
 
+                if (stopwatch.Elapsed >= waitOptions.Timeout)
+                    throw new TimeoutException();
+            }
         }
     }
 }

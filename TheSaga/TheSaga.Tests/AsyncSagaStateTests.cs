@@ -74,9 +74,8 @@ namespace TheSaga.Tests
         public AsyncSagaStateTests()
         {
             IServiceCollection services = new ServiceCollection();
-            services.AddScoped<ISagaPersistance, InMemorySagaPersistance>();
-            services.AddScoped<ISagaRegistrator, SagaRegistrator>();
-            services.AddScoped<ISagaCoordinator, SagaCoordinator>();
+            services.AddTheSaga();
+
             serviceProvider = services.BuildServiceProvider();
 
             sagaRegistrator = serviceProvider.

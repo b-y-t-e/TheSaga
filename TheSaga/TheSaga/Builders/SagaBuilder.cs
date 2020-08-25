@@ -64,7 +64,7 @@ namespace TheSaga.Builders
                       uniqueNameGenerator.Generate(currentState, nameof(Finish)),
                       ctx =>
                       {
-                          ctx.State.CurrentState = Extensions.GetStateName<SagaFinishState>();
+                          ctx.State.CurrentState = new SagaFinishState().GetStateName();
                           ctx.State.CurrentStep = null;
                           ctx.State.IsCompensating = false;
                           return Task.CompletedTask;
@@ -76,7 +76,7 @@ namespace TheSaga.Builders
         public ISagaBuilderState<TSagaState> Start<TEvent>()
                     where TEvent : IEvent
         {
-            currentState = Extensions.GetStateName<SagaStartState>();
+            currentState = new SagaStartState().GetStateName();
             currentEvent = typeof(TEvent);
             model.Actions.Add(new SagaAction<TSagaState>()
             {
@@ -90,7 +90,7 @@ namespace TheSaga.Builders
             where TEvent : IEvent
             where TEventHandler : IEventHandler<TSagaState, TEvent>
         {
-            currentState = Extensions.GetStateName<SagaStartState>();
+            currentState = new SagaStartState().GetStateName();
             currentEvent = typeof(TEvent);
             model.Actions.Add(new SagaAction<TSagaState>()
             {
@@ -111,7 +111,7 @@ namespace TheSaga.Builders
             where TEvent : IEvent
             where TEventHandler : IEventHandler<TSagaState, TEvent>
         {
-            currentState =Extensions.GetStateName<SagaStartState>();
+            currentState = new SagaStartState().GetStateName();
             currentEvent = typeof(TEvent);
             model.Actions.Add(new SagaAction<TSagaState>()
             {

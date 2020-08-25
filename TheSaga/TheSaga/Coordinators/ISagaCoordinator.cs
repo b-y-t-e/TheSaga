@@ -12,7 +12,7 @@ namespace TheSaga.Coordinators
         Task<ISagaState> Publish(IEvent @event);
         Task<ISagaState> Send(IEvent @event);
         Task WaitForState<TState>(Guid correlationID, SagaWaitOptions waitOptions = null)
-            where TState : IState;
+            where TState : IState, new ();
         Task WaitForEvent<TEvent>(Guid correlationID, SagaWaitOptions waitOptions = null)
             where TEvent : IEvent;
     }

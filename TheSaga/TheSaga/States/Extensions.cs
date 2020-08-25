@@ -14,7 +14,7 @@ namespace TheSaga.States
             return nameof(TState);
         }
 
-        static string GetStateName<TState>(TState state)
+        internal static string GetStateName<TState>(this TState state)
             where TState : IState
         {
             if (typeof(TState) == typeof(IStateWithCustomName) || typeof(IStateWithCustomName).IsAssignableFrom(typeof(TState)))

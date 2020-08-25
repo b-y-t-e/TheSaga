@@ -7,7 +7,7 @@ using TheSaga.Execution.Context;
 
 namespace TheSaga.SagaStates.Steps
 {
-    public class SagaStepForActivity<TSagaState, TSagaActivity> : ISagaStep
+    internal class SagaStepForActivity<TSagaState, TSagaActivity> : ISagaStep
         where TSagaState : ISagaState
         where TSagaActivity : ISagaActivity<TSagaState>
     {

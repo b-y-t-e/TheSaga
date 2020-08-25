@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.Exceptions;
+using TheSaga.Messages.MessageBus;
 using TheSaga.Models;
 using TheSaga.Persistance;
 using TheSaga.SagaStates;
@@ -16,10 +17,12 @@ namespace TheSaga.Execution
         where TSagaState : ISagaState
     {
         private ISagaPersistance sagaPersistance;
+        private IInternalMessageBus internalMessageBus;
 
-        public SagaExecutor(ISagaPersistance sagaPersistance)
+        public SagaExecutor(ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
         {
             this.sagaPersistance = sagaPersistance;
+            this.internalMessageBus = internalMessageBus;
         }
 
         public async Task<ISagaState> Handle(Guid correlationID, ISagaModel model, IEvent @event)
@@ -47,7 +50,7 @@ namespace TheSaga.Execution
 
             ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
             newSagaState.CorrelationID = correlationID;
-            newSagaState.CurrentState = Extensions.GetStateName<SagaStartState>();
+            newSagaState.CurrentState = new SagaStartState().GetStateName();
             newSagaState.CurrentStep = null;
 
             await sagaPersistance.Set(newSagaState);
