@@ -10,14 +10,14 @@ namespace TheSaga.SagaStates.Actions
     public class SagaActions<TSagaState>
         where TSagaState : ISagaState
     {
-        private List<SagaAction<TSagaState>> items;
+        private List<SagaAction<TSagaState>> actions;
 
         public SagaActions()
         {
             States = new List<String>();
             DuringEvents = new List<Type>();
             StartEvents = new List<Type>();
-            items = new List<SagaAction<TSagaState>>();
+            actions = new List<SagaAction<TSagaState>>();
         }
 
         public List<Type> DuringEvents { get; private set; }
@@ -26,25 +26,25 @@ namespace TheSaga.SagaStates.Actions
 
         internal void Add(SagaAction<TSagaState> action)
         {
-            items.Add(action);
+            actions.Add(action);
             Rebuild();
         }
 
         internal SagaAction<TSagaState> FindAction(string state, Type eventType)
         {
-            return this.items.
+            return this.actions.
                 FirstOrDefault(s => s.State == state && s.Event == eventType);
         }
 
         internal SagaAction<TSagaState> FindAction(ISagaStep sagaStep)
         {
-            return this.items.
+            return this.actions.
                 FirstOrDefault(s => s.Steps.Contains(sagaStep));
         }
 
         internal IList<SagaAction<TSagaState>> FindActions(string state)
         {
-            return this.items.
+            return this.actions.
                 Where(s => s.State == state).
                 ToArray();
         }
@@ -55,7 +55,7 @@ namespace TheSaga.SagaStates.Actions
             DuringEvents = new List<Type>();
             StartEvents = new List<Type>();
 
-            foreach (var action in items)
+            foreach (var action in actions)
             {
                 if (action.Event != null)
                 {
