@@ -8,6 +8,6 @@ namespace TheSaga.SagaStates
         public string CurrentState { get; set; }
         public string CurrentStep { get; set; }
         public bool IsCompensating { get; set; }
-        public string CurrentError { get; set; }
+        public Exception CurrentError { get; set; }
     }
 }

@@ -12,6 +12,7 @@ using TheSaga.Persistance;
 using TheSaga.SagaStates;
 using TheSaga.SagaStates.Actions;
 using TheSaga.SagaStates.Steps;
+using TheSaga.Utils;
 
 namespace TheSaga.Execution
 {
@@ -153,6 +154,15 @@ namespace TheSaga.Execution
 #if DEBUG
                 Console.WriteLine($"state: {state.CurrentState}; step: {state.CurrentStep}; action: {(state.IsCompensating ? "Compensate" : "Execute")}");
 #endif
+                if (!state.IsCompensating &&
+                    sagaStep == action.Steps.First() &&
+                    state.CurrentError != null)
+                {
+                    state.CurrentError = null;
+
+                    await sagaPersistance.
+                        Set(state);
+                }
 
                 IExecutionContext context = new ExecutionContext<TSagaState>()
                 {
@@ -174,7 +184,7 @@ namespace TheSaga.Execution
             {
                 Console.WriteLine(ex.Message);
                 state.IsCompensating = true;
-                state.CurrentError = ex.Message;
+                state.CurrentError = ex.ToSagaStepException();
             }
 
             if (nextSagaStep != null)
@@ -190,14 +200,14 @@ namespace TheSaga.Execution
             await sagaPersistance.
                 Set(state);
 
+            internalMessageBus.Publish(
+                new SagaStepChangedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
+
             if (prevState != state.CurrentState)
             {
                 internalMessageBus.Publish(
                     new SagaStateChangedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
             }
-
-            internalMessageBus.Publish(
-                new SagaStepChangedMessage(typeof(TSagaState), state.CorrelationID, state.CurrentState, state.CurrentStep, state.IsCompensating));
 
             if (@async)
             {
@@ -206,8 +216,8 @@ namespace TheSaga.Execution
             }
             else
             {
-                if (state.CurrentStep == null && !string.IsNullOrEmpty(state.CurrentError))
-                    throw new SagaStepException(state.CorrelationID, state.CurrentState, state.CurrentError);
+                if (state.CurrentStep == null && state.CurrentError != null)
+                    throw state.CurrentError;
             }
         }
     }

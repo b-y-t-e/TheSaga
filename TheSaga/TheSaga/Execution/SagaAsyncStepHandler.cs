@@ -12,10 +12,11 @@ using TheSaga.SagaStates;
 using TheSaga.SagaStates.Actions;
 using TheSaga.SagaStates.Steps;
 using TheSaga.States;
+using TheSaga.Utils;
 
 namespace TheSaga.Execution
 {
-    internal class SagaAsyncStepHandler<TSagaState> 
+    internal class SagaAsyncStepHandler<TSagaState>
         where TSagaState : ISagaState
     {
         private ISagaExecutor sagaExecutor;
@@ -52,7 +53,7 @@ namespace TheSaga.Execution
                     try
                     {
                         var sagaState = await sagaPersistance.Get(message.CorrelationID);
-                        sagaState.CurrentError = ex.Message;
+                        sagaState.CurrentError = ex.ToSagaStepException();
                         await sagaPersistance.Set(sagaState);
                     }
                     catch (Exception ex2)

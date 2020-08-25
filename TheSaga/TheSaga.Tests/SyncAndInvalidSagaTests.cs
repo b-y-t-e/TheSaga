@@ -31,7 +31,7 @@ namespace TheSaga.Tests
             };
 
             // then
-            await Assert.ThrowsAsync<SagaStepException>(async () =>
+            await Assert.ThrowsAsync<TestSagaException>(async () =>
             {
                 // when
                 ISagaState sagaState = await sagaCoordinator.
@@ -50,7 +50,7 @@ namespace TheSaga.Tests
             };
 
             // when
-            await Assert.ThrowsAsync<SagaStepException>(async () =>
+            await Assert.ThrowsAsync<TestSagaException>(async () =>
             {
                 ISagaState sagaState = await sagaCoordinator.
                     Send(startEvent);
@@ -69,7 +69,7 @@ namespace TheSaga.Tests
                 Send(new ValidCreatedEvent());
 
             // when
-            await Assert.ThrowsAsync<SagaStepException>(async () =>
+            await Assert.ThrowsAsync<TestSagaException>(async () =>
             {
                 await sagaCoordinator.Send(new InvalidUpdateEvent()
                 {
@@ -92,6 +92,76 @@ namespace TheSaga.Tests
             persistedState.Logs.ShouldContain("compensation2");
             persistedState.Logs.ShouldContain("execution1");
             persistedState.Logs.ShouldContain("compensation1");
+        }
+
+        [Fact]
+        public async Task WHEN_compensationThrowsErrorOnUpdate_THEN_sagaShouldBeInValidState()
+        {
+            // given
+            ISagaState sagaState = await sagaCoordinator.
+                Send(new ValidCreatedEvent());
+
+            // when
+            await Assert.ThrowsAsync<TestCompensationException>(async () =>
+            {
+                await sagaCoordinator.Send(new InvalidCompensationEvent()
+                {
+                    CorrelationID = sagaState.CorrelationID
+                });
+            });
+
+            // then
+            InvalidSagaState persistedState = (InvalidSagaState)await sagaPersistance.
+                Get(sagaState.CorrelationID);
+
+            persistedState.ShouldNotBeNull();
+            persistedState.CurrentStep.ShouldBe(null);
+            persistedState.CurrentState.ShouldBe(nameof(StateCreated));
+            persistedState.CurrentError.ShouldNotBeNull();
+            persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
+            persistedState.Logs.ShouldContain("execution3");
+            persistedState.Logs.ShouldContain("compensation3");
+            persistedState.Logs.ShouldContain("execution2");
+            persistedState.Logs.ShouldContain("compensation2");
+            persistedState.Logs.ShouldContain("execution1");
+            persistedState.Logs.ShouldContain("compensation1");
+        }
+
+
+        [Fact]
+        public async Task WHEN_sendValidStateToSagaWithError_THEN_errorShouldBeNull()
+        {
+            // given
+            ISagaState sagaState = await sagaCoordinator.
+                Send(new ValidCreatedEvent());
+
+            await Assert.ThrowsAsync<TestCompensationException>(async () =>
+            {
+                await sagaCoordinator.Send(new InvalidCompensationEvent()
+                {
+                    CorrelationID = sagaState.CorrelationID
+                });
+            });
+
+            // then
+            InvalidSagaState persistedState2 = (InvalidSagaState)await sagaPersistance.
+                Get(sagaState.CorrelationID);
+
+            // when
+            await sagaCoordinator.Send(new ValidUpdateEvent()
+            {
+                CorrelationID = sagaState.CorrelationID
+            });
+
+            // then
+            InvalidSagaState persistedState = (InvalidSagaState)await sagaPersistance.
+                Get(sagaState.CorrelationID);
+
+            persistedState.ShouldNotBeNull();
+            persistedState.CurrentStep.ShouldBe(null);
+            persistedState.CurrentState.ShouldBe(nameof(StateUpdated));
+            persistedState.CurrentError.ShouldBeNull();
+            persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);            
         }
 
         #region Arrange

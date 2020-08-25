@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Threading.Tasks;
 using TheSaga.Builders;
 using TheSaga.Models;
@@ -32,7 +33,7 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga
                     ctx =>
                     {
                         ctx.State.Logs.Add("execution2");
-                        throw new SagaException("error");
+                        throw new TestSagaException("error");
                     },
                     ctx =>
                     {
@@ -74,7 +75,7 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga
                     ctx =>
                     {
                         ctx.State.Logs.Add("execution3");
-                        throw new SagaException("error");
+                        throw new TestSagaException("error");
                     },
                     ctx =>
                     {
@@ -82,6 +83,49 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga
                         return Task.CompletedTask;
                     }).
                 Finish();
+
+            builder.
+                During<StateCreated>().
+                When<InvalidCompensationEvent>().
+                Then(
+                    ctx =>
+                    {
+                        ctx.State.Logs.Add("execution1");
+                        return Task.CompletedTask;
+                    },
+                    ctx =>
+                    {
+                        ctx.State.Logs.Add("compensation1");
+                        return Task.CompletedTask;
+                    }).
+                Then(
+                    ctx =>
+                    {
+                        ctx.State.Logs.Add("execution2");
+                        return Task.CompletedTask;
+                    },
+                    ctx =>
+                    {
+                        ctx.State.Logs.Add("compensation2");
+                        return Task.CompletedTask;
+                    }).
+               Then(
+                    ctx =>
+                    {
+                        ctx.State.Logs.Add("execution3");
+                        throw new TestSagaException("error");
+                    },
+                    ctx =>
+                    {
+                        ctx.State.Logs.Add("compensation3");
+                        throw new TestCompensationException("compensation error");
+                    }).
+                Finish();
+
+            builder.
+                During<StateCreated>().
+                When<ValidUpdateEvent>().
+                TransitionTo<StateUpdated>();
 
             return builder.
                 Build();

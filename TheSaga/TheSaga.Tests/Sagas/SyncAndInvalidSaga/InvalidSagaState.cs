@@ -17,6 +17,6 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga
         public string CurrentStep { get; set; }
         public bool IsCompensating { get; set; }
         public List<String> Logs { get; set; }
-        public string CurrentError { get; set; }
+        public Exception CurrentError { get; set; }
     }
 }

@@ -51,12 +51,13 @@ namespace TheSaga.Coordinators
         public async Task WaitForEvent<TSagaEvent>(Guid correlationID, SagaWaitOptions waitOptions = null)
             where TSagaEvent : IEvent
         {
+            throw new NotImplementedException();
+
             ISagaState state = await sagaPersistance.
                 Get(correlationID);
 
             if (state == null)
                 throw new SagaInstanceNotFoundException(correlationID);
-
         }
 
         public async Task WaitForState<TState>(Guid correlationID, SagaWaitOptions waitOptions = null)
