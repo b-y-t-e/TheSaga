@@ -15,9 +15,8 @@ namespace TheSaga
         {
             services.AddSingleton<IInternalMessageBus, InternalMessageBus>();
             services.AddSingleton<ISagaPersistance, InMemorySagaPersistance>();
-            services.AddScoped<ISagaRegistrator, SagaRegistrator>();
-            services.AddScoped<ISagaCoordinator, SagaCoordinator>();
-
+            services.AddSingleton<ISagaRegistrator, SagaRegistrator>();
+            services.AddSingleton<ISagaCoordinator, SagaCoordinator>();
             return services;
         }
     }

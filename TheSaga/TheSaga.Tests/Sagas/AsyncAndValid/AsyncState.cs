@@ -8,7 +8,7 @@ namespace TheSaga.Tests.Sagas.AsyncAndValid
     {
         public AsyncState()
         {
-            History = new List<SagaStepLog>();
+            History = new List<SagaStepHistory>();
         }
 
         public Guid CorrelationID { get; set; }
@@ -16,6 +16,6 @@ namespace TheSaga.Tests.Sagas.AsyncAndValid
         public string CurrentStep { get; set; }
         public bool IsCompensating { get; set; }
         public Exception CurrentError { get; set; }
-        public IList<SagaStepLog> History { get; set; }
+        public IList<SagaStepHistory> History { get; set; }
     }
 }

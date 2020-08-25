@@ -155,7 +155,7 @@ namespace TheSaga.Execution
                 state.CurrentError = null;
             }
 
-            SagaStepLog stepLog = new SagaStepLog()
+            SagaStepHistory stepLog = new SagaStepHistory()
             {
                 Created = DateTime.Now,
                 StateName = state.CurrentState,
