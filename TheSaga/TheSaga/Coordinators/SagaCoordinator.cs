@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using TheSaga.Coordinators.AsyncHandlers;
@@ -101,7 +102,7 @@ namespace TheSaga.Coordinators
                 if (state == null)
                     throw new SagaInstanceNotFoundException(correlationID);
 
-                if (state.SagaCurrentState == new TState().GetStateName())
+                if (state.SagaState.SagaCurrentState == new TState().GetStateName())
                     return;
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
@@ -125,10 +126,13 @@ namespace TheSaga.Coordinators
 
             ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
             newSagaState.CorrelationID = correlationID;
-            newSagaState.SagaCurrentState = new SagaStartState().GetStateName();
-            newSagaState.SagaCurrentStep = null;
-            newSagaState.SagaCreated = dateTimeProvider.Now;
-            newSagaState.SagaModified = dateTimeProvider.Now;
+            newSagaState.SagaState = new SagaData();
+            newSagaState.SagaState.SagaCurrentState = new SagaStartState().GetStateName();
+            newSagaState.SagaState.SagaCurrentStep = null;
+            newSagaState.SagaInfo = new SagaInfo();
+            newSagaState.SagaInfo.SagaHistory = new List<SagaStepHistory>();
+            newSagaState.SagaInfo.SagaCreated = dateTimeProvider.Now;
+            newSagaState.SagaInfo.SagaModified = dateTimeProvider.Now;
 
             await sagaPersistance.
                 Set(newSagaState);
@@ -154,7 +158,7 @@ namespace TheSaga.Coordinators
         private void SendInternalMessages(Guid correlationID, ISagaModel model)
         {
             internalMessageBus.Publish(
-                                new SagaProcessingStartMessage(model.SagaStateType, correlationID));
+                new SagaProcessingStartMessage(model.SagaStateType, correlationID));
         }
     }
 }

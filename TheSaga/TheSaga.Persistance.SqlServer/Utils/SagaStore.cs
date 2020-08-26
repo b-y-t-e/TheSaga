@@ -119,11 +119,11 @@ namespace TheSaga.Persistance.SqlServer.Utils
             Dictionary<string, object> dbobject = new Dictionary<string, object>();
             dbobject[correlationIdColumn] = @state.CorrelationID;
             dbobject[stateNameColumn] = stateType.Name;
-            dbobject[createdColumn] = @state.SagaCreated;
-            dbobject[modifiedColumn] = @state.SagaModified;
-            dbobject[stateColumn] = @state.SagaCurrentState;
-            dbobject[stepColumn] = @state.SagaCurrentStep;
-            dbobject[compensatingColumn] = @state.SagaIsCompensating;
+            dbobject[createdColumn] = @state.SagaInfo.SagaCreated;
+            dbobject[modifiedColumn] = @state.SagaInfo.SagaModified;
+            dbobject[stateColumn] = @state.SagaState.SagaCurrentState;
+            dbobject[stepColumn] = @state.SagaState.SagaCurrentStep;
+            dbobject[compensatingColumn] = @state.SagaState.SagaIsCompensating;
             dbobject[jsonColumn] = JsonConvert.SerializeObject(@state, _serializerSettings);
 
             /*foreach (var columnInfo in getColumnsForType(stateType))
