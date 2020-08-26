@@ -8,74 +8,74 @@ using TheSaga.States;
 
 namespace TheSaga.Builders
 {
-    public interface ISagaBuilder<TSagaState> where TSagaState : ISagaState
+    public interface ISagaBuilder<TSagaData> where TSagaData : ISagaData
     {
-        ISagaModel<TSagaState> Build();
+        ISagaModel<TSagaData> Build();
 
-        ISagaBuilderDuringState<TSagaState> During<TState>() where TState : IState;
+        ISagaBuilderDuringState<TSagaData> During<TState>() where TState : IState;
 
-        ISagaBuilderState<TSagaState> Start<TEvent>() where TEvent : IEvent;
+        ISagaBuilderState<TSagaData> Start<TEvent>() where TEvent : IEvent;
 
-        ISagaBuilderState<TSagaState> Start<TEvent, TEventHandler>() where TEvent : IEvent
-           where TEventHandler : IEventHandler<TSagaState, TEvent>;
+        ISagaBuilderState<TSagaData> Start<TEvent, TEventHandler>() where TEvent : IEvent
+           where TEventHandler : IEventHandler<TSagaData, TEvent>;
 
-        ISagaBuilderState<TSagaState> Start<TEvent>(string stepName) where TEvent : IEvent;
+        ISagaBuilderState<TSagaData> Start<TEvent>(string stepName) where TEvent : IEvent;
 
-        ISagaBuilderState<TSagaState> Start<TEvent, TEventHandler>(string stepName) where TEvent : IEvent
-           where TEventHandler : IEventHandler<TSagaState, TEvent>;
+        ISagaBuilderState<TSagaData> Start<TEvent, TEventHandler>(string stepName) where TEvent : IEvent
+           where TEventHandler : IEventHandler<TSagaData, TEvent>;
 
-        ISagaBuilderState<TSagaState> StartAsync<TEvent, TEventHandler>() where TEvent : IEvent
-                           where TEventHandler : IEventHandler<TSagaState, TEvent>;
+        ISagaBuilderState<TSagaData> StartAsync<TEvent, TEventHandler>() where TEvent : IEvent
+                           where TEventHandler : IEventHandler<TSagaData, TEvent>;
 
-        ISagaBuilderState<TSagaState> StartAsync<TEvent, TEventHandler>(string stepName) where TEvent : IEvent
-           where TEventHandler : IEventHandler<TSagaState, TEvent>;
+        ISagaBuilderState<TSagaData> StartAsync<TEvent, TEventHandler>(string stepName) where TEvent : IEvent
+           where TEventHandler : IEventHandler<TSagaData, TEvent>;
     }
 
-    public interface ISagaBuilderDuringState<TSagaState> : ISagaBuilderState<TSagaState>
-        where TSagaState : ISagaState
+    public interface ISagaBuilderDuringState<TSagaData> : ISagaBuilderState<TSagaData>
+        where TSagaData : ISagaData
     {
-        ISagaBuilderState<TSagaState> When<TEvent>() where TEvent : IEvent;
+        ISagaBuilderState<TSagaData> When<TEvent>() where TEvent : IEvent;
 
-        ISagaBuilderState<TSagaState> When<TEvent, TEventHandler>() where TEvent : IEvent
-           where TEventHandler : IEventHandler<TSagaState, TEvent>;
+        ISagaBuilderState<TSagaData> When<TEvent, TEventHandler>() where TEvent : IEvent
+           where TEventHandler : IEventHandler<TSagaData, TEvent>;
 
-        ISagaBuilderState<TSagaState> WhenAsync<TEvent, TEventHandler>() where TEvent : IEvent
-           where TEventHandler : IEventHandler<TSagaState, TEvent>;
+        ISagaBuilderState<TSagaData> WhenAsync<TEvent, TEventHandler>() where TEvent : IEvent
+           where TEventHandler : IEventHandler<TSagaData, TEvent>;
     }
 
-    public interface ISagaBuilderState<TSagaState>
-            where TSagaState : ISagaState
+    public interface ISagaBuilderState<TSagaData>
+            where TSagaData : ISagaData
     {
-        ISagaBuilderState<TSagaState> After(TimeSpan time);
+        ISagaBuilderState<TSagaData> After(TimeSpan time);
 
-        ISagaModel<TSagaState> Build();
+        ISagaModel<TSagaData> Build();
 
-        ISagaBuilder<TSagaState> Finish();
+        ISagaBuilder<TSagaData> Finish();
 
-        ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action);
+        ISagaBuilderState<TSagaData> Then(ThenActionDelegate<TSagaData> action);
 
-        ISagaBuilderState<TSagaState> Then(string stepName, ThenActionDelegate<TSagaState> action);
+        ISagaBuilderState<TSagaData> Then(string stepName, ThenActionDelegate<TSagaData> action);
 
-        ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation);
+        ISagaBuilderState<TSagaData> Then(ThenActionDelegate<TSagaData> action, ThenActionDelegate<TSagaData> compensation);
 
-        ISagaBuilderState<TSagaState> Then(string stepName, ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation);
+        ISagaBuilderState<TSagaData> Then(string stepName, ThenActionDelegate<TSagaData> action, ThenActionDelegate<TSagaData> compensation);
 
-        ISagaBuilderState<TSagaState> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;
+        ISagaBuilderState<TSagaData> Then<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaData>;
 
-        ISagaBuilderState<TSagaState> Then<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaState>;
+        ISagaBuilderState<TSagaData> Then<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaData>;
 
-        ISagaBuilderState<TSagaState> ThenAsync(ThenActionDelegate<TSagaState> action);
+        ISagaBuilderState<TSagaData> ThenAsync(ThenActionDelegate<TSagaData> action);
 
-        ISagaBuilderState<TSagaState> ThenAsync(string stepName, ThenActionDelegate<TSagaState> action);
+        ISagaBuilderState<TSagaData> ThenAsync(string stepName, ThenActionDelegate<TSagaData> action);
 
-        ISagaBuilderState<TSagaState> ThenAsync(ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation);
+        ISagaBuilderState<TSagaData> ThenAsync(ThenActionDelegate<TSagaData> action, ThenActionDelegate<TSagaData> compensation);
 
-        ISagaBuilderState<TSagaState> ThenAsync(string stepName, ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation);
+        ISagaBuilderState<TSagaData> ThenAsync(string stepName, ThenActionDelegate<TSagaData> action, ThenActionDelegate<TSagaData> compensation);
 
-        ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaState>;
+        ISagaBuilderState<TSagaData> ThenAsync<TSagaActivity>() where TSagaActivity : ISagaActivity<TSagaData>;
 
-        ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaState>;
+        ISagaBuilderState<TSagaData> ThenAsync<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaData>;
 
-        ISagaBuilder<TSagaState> TransitionTo<TState>() where TState : IState;
+        ISagaBuilder<TSagaData> TransitionTo<TState>() where TState : IState;
     }
 }

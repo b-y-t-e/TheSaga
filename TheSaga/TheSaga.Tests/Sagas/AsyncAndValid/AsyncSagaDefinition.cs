@@ -7,11 +7,11 @@ using TheSaga.Tests.Sagas.AsyncAndValid.Events;
 
 namespace TheSaga.Tests.Sagas.AsyncAndValid
 {
-    public class AsyncSagaDefinition : ISagaModelDefintion<AsyncState>
+    public class AsyncSagaDefinition : ISagaModelDefintion<AsyncData>
     {
-        public ISagaModel<AsyncState> GetModel(IServiceProvider serviceProvider)
+        public ISagaModel<AsyncData> GetModel(IServiceProvider serviceProvider)
         {
-            ISagaBuilder<AsyncState> builder = new SagaBuilder<AsyncState>(serviceProvider);
+            ISagaBuilder<AsyncData> builder = new SagaBuilder<AsyncData>(serviceProvider);
 
             builder.
                 Start<CreatedEvent, CreatedEventHandler>(

@@ -24,25 +24,25 @@ namespace TheSaga.Tests
             // given
             IEvent startEvent = new CreatedEvent();
 
-            ISagaState sagaState = await sagaCoordinator.
+            ISagaData sagaData = await sagaCoordinator.
                 Send(startEvent);
 
             // when
             await sagaCoordinator.
-                WaitForState<SagaFinishState>(sagaState.CorrelationID);
+                WaitForState<SagaFinishState>(sagaData.CorrelationID);
 
             // then
-            AsyncState persistedState = (AsyncState)await sagaPersistance.
-                Get(sagaState.CorrelationID);
+            AsyncData persistedState = (AsyncData)await sagaPersistance.
+                Get(sagaData.CorrelationID);
 
             persistedState.ShouldNotBeNull();
-            persistedState.SagaState.SagaCurrentStep.ShouldBe(new SagaFinishState().Name);
-            persistedState.SagaState.SagaCurrentState.ShouldBe(new SagaFinishState().Name);
-            persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
-            persistedState.SagaInfo.SagaHistory.ShouldContain(step => step.StepName == "CreatedEventStep0" && !step.IsCompensating && step.HasSucceeded);
-            persistedState.SagaInfo.SagaHistory.ShouldContain(step => step.StepName == "CreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
-            persistedState.SagaInfo.SagaHistory.ShouldContain(step => step.StepName == "CreatedEventStep2" && !step.IsCompensating && step.HasSucceeded);
-            persistedState.SagaInfo.SagaHistory.Count.ShouldBe(4);
+            persistedState.SagaState.CurrentStep.ShouldBe(new SagaFinishState().Name);
+            persistedState.SagaState.CurrentState.ShouldBe(new SagaFinishState().Name);
+            persistedState.CorrelationID.ShouldBe(sagaData.CorrelationID);
+            persistedState.SagaInfo.History.ShouldContain(step => step.StepName == "CreatedEventStep0" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.SagaInfo.History.ShouldContain(step => step.StepName == "CreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.SagaInfo.History.ShouldContain(step => step.StepName == "CreatedEventStep2" && !step.IsCompensating && step.HasSucceeded);
+            persistedState.SagaInfo.History.Count.ShouldBe(4);
         }
 
         [Fact]
@@ -52,19 +52,19 @@ namespace TheSaga.Tests
             IEvent startEvent = new CreatedEvent();
 
             // when
-            ISagaState sagaState = await sagaCoordinator.
+            ISagaData sagaData = await sagaCoordinator.
                 Send(startEvent);
 
             // then
-            AsyncState persistedState = (AsyncState)await sagaPersistance.
-                Get(sagaState.CorrelationID);
+            AsyncData persistedState = (AsyncData)await sagaPersistance.
+                Get(sagaData.CorrelationID);
 
             persistedState.ShouldNotBeNull();
-            persistedState.SagaState.SagaCurrentStep.ShouldStartWith("CreatedEventStep");
-            persistedState.SagaState.SagaCurrentState.ShouldBe(new SagaStartState().Name);
-            persistedState.CorrelationID.ShouldBe(sagaState.CorrelationID);
-            persistedState.SagaInfo.SagaHistory.ShouldContain(step => step.StepName == "CreatedEventStep0" && !step.IsCompensating);
-            persistedState.SagaInfo.SagaHistory.Count.ShouldBe(1);
+            persistedState.SagaState.CurrentStep.ShouldStartWith("CreatedEventStep");
+            persistedState.SagaState.CurrentState.ShouldBe(new SagaStartState().Name);
+            persistedState.CorrelationID.ShouldBe(sagaData.CorrelationID);
+            persistedState.SagaInfo.History.ShouldContain(step => step.StepName == "CreatedEventStep0" && !step.IsCompensating);
+            persistedState.SagaInfo.History.Count.ShouldBe(1);
         }
 
         #region Arrange

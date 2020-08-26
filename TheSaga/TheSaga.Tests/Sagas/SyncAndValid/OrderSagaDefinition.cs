@@ -9,11 +9,11 @@ using TheSaga.Tests.Sagas.SyncAndValid.States;
 
 namespace TheSaga.Tests.Sagas.SyncAndValid
 {
-    public class OrderSagaDefinition : ISagaModelDefintion<OrderState>
+    public class OrderSagaDefinition : ISagaModelDefintion<OrderData>
     {
-        public ISagaModel<OrderState> GetModel(IServiceProvider serviceProvider)
+        public ISagaModel<OrderData> GetModel(IServiceProvider serviceProvider)
         {
-            ISagaBuilder<OrderState> builder = new SagaBuilder<OrderState>(serviceProvider);
+            ISagaBuilder<OrderData> builder = new SagaBuilder<OrderData>(serviceProvider);
 
             builder.
                 Start<OrderCreatedEvent, OrderCreatedEventHandler>("OrderCreatedEventStep0").

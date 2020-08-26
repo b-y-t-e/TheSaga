@@ -2,7 +2,7 @@
 
 namespace TheSaga.Execution.Context
 {
-    public interface IExecutionContext<TState> : IExecutionContext where TState : ISagaState
+    public interface IExecutionContext<TState> : IExecutionContext where TState : ISagaData
     {
         TState State { get; }
     }

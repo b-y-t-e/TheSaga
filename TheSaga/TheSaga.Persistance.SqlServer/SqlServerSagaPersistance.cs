@@ -25,7 +25,7 @@ namespace TheSaga.Persistance.SqlServer
             this.sqlServerOptions = sqlServerOptions;
         }
 
-        public async Task<ISagaState> Get(Guid correlationID)
+        public async Task<ISagaData> Get(Guid correlationID)
         {
             using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
             {
@@ -41,11 +41,11 @@ namespace TheSaga.Persistance.SqlServer
             }
         }
 
-        public async Task Set(ISagaState sagaState)
+        public async Task Set(ISagaData sagaData)
         {
             using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
             {
-                await sagaStore.Store(sagaState);
+                await sagaStore.Store(sagaData);
             }
         }
 

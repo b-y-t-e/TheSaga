@@ -7,8 +7,8 @@ using TheSaga.SagaStates;
 
 namespace TheSaga.Execution.AsyncHandlers
 {
-    internal class SagaAsyncStepCompletedHandler<TSagaState>
-        where TSagaState : ISagaState
+    internal class SagaAsyncStepCompletedHandler<TSagaData>
+        where TSagaData : ISagaData
     {
         private IInternalMessageBus internalMessageBus;
         private ISagaExecutor sagaExecutor;
@@ -35,7 +35,7 @@ namespace TheSaga.Execution.AsyncHandlers
 
         private Task HandleAsyncStepCompletedMessage(SagaAsyncStepCompletedMessage message)
         {
-            if (message.SagaStateType != typeof(TSagaState))
+            if (message.SagaStateType != typeof(TSagaData))
                 return Task.CompletedTask;
 
             return sagaExecutor.

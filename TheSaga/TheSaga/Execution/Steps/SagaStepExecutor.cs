@@ -15,10 +15,10 @@ using TheSaga.Utils;
 
 namespace TheSaga.Execution.Steps
 {
-    internal class SagaStepExecutor<TSagaState>
-        where TSagaState : ISagaState
+    internal class SagaStepExecutor<TSagaData>
+        where TSagaData : ISagaData
     {
-        private ISagaState sagaState;
+        private ISagaData sagaData;
         private ISagaAction sagaAction;
         private ISagaStep sagaStep;
         private IEvent @event;
@@ -30,7 +30,7 @@ namespace TheSaga.Execution.Steps
         public SagaStepExecutor(
             IsExecutionAsync async,
             IEvent @event,
-            ISagaState state,
+            ISagaData state,
             ISagaStep sagaStep,
             ISagaAction sagaAction,
             IInternalMessageBus internalMessageBus,
@@ -41,7 +41,7 @@ namespace TheSaga.Execution.Steps
             this.@event = @event;
             this.internalMessageBus = internalMessageBus;
             this.sagaPersistance = sagaPersistance;
-            this.sagaState = state;
+            this.sagaData = state;
             this.sagaStep = sagaStep;
             this.sagaAction = sagaAction;
             this.dateTimeProvider = dateTimeProvider;
@@ -66,39 +66,39 @@ namespace TheSaga.Execution.Steps
 
         private async Task ExecuteStepSync()
         {
-            string currentState = sagaState.SagaState.SagaCurrentState;
+            string currentState = sagaData.SagaState.CurrentState;
             bool hasSagaCompleted = false;
             ISagaStep nextSagaStep = FindNextStep();
 
-            if (!sagaState.SagaState.SagaIsCompensating &&
+            if (!sagaData.SagaState.IsCompensating &&
                 sagaStep == sagaAction.Steps.First())
             {
-                sagaState.SagaState.SagaCurrentError = null;
+                sagaData.SagaState.CurrentError = null;
             }
 
-            sagaState.SagaState.SagaCurrentStep = sagaStep.StepName;
-            sagaState.SagaInfo.SagaModified = dateTimeProvider.Now;
+            sagaData.SagaState.CurrentStep = sagaStep.StepName;
+            sagaData.SagaInfo.Modified = dateTimeProvider.Now;
 
             SagaStepHistory stepLog = CreateStepLog(nextSagaStep);
 
             await sagaPersistance.
-                Set(sagaState);
+                Set(sagaData);
 
             try
             {
 #if DEBUG
-                Console.WriteLine($"state: {sagaState.SagaState.SagaCurrentState}; step: {sagaState.SagaState.SagaCurrentStep}; action: {(sagaState.SagaState.SagaIsCompensating ? "Compensate" : "Execute")}");
+                Console.WriteLine($"state: {sagaData.SagaState.CurrentState}; step: {sagaData.SagaState.CurrentStep}; action: {(sagaData.SagaState.IsCompensating ? "Compensate" : "Execute")}");
 #endif
 
-                IExecutionContext context = new ExecutionContext<TSagaState>()
+                IExecutionContext context = new ExecutionContext<TSagaData>()
                 {
-                    State = (TSagaState)sagaState
+                    State = (TSagaData)sagaData
                 };
 
                 if (@event is EmptyEvent)
                     @event = null;
 
-                if (sagaState.SagaState.SagaIsCompensating)
+                if (sagaData.SagaState.IsCompensating)
                 {
                     await sagaStep.
                         Compensate(context, @event);
@@ -114,8 +114,8 @@ namespace TheSaga.Execution.Steps
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                sagaState.SagaState.SagaIsCompensating = true;
-                sagaState.SagaState.SagaCurrentError = ex.ToSagaStepException();
+                sagaData.SagaState.IsCompensating = true;
+                sagaData.SagaState.CurrentError = ex.ToSagaStepException();
 
                 stepLog.HasSucceeded = false;
                 stepLog.Error = ex.ToSagaStepException();
@@ -127,18 +127,18 @@ namespace TheSaga.Execution.Steps
 
             if (nextSagaStep != null)
             {
-                sagaState.SagaState.SagaCurrentStep = nextSagaStep.StepName;
+                sagaData.SagaState.CurrentStep = nextSagaStep.StepName;
             }
             else
             {
                 hasSagaCompleted = true;
-                sagaState.SagaState.SagaIsCompensating = false;
-                sagaState.SagaState.SagaCurrentStep = null;
+                sagaData.SagaState.IsCompensating = false;
+                sagaData.SagaState.CurrentStep = null;
             }
-            sagaState.SagaInfo.SagaModified = dateTimeProvider.Now;
+            sagaData.SagaInfo.Modified = dateTimeProvider.Now;
 
             await sagaPersistance.
-                Set(sagaState);
+                Set(sagaData);
 
             SendInternalMessages(currentState, hasSagaCompleted);
 
@@ -148,7 +148,7 @@ namespace TheSaga.Execution.Steps
         private ISagaStep FindNextStep()
         {
             ISagaStep nextSagaStep = null;
-            if (sagaState.SagaState.SagaIsCompensating)
+            if (sagaData.SagaState.IsCompensating)
             {
                 nextSagaStep = sagaAction.FindPrevBefore(sagaStep);
             }
@@ -165,13 +165,13 @@ namespace TheSaga.Execution.Steps
             SagaStepHistory stepLog = new SagaStepHistory()
             {
                 Created = dateTimeProvider.Now,
-                StateName = sagaState.SagaState.SagaCurrentState,
-                StepName = sagaState.SagaState.SagaCurrentStep,
-                IsCompensating = sagaState.SagaState.SagaIsCompensating,
+                StateName = sagaData.SagaState.CurrentState,
+                StepName = sagaData.SagaState.CurrentStep,
+                IsCompensating = sagaData.SagaState.IsCompensating,
                 Async = @async,
                 NextStepName = nextSagaStep == null ? null : nextSagaStep.StepName
             };
-            sagaState.SagaInfo.SagaHistory.Add(stepLog);
+            sagaData.SagaInfo.History.Add(stepLog);
             return stepLog;
         }
 
@@ -179,33 +179,33 @@ namespace TheSaga.Execution.Steps
         {
             if (!@async)
             {
-                if (sagaState.IsProcessingCompleted() &&
-                    sagaState.SagaState.SagaCurrentError != null)
+                if (sagaData.IsProcessingCompleted() &&
+                    sagaData.SagaState.CurrentError != null)
                 {
-                    throw sagaState.SagaState.SagaCurrentError;
+                    throw sagaData.SagaState.CurrentError;
                 }
             }
         }
 
         private void SendInternalMessages(string currentState, bool hasSagaCompleted)
         {
-            if (currentState != sagaState.SagaState.SagaCurrentState)
+            if (currentState != sagaData.SagaState.CurrentState)
             {
                 internalMessageBus.Publish(
-                    new SagaStateChangedMessage(typeof(TSagaState), sagaState.CorrelationID, sagaState.SagaState.SagaCurrentState, sagaState.SagaState.SagaCurrentStep, sagaState.SagaState.SagaIsCompensating));
+                    new SagaStateChangedMessage(typeof(TSagaData), sagaData.CorrelationID, sagaData.SagaState.CurrentState, sagaData.SagaState.CurrentStep, sagaData.SagaState.IsCompensating));
             }
 
             if (hasSagaCompleted)
             {
                 internalMessageBus.Publish(
-                    new SagaProcessingCompletedMessage(typeof(TSagaState), sagaState.CorrelationID));
+                    new SagaProcessingCompletedMessage(typeof(TSagaData), sagaData.CorrelationID));
             }
             else
             {
                 if (@async)
                 {
                     internalMessageBus.Publish(
-                        new SagaAsyncStepCompletedMessage(typeof(TSagaState), sagaState.CorrelationID, sagaState.SagaState.SagaCurrentState, sagaState.SagaState.SagaCurrentStep, sagaState.SagaState.SagaIsCompensating));
+                        new SagaAsyncStepCompletedMessage(typeof(TSagaData), sagaData.CorrelationID, sagaData.SagaState.CurrentState, sagaData.SagaState.CurrentStep, sagaData.SagaState.IsCompensating));
                 }
             }
         }

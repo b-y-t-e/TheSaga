@@ -6,14 +6,14 @@ using TheSaga.SagaStates;
 
 namespace TheSaga.Execution
 {
-    internal interface ISagaExecutor<TSagaState> : ISagaExecutor
-        where TSagaState : ISagaState
+    internal interface ISagaExecutor<TSagaData> : ISagaExecutor
+        where TSagaData : ISagaData
     { 
     
     }
 
     internal interface ISagaExecutor
     {
-        Task<ISagaState> Handle(Guid correlationID, IEvent @event, IsExecutionAsync async);
+        Task<ISagaData> Handle(Guid correlationID, IEvent @event, IsExecutionAsync async);
     }
 }

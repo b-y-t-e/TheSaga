@@ -6,9 +6,9 @@ using TheSaga.Execution.Context;
 
 namespace TheSaga.SagaStates.Steps
 {
-    internal class SagaStepForEventHandler<TSagaState, TEventHandler, TEvent> : ISagaStep
-        where TSagaState : ISagaState
-        where TEventHandler : IEventHandler<TSagaState, TEvent>
+    internal class SagaStepForEventHandler<TSagaData, TEventHandler, TEvent> : ISagaStep
+        where TSagaData : ISagaData
+        where TEventHandler : IEventHandler<TSagaData, TEvent>
         where TEvent : IEvent
     {
         private readonly IServiceProvider serviceProvider;
@@ -26,10 +26,10 @@ namespace TheSaga.SagaStates.Steps
 
         public async Task Compensate(IExecutionContext context, IEvent @event)
         {
-            IExecutionContext<TSagaState> contextForAction =
-                (IExecutionContext<TSagaState>)context;
+            IExecutionContext<TSagaData> contextForAction =
+                (IExecutionContext<TSagaData>)context;
 
-            var eventContext = new EventContext<TSagaState, TEvent>()
+            var eventContext = new EventContext<TSagaData, TEvent>()
             {
                 Event = (TEvent)@event,
                 State = contextForAction.State
@@ -44,10 +44,10 @@ namespace TheSaga.SagaStates.Steps
 
         public async Task Execute(IExecutionContext context, IEvent @event)
         {
-            IExecutionContext<TSagaState> contextForAction =
-                (IExecutionContext<TSagaState>)context;
+            IExecutionContext<TSagaData> contextForAction =
+                (IExecutionContext<TSagaData>)context;
 
-            var eventContext = new EventContext<TSagaState, TEvent>()
+            var eventContext = new EventContext<TSagaData, TEvent>()
             {
                 Event = (TEvent)@event,
                 State = contextForAction.State

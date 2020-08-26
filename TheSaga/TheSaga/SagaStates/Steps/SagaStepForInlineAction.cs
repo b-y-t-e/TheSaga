@@ -5,16 +5,16 @@ using TheSaga.Execution.Context;
 
 namespace TheSaga.SagaStates.Steps
 {
-    public delegate Task ThenActionDelegate<TSagaState>(IExecutionContext<TSagaState> context)
-        where TSagaState : ISagaState;
+    public delegate Task ThenActionDelegate<TSagaData>(IExecutionContext<TSagaData> context)
+        where TSagaData : ISagaData;
 
-    internal class SagaStepForInlineAction<TSagaState> : ISagaStep
-            where TSagaState : ISagaState
+    internal class SagaStepForInlineAction<TSagaData> : ISagaStep
+            where TSagaData : ISagaData
     {
-        private ThenActionDelegate<TSagaState> compensation;
+        private ThenActionDelegate<TSagaData> compensation;
 
         public SagaStepForInlineAction(
-            String stepName, ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation, Boolean async)
+            String stepName, ThenActionDelegate<TSagaData> action, ThenActionDelegate<TSagaData> compensation, Boolean async)
         {
             this.StepName = stepName;
             this.action = action;
@@ -24,12 +24,12 @@ namespace TheSaga.SagaStates.Steps
 
         public bool Async { get; }
         public String StepName { get; }
-        private ThenActionDelegate<TSagaState> action { get; }
+        private ThenActionDelegate<TSagaData> action { get; }
 
         public async Task Compensate(IExecutionContext context, IEvent @event)
         {
-            IExecutionContext<TSagaState> contextForAction =
-                (IExecutionContext<TSagaState>)context;
+            IExecutionContext<TSagaData> contextForAction =
+                (IExecutionContext<TSagaData>)context;
 
             if (compensation != null)
                 await compensation(contextForAction);
@@ -37,8 +37,8 @@ namespace TheSaga.SagaStates.Steps
 
         public async Task Execute(IExecutionContext context, IEvent @event)
         {
-            IExecutionContext<TSagaState> contextForAction =
-                (IExecutionContext<TSagaState>)context;
+            IExecutionContext<TSagaData> contextForAction =
+                (IExecutionContext<TSagaData>)context;
 
             if (action != null)
                 await action(contextForAction);

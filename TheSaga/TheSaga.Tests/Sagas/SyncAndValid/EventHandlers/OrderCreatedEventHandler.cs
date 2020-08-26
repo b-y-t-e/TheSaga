@@ -5,18 +5,18 @@ using TheSaga.Tests.Sagas.SyncAndValid.Events;
 
 namespace TheSaga.Tests.Sagas.SyncAndValid.EventHandlers
 {
-    public class OrderCreatedEventHandler : IEventHandler<OrderState, OrderCreatedEvent>
+    public class OrderCreatedEventHandler : IEventHandler<OrderData, OrderCreatedEvent>
     {
         public OrderCreatedEventHandler()
         {
         }
 
-        public Task Compensate(IEventContext<OrderState, OrderCreatedEvent> context)
+        public Task Compensate(IEventContext<OrderData, OrderCreatedEvent> context)
         {
             return Task.CompletedTask;
         }
 
-        public Task Execute(IEventContext<OrderState, OrderCreatedEvent> context)
+        public Task Execute(IEventContext<OrderData, OrderCreatedEvent> context)
         {
             return Task.CompletedTask;
         }

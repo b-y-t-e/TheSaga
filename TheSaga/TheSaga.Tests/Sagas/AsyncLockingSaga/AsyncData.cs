@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using TheSaga.SagaStates;
 
-namespace TheSaga.Tests.Sagas.SyncAndValid
+namespace TheSaga.Tests.Sagas.AsyncLockingSaga
 {
-    public class OrderState : ISagaState
+    public class AsyncData : ISagaData
     {
-        public OrderState()
+        public AsyncData()
         {
 
         }
 
         public Guid CorrelationID { get; set; }
-        public SagaData SagaState { get; set; }
+        public SagaState SagaState { get; set; }
         public SagaInfo SagaInfo { get; set; }
     }
 }

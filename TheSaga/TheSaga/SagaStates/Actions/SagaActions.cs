@@ -6,42 +6,42 @@ using TheSaga.States;
 
 namespace TheSaga.SagaStates.Actions
 {
-    public class SagaActions<TSagaState>
-        where TSagaState : ISagaState
+    public class SagaActions<TSagaData>
+        where TSagaData : ISagaData
     {
-        private List<SagaAction<TSagaState>> actions;
+        private List<SagaAction<TSagaData>> actions;
 
         public SagaActions()
         {
             States = new List<String>();
             DuringEvents = new List<Type>();
             StartEvents = new List<Type>();
-            actions = new List<SagaAction<TSagaState>>();
+            actions = new List<SagaAction<TSagaData>>();
         }
 
         public List<Type> DuringEvents { get; private set; }
         public List<Type> StartEvents { get; private set; }
         public List<String> States { get; private set; }
 
-        internal void Add(SagaAction<TSagaState> action)
+        internal void Add(SagaAction<TSagaData> action)
         {
             actions.Add(action);
             Rebuild();
         }
 
-        internal SagaAction<TSagaState> FindAction(string state, Type eventType)
+        internal SagaAction<TSagaData> FindAction(string state, Type eventType)
         {
             return this.actions.
                 FirstOrDefault(s => s.State == state && s.Event == eventType);
         }
 
-        internal SagaAction<TSagaState> FindAction(ISagaStep sagaStep)
+        internal SagaAction<TSagaData> FindAction(ISagaStep sagaStep)
         {
             return this.actions.
                 FirstOrDefault(s => s.Steps.Contains(sagaStep));
         }
 
-        internal IList<SagaAction<TSagaState>> FindActions(string state)
+        internal IList<SagaAction<TSagaData>> FindActions(string state)
         {
             return this.actions.
                 Where(s => s.State == state).

@@ -3,8 +3,8 @@ using TheSaga.SagaStates;
 
 namespace TheSaga.Models
 {
-    public interface ISagaModelDefintion<TSagaState> where TSagaState : ISagaState
+    public interface ISagaModelDefintion<TSagaData> where TSagaData : ISagaData
     {
-        ISagaModel<TSagaState> GetModel(IServiceProvider serviceProvider);
+        ISagaModel<TSagaData> GetModel(IServiceProvider serviceProvider);
     }
 }

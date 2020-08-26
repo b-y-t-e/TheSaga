@@ -11,29 +11,29 @@ using TheSaga.SagaStates;
 
 namespace TheSaga.Execution
 {
-    internal class SagaExecutor<TSagaState> : ISagaExecutor<TSagaState>
-        where TSagaState : ISagaState
+    internal class SagaExecutor<TSagaData> : ISagaExecutor<TSagaData>
+        where TSagaData : ISagaData
     {
-        private ISagaModel<TSagaState> model;
+        private ISagaModel<TSagaData> model;
         private IServiceProvider serviceProvider;
 
         public SagaExecutor(
             ISagaModel model,
             IServiceProvider serviceProvider)
         {
-            this.model = (ISagaModel<TSagaState>)model;
+            this.model = (ISagaModel<TSagaData>)model;
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task<ISagaState> Handle(Guid correlationID, IEvent @event, IsExecutionAsync async)
+        public async Task<ISagaData> Handle(Guid correlationID, IEvent @event, IsExecutionAsync async)
         {
             try
             {
                 if (@event == null)
                     @event = new EmptyEvent();
 
-                SagaActionExecutor<TSagaState> actionExecutor = ActivatorUtilities.
-                   CreateInstance<SagaActionExecutor<TSagaState>>(serviceProvider, correlationID, async, @event, model);
+                SagaActionExecutor<TSagaData> actionExecutor = ActivatorUtilities.
+                   CreateInstance<SagaActionExecutor<TSagaData>>(serviceProvider, correlationID, async, @event, model);
 
                 ActionExecutionResult stepExecutionResult = await actionExecutor.
                     ExecuteAction();

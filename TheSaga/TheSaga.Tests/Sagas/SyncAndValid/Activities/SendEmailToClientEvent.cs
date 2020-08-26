@@ -4,13 +4,13 @@ using TheSaga.Execution.Context;
 
 namespace TheSaga.Tests.Sagas.SyncAndValid.Activities
 {
-    internal class SendEmailToClientEvent : ISagaActivity<OrderState>
+    internal class SendEmailToClientEvent : ISagaActivity<OrderData>
     {
-        public async Task Compensate(IExecutionContext<OrderState> context)
+        public async Task Compensate(IExecutionContext<OrderData> context)
         {
         }
 
-        public async Task Execute(IExecutionContext<OrderState> context)
+        public async Task Execute(IExecutionContext<OrderData> context)
         {
         }
     }

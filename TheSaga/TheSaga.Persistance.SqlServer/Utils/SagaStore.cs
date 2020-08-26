@@ -52,7 +52,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             };
         }
 
-        public async Task Store(ISagaState @state)
+        public async Task Store(ISagaData @state)
         {
             if (@state == null)
                 return;
@@ -86,7 +86,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             }*/
         }
 
-        public async Task<ISagaState> Get(Guid correlationId)
+        public async Task<ISagaData> Get(Guid correlationId)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
                     new { correlationId = correlationId });
 
                 object stateObject = JsonConvert.DeserializeObject(json, _serializerSettings);
-                return (ISagaState)stateObject;
+                return (ISagaData)stateObject;
             }
             catch (Exception ex)
             {
@@ -112,18 +112,18 @@ namespace TheSaga.Persistance.SqlServer.Utils
                 new { correlationId = correlationId });
         }
 
-        private Dictionary<string, object> prepareDbObject(ISagaState @state)
+        private Dictionary<string, object> prepareDbObject(ISagaData @state)
         {
             Type stateType = @state.GetType();
 
             Dictionary<string, object> dbobject = new Dictionary<string, object>();
             dbobject[correlationIdColumn] = @state.CorrelationID;
             dbobject[stateNameColumn] = stateType.Name;
-            dbobject[createdColumn] = @state.SagaInfo.SagaCreated;
-            dbobject[modifiedColumn] = @state.SagaInfo.SagaModified;
-            dbobject[stateColumn] = @state.SagaState.SagaCurrentState;
-            dbobject[stepColumn] = @state.SagaState.SagaCurrentStep;
-            dbobject[compensatingColumn] = @state.SagaState.SagaIsCompensating;
+            dbobject[createdColumn] = @state.SagaInfo.Created;
+            dbobject[modifiedColumn] = @state.SagaInfo.Modified;
+            dbobject[stateColumn] = @state.SagaState.CurrentState;
+            dbobject[stepColumn] = @state.SagaState.CurrentStep;
+            dbobject[compensatingColumn] = @state.SagaState.IsCompensating;
             dbobject[jsonColumn] = JsonConvert.SerializeObject(@state, _serializerSettings);
 
             /*foreach (var columnInfo in getColumnsForType(stateType))
@@ -175,7 +175,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
                 new { correlationId = correlationId })) != null;
         }
 
-        private string generateInsertScriptForObject(ISagaState @state)
+        private string generateInsertScriptForObject(ISagaData @state)
         {
             Type type = @state.GetType();
             StringBuilder script = new StringBuilder();
@@ -195,7 +195,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             return script.ToString();
         }
 
-        private string generateUpdateScriptForObject(ISagaState @state)
+        private string generateUpdateScriptForObject(ISagaData @state)
         {
             Type type = @state.GetType();
             StringBuilder script = new StringBuilder();

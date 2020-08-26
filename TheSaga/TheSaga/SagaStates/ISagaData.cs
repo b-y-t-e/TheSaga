@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace TheSaga.SagaStates
 {
-    public interface ISagaState
+    public interface ISagaData
     {
         public Guid CorrelationID { get; set; }
-        public SagaData SagaState { get; set; }     
+        public SagaState SagaState { get; set; }     
         public SagaInfo SagaInfo { get; set; }
     }
 }

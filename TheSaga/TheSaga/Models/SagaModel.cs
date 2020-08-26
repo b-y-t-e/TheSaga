@@ -7,16 +7,16 @@ using TheSaga.SagaStates.Steps;
 
 namespace TheSaga.Models
 {
-    internal class SagaModel<TSagaState> : ISagaModel<TSagaState>
-        where TSagaState : ISagaState
+    internal class SagaModel<TSagaData> : ISagaModel<TSagaData>
+        where TSagaData : ISagaData
     {
         public SagaModel()
         {
-            Actions = new SagaActions<TSagaState>();
-            SagaStateType = typeof(TSagaState);
+            Actions = new SagaActions<TSagaData>();
+            SagaStateType = typeof(TSagaData);
         }
 
-        public SagaActions<TSagaState> Actions { get; }
+        public SagaActions<TSagaData> Actions { get; }
         public Type SagaStateType { get; }
 
         public bool ContainsEvent(Type type)
@@ -34,12 +34,12 @@ namespace TheSaga.Models
 
         public ISagaAction FindActionOrCreateForStateAndEvent(string state, Type eventType)
         {
-            SagaAction<TSagaState> action = this.Actions.
+            SagaAction<TSagaData> action = this.Actions.
                 FindAction(state, eventType);
 
             if (action == null)
             {
-                action = new SagaAction<TSagaState>()
+                action = new SagaAction<TSagaData>()
                 {
                     Event = eventType,
                     State = state

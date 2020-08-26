@@ -4,8 +4,8 @@ using TheSaga.SagaStates;
 
 namespace TheSaga.Execution.Actions
 {
-    internal interface ISagaActionExecutor<TSagaState>
-        where TSagaState : ISagaState
+    internal interface ISagaActionExecutor<TSagaData>
+        where TSagaData : ISagaData
     {
         Task<ActionExecutionResult> ExecuteAction();
     }

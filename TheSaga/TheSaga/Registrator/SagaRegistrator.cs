@@ -42,19 +42,19 @@ namespace TheSaga.Registrator
                 FirstOrDefault(v => v.ContainsEvent(eventType));
         }
 
-        public void Register<TSagaState>(ISagaModel<TSagaState> model)
-            where TSagaState : ISagaState
+        public void Register<TSagaData>(ISagaModel<TSagaData> model)
+            where TSagaData : ISagaData
         {
             registeredModels.
                 Add((ISagaModel)model);
 
-            SagaExecutor<TSagaState> sagaExecutor = ActivatorUtilities.
-               CreateInstance<SagaExecutor<TSagaState>>(serviceProvider, model);
+            SagaExecutor<TSagaData> sagaExecutor = ActivatorUtilities.
+               CreateInstance<SagaExecutor<TSagaData>>(serviceProvider, model);
 
-            new SagaAsyncStepCompletedHandler<TSagaState>(sagaExecutor, internalMessageBus).
+            new SagaAsyncStepCompletedHandler<TSagaData>(sagaExecutor, internalMessageBus).
                 Subscribe();
 
-            registeredExecutors[typeof(TSagaState)] = sagaExecutor;
+            registeredExecutors[typeof(TSagaData)] = sagaExecutor;
         }
     }
 }

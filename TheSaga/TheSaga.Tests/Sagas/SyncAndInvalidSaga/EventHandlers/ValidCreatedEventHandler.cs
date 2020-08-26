@@ -6,7 +6,7 @@ using TheSaga.Tests.Sagas.SyncAndInvalidSaga.Events;
 
 namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga.EventHandlers
 {
-    public class ValidCreatedEventHandler : IEventHandler<InvalidSagaState, ValidCreatedEvent>
+    public class ValidCreatedEventHandler : IEventHandler<InvalidSagaData, ValidCreatedEvent>
     {
         private readonly ISagaCoordinator sagaCoordinator;
 
@@ -15,12 +15,12 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga.EventHandlers
             this.sagaCoordinator = sagaCoordinator;
         }
 
-        public Task Compensate(IEventContext<InvalidSagaState, ValidCreatedEvent> context)
+        public Task Compensate(IEventContext<InvalidSagaData, ValidCreatedEvent> context)
         {
             return Task.CompletedTask;
         }
 
-        public Task Execute(IEventContext<InvalidSagaState, ValidCreatedEvent> context)
+        public Task Execute(IEventContext<InvalidSagaData, ValidCreatedEvent> context)
         {
             return Task.CompletedTask;
         }

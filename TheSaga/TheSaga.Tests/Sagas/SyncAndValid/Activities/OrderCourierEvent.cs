@@ -4,14 +4,14 @@ using TheSaga.Execution.Context;
 
 namespace TheSaga.Tests.Sagas.SyncAndValid.Activities
 {
-    internal class OrderCourierEvent : ISagaActivity<OrderState>
+    internal class OrderCourierEvent : ISagaActivity<OrderData>
     {
-        public Task Compensate(IExecutionContext<OrderState> context)
+        public Task Compensate(IExecutionContext<OrderData> context)
         {
             return Task.CompletedTask;
         }
 
-        public Task Execute(IExecutionContext<OrderState> context)
+        public Task Execute(IExecutionContext<OrderData> context)
         {
             return Task.CompletedTask;
         }

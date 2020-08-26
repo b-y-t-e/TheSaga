@@ -6,9 +6,9 @@ using TheSaga.SagaStates.Steps;
 
 namespace TheSaga.Models
 {
-    public interface ISagaModel<TSagaState> : ISagaModel where TSagaState : ISagaState
+    public interface ISagaModel<TSagaData> : ISagaModel where TSagaData : ISagaData
     {
-        SagaActions<TSagaState> Actions { get; }
+        SagaActions<TSagaData> Actions { get; }
     }
 
     public interface ISagaModel

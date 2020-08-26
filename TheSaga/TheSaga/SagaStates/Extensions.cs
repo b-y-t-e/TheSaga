@@ -2,9 +2,9 @@
 {
     public static class Extensions
     {
-        public static bool IsProcessingCompleted(this ISagaState sagaState)
+        public static bool IsProcessingCompleted(this ISagaData sagaData)
         {
-            return sagaState.SagaState.SagaCurrentStep == null;
+            return sagaData.SagaState.CurrentStep == null;
         }
     }
 }

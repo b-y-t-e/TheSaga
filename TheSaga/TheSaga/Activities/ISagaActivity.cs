@@ -4,11 +4,11 @@ using TheSaga.SagaStates;
 
 namespace TheSaga.Activities
 {
-    public interface ISagaActivity<TSagaState>
-        where TSagaState : ISagaState
+    public interface ISagaActivity<TSagaData>
+        where TSagaData : ISagaData
     {
-        Task Compensate(IExecutionContext<TSagaState> context);
+        Task Compensate(IExecutionContext<TSagaData> context);
 
-        Task Execute(IExecutionContext<TSagaState> context);
+        Task Execute(IExecutionContext<TSagaData> context);
     }
 }

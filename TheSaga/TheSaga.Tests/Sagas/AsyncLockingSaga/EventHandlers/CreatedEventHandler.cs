@@ -6,7 +6,7 @@ using TheSaga.Tests.Sagas.AsyncLockingSaga.Events;
 
 namespace TheSaga.Tests.Sagas.AsyncLockingSaga.EventHandlers
 {
-    public class CreatedEventHandler : IEventHandler<AsyncState, CreatedEvent>
+    public class CreatedEventHandler : IEventHandler<AsyncData, CreatedEvent>
     {
         private readonly ISagaCoordinator sagaCoordinator;
 
@@ -15,12 +15,12 @@ namespace TheSaga.Tests.Sagas.AsyncLockingSaga.EventHandlers
             this.sagaCoordinator = sagaCoordinator;
         }
 
-        public Task Compensate(IEventContext<AsyncState, CreatedEvent> context)
+        public Task Compensate(IEventContext<AsyncData, CreatedEvent> context)
         {
             return Task.CompletedTask;
         }
 
-        public Task Execute(IEventContext<AsyncState, CreatedEvent> context)
+        public Task Execute(IEventContext<AsyncData, CreatedEvent> context)
         {
             return Task.CompletedTask;
         }

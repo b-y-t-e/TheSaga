@@ -5,8 +5,8 @@ using TheSaga.SagaStates.Steps;
 
 namespace TheSaga.SagaStates.Actions
 {
-    internal class SagaAction<TSagaState> : ISagaAction
-        where TSagaState : ISagaState
+    internal class SagaAction<TSagaData> : ISagaAction
+        where TSagaData : ISagaData
     {
         public SagaAction()
         {
