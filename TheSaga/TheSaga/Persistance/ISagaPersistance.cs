@@ -8,7 +8,8 @@ namespace TheSaga.Persistance
     {
         Task<ISagaState> Get(Guid correlationID);
 
-        Task Set(ISagaState sagaState);
         Task Remove(Guid correlationID);
+
+        Task Set(ISagaState sagaState);
     }
 }

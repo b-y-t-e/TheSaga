@@ -17,10 +17,10 @@ namespace TheSaga.Tests.Sagas.AsyncAndValid
                 Start<CreatedEvent, CreatedEventHandler>(
                     "CreatedEventStep0").
                 ThenAsync(
-                    "CreatedEventStep1", 
+                    "CreatedEventStep1",
                     ctx => Task.Delay(TimeSpan.FromSeconds(1))).
                 Then(
-                    "CreatedEventStep2", 
+                    "CreatedEventStep2",
                     ctx => Task.Delay(TimeSpan.FromSeconds(1))).
                 Finish();
 

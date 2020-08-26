@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using TheSaga.Coordinators;
 using TheSaga.Events;
 using TheSaga.Execution.Context;
 using TheSaga.Tests.Sagas.SyncAndValid.Events;
@@ -10,7 +9,6 @@ namespace TheSaga.Tests.Sagas.SyncAndValid.EventHandlers
     {
         public OrderCreatedEventHandler()
         {
-
         }
 
         public Task Compensate(IEventContext<OrderState, OrderCreatedEvent> context)

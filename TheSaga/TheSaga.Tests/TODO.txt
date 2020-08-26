@@ -6,16 +6,11 @@
  + podpiecie sie do masstransit
  + after
  + retry
- + sprawdzenie lockow
- 
-
-
-Zmiana nazwy eventa sagastepcompleted na... Async żeby było wiadomo że to asynchroniczną obsługa
-Skakanie w compenssatach do tylu po historii (ecexutionid?)
-If else
-
+ + Skakanie w compenssatach do tylu po historii (ecexutionid?) 
+ + If else
 
 DONE:
+ + sprawdzenie lockow
  + likwidacja task.run
  + eventy na sam koniec taskexection
  + locki

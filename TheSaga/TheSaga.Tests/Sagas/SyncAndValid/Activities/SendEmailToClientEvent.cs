@@ -8,12 +8,10 @@ namespace TheSaga.Tests.Sagas.SyncAndValid.Activities
     {
         public async Task Compensate(IExecutionContext<OrderState> context)
         {
-
         }
 
         public async Task Execute(IExecutionContext<OrderState> context)
         {
-
         }
     }
 }

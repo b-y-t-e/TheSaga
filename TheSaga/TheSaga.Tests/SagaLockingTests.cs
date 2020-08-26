@@ -8,9 +8,7 @@ using TheSaga.Exceptions;
 using TheSaga.Persistance;
 using TheSaga.Registrator;
 using TheSaga.SagaStates;
-using TheSaga.States;
 using TheSaga.Tests.Sagas.AsyncLockingSaga;
-using TheSaga.Tests.Sagas.AsyncLockingSaga.EventHandlers;
 using TheSaga.Tests.Sagas.AsyncLockingSaga.Events;
 using TheSaga.Tests.Sagas.AsyncLockingSaga.States;
 using TheSaga.Utils;
@@ -20,23 +18,6 @@ namespace TheSaga.Tests
 {
     public class SagaLockingTests
     {
-
-        [Fact]
-        public async Task WHEN_runSagaAsynchronous_THEN_sagaShouldBeLocked()
-        {
-            // given
-            IEvent startEvent = new CreatedEvent();
-
-            // when
-            ISagaState sagaState = await sagaCoordinator.
-                Send(startEvent);
-
-            // then
-            CorrelationIdLock.
-                IsAcquired(sagaState.CorrelationID).
-                ShouldBeTrue();
-        }
-
         [Fact]
         public async Task WHEN_afterAsynchronousSagaRun_THEN_sagaShouldNotBeLocked()
         {
@@ -52,6 +33,22 @@ namespace TheSaga.Tests
             CorrelationIdLock.
                 IsAcquired(sagaState.CorrelationID).
                 ShouldBeFalse();
+        }
+
+        [Fact]
+        public async Task WHEN_runSagaAsynchronous_THEN_sagaShouldBeLocked()
+        {
+            // given
+            IEvent startEvent = new CreatedEvent();
+
+            // when
+            ISagaState sagaState = await sagaCoordinator.
+                Send(startEvent);
+
+            // then
+            CorrelationIdLock.
+                IsAcquired(sagaState.CorrelationID).
+                ShouldBeTrue();
         }
 
         [Fact]

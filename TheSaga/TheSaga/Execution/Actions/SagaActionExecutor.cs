@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.Exceptions;
-using TheSaga.Execution.Context;
 using TheSaga.Execution.Steps;
 using TheSaga.InternalMessages.MessageBus;
 using TheSaga.Models;
@@ -12,16 +11,22 @@ using TheSaga.Persistance;
 using TheSaga.SagaStates;
 using TheSaga.SagaStates.Actions;
 using TheSaga.SagaStates.Steps;
-using TheSaga.Utils;
 
 namespace TheSaga.Execution.Actions
 {
-    internal class SagaActionExecutor<TSagaState>
-        where TSagaState : ISagaState
+    internal class ActionExecutionResult
     {
+        internal bool IsSyncProcessingComplete;
+
+        internal ISagaState State;
+    }
+
+    internal class SagaActionExecutor<TSagaState>
+            where TSagaState : ISagaState
+    {
+        private bool @async;
         private IEvent @event;
         private Guid correlationID;
-        private bool @async;
         private IInternalMessageBus internalMessageBus;
         private ISagaModel<TSagaState> model;
         private ISagaPersistance sagaPersistance;
@@ -127,11 +132,5 @@ namespace TheSaga.Execution.Actions
 
             return step;
         }
-    }
-    internal class ActionExecutionResult
-    {
-        internal bool IsSyncProcessingComplete;
-
-        internal ISagaState State;
     }
 }

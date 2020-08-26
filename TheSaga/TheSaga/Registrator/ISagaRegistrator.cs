@@ -7,11 +7,11 @@ namespace TheSaga.Registrator
 {
     public interface ISagaRegistrator
     {
-        internal ISagaExecutor FindExecutorForStateType(Type stateType);
-
         ISagaModel FindModelForEventType(Type eventType);
 
         void Register<TSagaState>(ISagaModel<TSagaState> model)
             where TSagaState : ISagaState;
+
+        internal ISagaExecutor FindExecutorForStateType(Type stateType);
     }
 }

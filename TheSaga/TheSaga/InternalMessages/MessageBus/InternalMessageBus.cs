@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using TheSaga.Coordinators;
 using TheSaga.Utils;
 
 namespace TheSaga.InternalMessages.MessageBus
 {
     public class InternalMessageBus : IInternalMessageBus
     {
-        Dictionary<Type, Dictionary<Object, InternalMessageBus.Subscriber>> typesAndSubscribers =
+        private Dictionary<Type, Dictionary<Object, InternalMessageBus.Subscriber>> typesAndSubscribers =
             new Dictionary<Type, Dictionary<object, Subscriber>>();
 
         public void Publish(IInternalMessage message)
@@ -45,7 +42,6 @@ namespace TheSaga.InternalMessages.MessageBus
                     }
                 }
             }
-
         }
 
         public void Subscribe<T>(object listener, Func<T, Task> handler)
@@ -92,9 +88,8 @@ namespace TheSaga.InternalMessages.MessageBus
 
         internal class Subscriber
         {
-            internal Object Sub;
-
             internal List<Func<IInternalMessage, Task>> Actions;
+            internal Object Sub;
 
             public Subscriber()
             {

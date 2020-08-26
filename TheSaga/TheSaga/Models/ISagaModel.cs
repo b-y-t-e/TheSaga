@@ -17,11 +17,11 @@ namespace TheSaga.Models
 
         bool ContainsEvent(Type type);
 
+        ISagaAction FindActionForStep(ISagaStep sagaStep);
+
         ISagaAction FindActionOrCreateForStateAndEvent(string state, Type eventType);
 
         IList<ISagaAction> FindActionsForState(string state);
-
-        ISagaAction FindActionForStep(ISagaStep sagaStep);
 
         bool IsStartEvent(Type type);
     }

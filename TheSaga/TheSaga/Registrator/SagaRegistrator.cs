@@ -11,10 +11,10 @@ namespace TheSaga.Registrator
 {
     public class SagaRegistrator : ISagaRegistrator
     {
-        Dictionary<Type, ISagaExecutor> registeredExecutors;
-        List<ISagaModel> registeredModels;
-        ISagaPersistance sagaPersistance;
-        IInternalMessageBus internalMessageBus;
+        private IInternalMessageBus internalMessageBus;
+        private Dictionary<Type, ISagaExecutor> registeredExecutors;
+        private List<ISagaModel> registeredModels;
+        private ISagaPersistance sagaPersistance;
 
         public SagaRegistrator(ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
         {
@@ -45,6 +45,5 @@ namespace TheSaga.Registrator
             registeredExecutors[typeof(TSagaState)] =
                 new SagaExecutor<TSagaState>(model, sagaPersistance, internalMessageBus);
         }
-
     }
 }

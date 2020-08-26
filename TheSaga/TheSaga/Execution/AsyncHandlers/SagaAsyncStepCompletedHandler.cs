@@ -1,27 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using TheSaga.Events;
-using TheSaga.Exceptions;
+﻿using System.Threading.Tasks;
 using TheSaga.InternalMessages;
 using TheSaga.InternalMessages.MessageBus;
-using TheSaga.Models;
 using TheSaga.Persistance;
 using TheSaga.SagaStates;
-using TheSaga.SagaStates.Actions;
-using TheSaga.SagaStates.Steps;
-using TheSaga.States;
-using TheSaga.Utils;
 
 namespace TheSaga.Execution.AsyncHandlers
 {
     internal class SagaAsyncStepCompletedHandler<TSagaState>
         where TSagaState : ISagaState
     {
+        private IInternalMessageBus internalMessageBus;
         private ISagaExecutor sagaExecutor;
         private ISagaPersistance sagaPersistance;
-        private IInternalMessageBus internalMessageBus;
 
         public SagaAsyncStepCompletedHandler(ISagaExecutor sagaExecutor, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
         {
@@ -50,6 +40,5 @@ namespace TheSaga.Execution.AsyncHandlers
             return sagaExecutor.
                 Handle(message.CorrelationID, null, true);
         }
-
     }
 }

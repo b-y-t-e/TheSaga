@@ -13,9 +13,6 @@ namespace TheSaga.SagaStates.Steps
     {
         private ThenActionDelegate<TSagaState> compensation;
 
-        private ThenActionDelegate<TSagaState> action { get;  }
-        public bool Async { get; }
-        public String StepName { get; }
         public SagaStepForInlineAction(
             String stepName, ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation, Boolean async)
         {
@@ -25,6 +22,9 @@ namespace TheSaga.SagaStates.Steps
             Async = async;
         }
 
+        public bool Async { get; }
+        public String StepName { get; }
+        private ThenActionDelegate<TSagaState> action { get; }
 
         public async Task Compensate(IExecutionContext context, IEvent @event)
         {

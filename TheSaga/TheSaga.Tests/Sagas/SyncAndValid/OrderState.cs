@@ -12,10 +12,10 @@ namespace TheSaga.Tests.Sagas.SyncAndValid
         }
 
         public Guid CorrelationID { get; set; }
+        public Exception CurrentError { get; set; }
         public string CurrentState { get; set; }
         public string CurrentStep { get; set; }
-        public bool IsCompensating { get; set; }
-        public Exception CurrentError { get; set; }
         public IList<SagaStepHistory> History { get; set; }
+        public bool IsCompensating { get; set; }
     }
 }

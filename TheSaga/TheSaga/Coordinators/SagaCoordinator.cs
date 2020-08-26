@@ -13,15 +13,14 @@ using TheSaga.Persistance;
 using TheSaga.Registrator;
 using TheSaga.SagaStates;
 using TheSaga.States;
-using TheSaga.Utils;
 
 namespace TheSaga.Coordinators
 {
     public class SagaCoordinator : ISagaCoordinator
     {
-        private ISagaRegistrator sagaRegistrator;
-        private ISagaPersistance sagaPersistance;
         private IInternalMessageBus internalMessageBus;
+        private ISagaPersistance sagaPersistance;
+        private ISagaRegistrator sagaRegistrator;
 
         public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
         {
@@ -72,43 +71,6 @@ namespace TheSaga.Coordinators
             }
         }
 
-        private void SendInternalMessages(Guid correlationID, ISagaModel model)
-        {
-            internalMessageBus.Publish(
-                                new SagaProcessingStartMessage(model.SagaStateType, correlationID));
-        }
-
-        private async Task<Guid?> CreateNewSagaIfRequired(ISagaModel model, Guid correlationID, Type eventType)
-        {
-            if (eventType != null)
-            {
-                bool isStartEvent = model.IsStartEvent(eventType);
-                if (isStartEvent)
-                {
-                    correlationID = await CreateNewSaga(model, correlationID);
-                    return correlationID;
-                }
-            }
-
-            return null;
-        }
-
-        private async Task<Guid> CreateNewSaga(ISagaModel model, Guid correlationID)
-        {
-            if (correlationID == Guid.Empty)
-                correlationID = Guid.NewGuid();
-
-            ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
-            newSagaState.CorrelationID = correlationID;
-            newSagaState.CurrentState = new SagaStartState().GetStateName();
-            newSagaState.CurrentStep = null;
-
-            await sagaPersistance.
-                Set(newSagaState);
-
-            return correlationID;
-        }
-
         public async Task WaitForState<TState>(Guid correlationID, SagaWaitOptions waitOptions = null)
             where TState : IState, new()
         {
@@ -152,5 +114,41 @@ namespace TheSaga.Coordinators
             }
         }
 
+        private async Task<Guid> CreateNewSaga(ISagaModel model, Guid correlationID)
+        {
+            if (correlationID == Guid.Empty)
+                correlationID = Guid.NewGuid();
+
+            ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
+            newSagaState.CorrelationID = correlationID;
+            newSagaState.CurrentState = new SagaStartState().GetStateName();
+            newSagaState.CurrentStep = null;
+
+            await sagaPersistance.
+                Set(newSagaState);
+
+            return correlationID;
+        }
+
+        private async Task<Guid?> CreateNewSagaIfRequired(ISagaModel model, Guid correlationID, Type eventType)
+        {
+            if (eventType != null)
+            {
+                bool isStartEvent = model.IsStartEvent(eventType);
+                if (isStartEvent)
+                {
+                    correlationID = await CreateNewSaga(model, correlationID);
+                    return correlationID;
+                }
+            }
+
+            return null;
+        }
+
+        private void SendInternalMessages(Guid correlationID, ISagaModel model)
+        {
+            internalMessageBus.Publish(
+                                new SagaProcessingStartMessage(model.SagaStateType, correlationID));
+        }
     }
 }

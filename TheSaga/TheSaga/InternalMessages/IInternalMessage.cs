@@ -1,9 +1,6 @@
-﻿using System;
-
-namespace TheSaga.InternalMessages
+﻿namespace TheSaga.InternalMessages
 {
     public interface IInternalMessage
     {
-        
     }
 }

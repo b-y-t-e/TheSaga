@@ -105,27 +105,6 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public ISagaBuilderState<TSagaState> StartAsync<TEvent, TEventHandler>()
-            where TEvent : IEvent
-            where TEventHandler : IEventHandler<TSagaState, TEvent>
-        {
-            currentState = new SagaStartState().GetStateName();
-            currentEvent = typeof(TEvent);
-            model.Actions.Add(new SagaAction<TSagaState>()
-            {
-                State = currentState,
-                Event = typeof(TEvent),
-                Steps = new List<ISagaStep>
-                {
-                    new SagaStepForEventHandler<TSagaState, TEventHandler, TEvent>(
-                        uniqueNameGenerator.Generate(currentState, nameof(StartAsync), typeof(TEvent).Name),
-                        serviceProvider,
-                        true)
-                }
-            });
-            return this;
-        }
-
         public ISagaBuilderState<TSagaState> Start<TEvent>(string stepName)
                     where TEvent : IEvent
         {
@@ -166,6 +145,27 @@ namespace TheSaga.Builders
                         stepName,
                         serviceProvider,
                         false)
+                }
+            });
+            return this;
+        }
+
+        public ISagaBuilderState<TSagaState> StartAsync<TEvent, TEventHandler>()
+                            where TEvent : IEvent
+            where TEventHandler : IEventHandler<TSagaState, TEvent>
+        {
+            currentState = new SagaStartState().GetStateName();
+            currentEvent = typeof(TEvent);
+            model.Actions.Add(new SagaAction<TSagaState>()
+            {
+                State = currentState,
+                Event = typeof(TEvent),
+                Steps = new List<ISagaStep>
+                {
+                    new SagaStepForEventHandler<TSagaState, TEventHandler, TEvent>(
+                        uniqueNameGenerator.Generate(currentState, nameof(StartAsync), typeof(TEvent).Name),
+                        serviceProvider,
+                        true)
                 }
             });
             return this;
@@ -247,6 +247,7 @@ namespace TheSaga.Builders
 
             return this;
         }
+
         public ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation)
         {
             model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(

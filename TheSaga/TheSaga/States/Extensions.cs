@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TheSaga.Utils;
+﻿using TheSaga.Utils;
 
 namespace TheSaga.States
 {

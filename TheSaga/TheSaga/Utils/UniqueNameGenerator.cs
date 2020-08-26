@@ -30,5 +30,4 @@ namespace TheSaga.Utils
             usedNames.Add(name);
         }
     }
-
 }

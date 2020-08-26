@@ -5,24 +5,16 @@ namespace TheSaga.Utils
 {
     internal static class CorrelationIdLock
     {
-        static HashSet<Guid> locks =
+        private static HashSet<Guid> locks =
             new HashSet<Guid>();
 
         internal static bool Acquire(this Guid guid)
         {
-            lock(locks)
+            lock (locks)
             {
                 bool hasAcquired = !locks.Contains(guid);
                 if (hasAcquired) locks.Add(guid);
                 return hasAcquired;
-            }
-        }
-
-        internal static bool IsAcquired(this Guid guid)
-        {
-            lock (locks)
-            {
-                return locks.Contains(guid);
             }
         }
 
@@ -33,6 +25,14 @@ namespace TheSaga.Utils
                 bool hasBanished = locks.Contains(guid);
                 if (hasBanished) locks.Remove(guid);
                 return hasBanished;
+            }
+        }
+
+        internal static bool IsAcquired(this Guid guid)
+        {
+            lock (locks)
+            {
+                return locks.Contains(guid);
             }
         }
     }

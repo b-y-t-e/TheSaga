@@ -9,8 +9,6 @@ using TheSaga.Persistance;
 using TheSaga.Registrator;
 using TheSaga.SagaStates;
 using TheSaga.Tests.Sagas.SyncAndValid;
-using TheSaga.Tests.Sagas.SyncAndValid.Activities;
-using TheSaga.Tests.Sagas.SyncAndValid.EventHandlers;
 using TheSaga.Tests.Sagas.SyncAndValid.Events;
 using TheSaga.Tests.Sagas.SyncAndValid.States;
 using Xunit;
