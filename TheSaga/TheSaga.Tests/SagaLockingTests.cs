@@ -6,6 +6,8 @@ using TheSaga.Coordinators;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Persistance;
+using TheSaga.Persistance.SqlServer;
+using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Registrator;
 using TheSaga.SagaStates;
 using TheSaga.Tests.Sagas.AsyncLockingSaga;
@@ -82,7 +84,15 @@ namespace TheSaga.Tests
         public SagaLockingTests()
         {
             IServiceCollection services = new ServiceCollection();
-            services.AddTheSaga();
+            services.AddTheSaga(cfg =>
+            {
+#if SQL_SERVER
+                cfg.UseSqlServer(new SqlServerOptions()
+                {
+                    ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
+                });
+#endif
+            });
 
             serviceProvider = services.BuildServiceProvider();
 

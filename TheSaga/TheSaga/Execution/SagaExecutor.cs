@@ -1,47 +1,52 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.Execution.Actions;
 using TheSaga.Execution.AsyncHandlers;
 using TheSaga.InternalMessages.MessageBus;
 using TheSaga.Models;
-using TheSaga.Persistance;
+using TheSaga.Providers;
 using TheSaga.SagaStates;
 
 namespace TheSaga.Execution
 {
-    internal class SagaExecutor<TSagaState> : ISagaExecutor
+    internal class SagaExecutor<TSagaState> : ISagaExecutor<TSagaState>
         where TSagaState : ISagaState
     {
-        private IInternalMessageBus internalMessageBus;
         private ISagaModel<TSagaState> model;
-        private ISagaPersistance sagaPersistance;
+        private IServiceProvider serviceProvider;
 
         public SagaExecutor(
-            ISagaModel<TSagaState> model,
-            ISagaPersistance sagaPersistance,
-            IInternalMessageBus internalMessageBus)
+            ISagaModel model,
+            IServiceProvider serviceProvider)
         {
-            this.model = model;
-            this.sagaPersistance = sagaPersistance;
-            this.internalMessageBus = internalMessageBus;
-
-            new SagaAsyncStepCompletedHandler<TSagaState>(this, sagaPersistance, internalMessageBus).
-                Subscribe();
+            this.model = (ISagaModel<TSagaState>)model;
+            this.serviceProvider = serviceProvider;
         }
 
-        public async Task<ISagaState> Handle(Guid correlationID, IEvent @event, bool async)
+        public async Task<ISagaState> Handle(Guid correlationID, IEvent @event, IsExecutionAsync async)
         {
-            SagaActionExecutor<TSagaState> actionExecutor =
-                new SagaActionExecutor<TSagaState>(correlationID, async, @event, model, internalMessageBus, sagaPersistance);
+            try
+            {
+                if (@event == null)
+                    @event = new EmptyEvent();
 
-            ActionExecutionResult stepExecutionResult = await actionExecutor.
-                ExecuteAction();
+                SagaActionExecutor<TSagaState> actionExecutor = ActivatorUtilities.
+                   CreateInstance<SagaActionExecutor<TSagaState>>(serviceProvider, correlationID, async, @event, model);
 
-            if (stepExecutionResult.IsSyncProcessingComplete)
-                return stepExecutionResult.State;
+                ActionExecutionResult stepExecutionResult = await actionExecutor.
+                    ExecuteAction();
 
-            return await Handle(correlationID, null, @async);
+                if (stepExecutionResult.IsSyncProcessingComplete)
+                    return stepExecutionResult.State;
+
+                return await Handle(correlationID, null, @async);
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }

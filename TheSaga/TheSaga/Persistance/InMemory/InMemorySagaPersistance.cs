@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TheSaga.SagaStates;
 
-namespace TheSaga.Persistance
+namespace TheSaga.Persistance.InMemory
 {
     public class InMemorySagaPersistance : ISagaPersistance
     {

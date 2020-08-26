@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using TheSaga.Execution.Actions;
 using TheSaga.InternalMessages;
 using TheSaga.InternalMessages.MessageBus;
 using TheSaga.Persistance;
@@ -11,12 +12,12 @@ namespace TheSaga.Execution.AsyncHandlers
     {
         private IInternalMessageBus internalMessageBus;
         private ISagaExecutor sagaExecutor;
-        private ISagaPersistance sagaPersistance;
 
-        public SagaAsyncStepCompletedHandler(ISagaExecutor sagaExecutor, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
+        public SagaAsyncStepCompletedHandler(
+            ISagaExecutor sagaExecutor, 
+            IInternalMessageBus internalMessageBus)
         {
             this.sagaExecutor = sagaExecutor;
-            this.sagaPersistance = sagaPersistance;
             this.internalMessageBus = internalMessageBus;
         }
 
@@ -38,7 +39,7 @@ namespace TheSaga.Execution.AsyncHandlers
                 return Task.CompletedTask;
 
             return sagaExecutor.
-                Handle(message.CorrelationID, null, true);
+                Handle(message.CorrelationID, null, IsExecutionAsync.True());
         }
     }
 }

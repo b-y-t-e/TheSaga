@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TheSaga.Execution;
+using TheSaga.Execution.AsyncHandlers;
 using TheSaga.InternalMessages.MessageBus;
 using TheSaga.Models;
 using TheSaga.Persistance;
+using TheSaga.Providers;
 using TheSaga.SagaStates;
 
 namespace TheSaga.Registrator
@@ -14,14 +17,16 @@ namespace TheSaga.Registrator
         private IInternalMessageBus internalMessageBus;
         private Dictionary<Type, ISagaExecutor> registeredExecutors;
         private List<ISagaModel> registeredModels;
-        private ISagaPersistance sagaPersistance;
+        private IServiceProvider serviceProvider;
 
-        public SagaRegistrator(ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
+        public SagaRegistrator(
+            IInternalMessageBus internalMessageBus,
+            IServiceProvider serviceProvider)
         {
             this.registeredExecutors = new Dictionary<Type, ISagaExecutor>();
             this.registeredModels = new List<ISagaModel>();
-            this.sagaPersistance = sagaPersistance;
             this.internalMessageBus = internalMessageBus;
+            this.serviceProvider = serviceProvider;
         }
 
         ISagaExecutor ISagaRegistrator.FindExecutorForStateType(Type stateType)
@@ -40,10 +45,16 @@ namespace TheSaga.Registrator
         public void Register<TSagaState>(ISagaModel<TSagaState> model)
             where TSagaState : ISagaState
         {
-            registeredModels.Add((ISagaModel)model);
+            registeredModels.
+                Add((ISagaModel)model);
 
-            registeredExecutors[typeof(TSagaState)] =
-                new SagaExecutor<TSagaState>(model, sagaPersistance, internalMessageBus);
+            SagaExecutor<TSagaState> sagaExecutor = ActivatorUtilities.
+               CreateInstance<SagaExecutor<TSagaState>>(serviceProvider, model);
+
+            new SagaAsyncStepCompletedHandler<TSagaState>(sagaExecutor, internalMessageBus).
+                Subscribe();
+
+            registeredExecutors[typeof(TSagaState)] = sagaExecutor;
         }
     }
 }

@@ -5,11 +5,14 @@ using TheSaga.Coordinators.AsyncHandlers;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Execution;
+using TheSaga.Execution.Actions;
+using TheSaga.Execution.AsyncHandlers;
 using TheSaga.InternalMessages;
 using TheSaga.InternalMessages.MessageBus;
 using TheSaga.Models;
 using TheSaga.Options;
 using TheSaga.Persistance;
+using TheSaga.Providers;
 using TheSaga.Registrator;
 using TheSaga.SagaStates;
 using TheSaga.States;
@@ -21,12 +24,13 @@ namespace TheSaga.Coordinators
         private IInternalMessageBus internalMessageBus;
         private ISagaPersistance sagaPersistance;
         private ISagaRegistrator sagaRegistrator;
-
-        public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus)
+        private IDateTimeProvider dateTimeProvider;
+        public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus, IDateTimeProvider dateTimeProvider)
         {
             this.sagaRegistrator = sagaRegistrator;
             this.sagaPersistance = sagaPersistance;
             this.internalMessageBus = internalMessageBus;
+            this.dateTimeProvider = dateTimeProvider;
 
             new SagaProcessingMessageHandler(internalMessageBus).
                 Subscribe();
@@ -57,7 +61,7 @@ namespace TheSaga.Coordinators
                     FindExecutorForStateType(model.SagaStateType);
 
                 return await sagaExecutor.
-                    Handle(correlationID, @event, false);
+                    Handle(correlationID, @event, IsExecutionAsync.False());
             }
             catch
             {
@@ -97,7 +101,7 @@ namespace TheSaga.Coordinators
                 if (state == null)
                     throw new SagaInstanceNotFoundException(correlationID);
 
-                if (state.CurrentState == new TState().GetStateName())
+                if (state.SagaCurrentState == new TState().GetStateName())
                     return;
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
@@ -121,8 +125,10 @@ namespace TheSaga.Coordinators
 
             ISagaState newSagaState = (ISagaState)Activator.CreateInstance(model.SagaStateType);
             newSagaState.CorrelationID = correlationID;
-            newSagaState.CurrentState = new SagaStartState().GetStateName();
-            newSagaState.CurrentStep = null;
+            newSagaState.SagaCurrentState = new SagaStartState().GetStateName();
+            newSagaState.SagaCurrentStep = null;
+            newSagaState.SagaCreated = dateTimeProvider.Now;
+            newSagaState.SagaModified = dateTimeProvider.Now;
 
             await sagaPersistance.
                 Set(newSagaState);

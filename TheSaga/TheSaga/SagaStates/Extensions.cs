@@ -4,7 +4,7 @@
     {
         public static bool IsProcessingCompleted(this ISagaState sagaState)
         {
-            return sagaState.CurrentStep == null;
+            return sagaState.SagaCurrentStep == null;
         }
     }
 }
