@@ -1,5 +1,4 @@
 ﻿TODO:
- + sqlserver persistance
  + wznawianie sag po restarcie
  + dodanie metody BusSend
  + dodanie metody Publish
@@ -8,8 +7,10 @@
  + retry
  + Skakanie w compenssatach do tylu po historii (ecexutionid?) 
  + If else
+ + executors -> command / handlers
 
 DONE:
+ + sqlserver persistance
  + sprawdzenie lockow
  + likwidacja task.run
  + eventy na sam koniec taskexection
