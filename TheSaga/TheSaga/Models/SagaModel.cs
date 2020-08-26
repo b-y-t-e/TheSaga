@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TheSaga.SagaStates;
 using TheSaga.SagaStates.Actions;
+using TheSaga.SagaStates.Steps;
 
 namespace TheSaga.Models
 {
@@ -25,7 +26,13 @@ namespace TheSaga.Models
                 Actions.DuringEvents.Contains(type);
         }
 
-        public ISagaAction FindActionOrCreate(string state, Type eventType)
+        public ISagaAction FindActionForStep(ISagaStep sagaStep)
+        {
+            return this.Actions.
+                FindAction(sagaStep);
+        }
+
+        public ISagaAction FindActionOrCreateForStateAndEvent(string state, Type eventType)
         {
             SagaAction<TSagaState> action = this.Actions.
                 FindAction(state, eventType);
@@ -43,7 +50,7 @@ namespace TheSaga.Models
             return action;
         }
 
-        public IList<ISagaAction> FindActions(string state)
+        public IList<ISagaAction> FindActionsForState(string state)
         {
             return this.Actions.
                  FindActions(state).

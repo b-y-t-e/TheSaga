@@ -14,36 +14,36 @@ namespace TheSaga.Messages.MessageBus
 
         public void Publish(IInternalMessage message)
         {
-            Task.Run(() =>
+            //Task.Run(() =>
+            // {
+            Type incomingMessageType = message.GetType();
+            lock (typesAndSubscribers)
             {
-                Type incomingMessageType = message.GetType();
-                lock (typesAndSubscribers)
+                foreach (var typesAndSubs in typesAndSubscribers)
                 {
-                    foreach (var typesAndSubs in typesAndSubscribers)
-                    {
-                        Type type = typesAndSubs.Key;
+                    Type type = typesAndSubs.Key;
 
-                        if (type == incomingMessageType ||
-                            type.IsAssignableFrom(incomingMessageType))
+                    if (type == incomingMessageType ||
+                        type.IsAssignableFrom(incomingMessageType))
+                    {
+                        foreach (var typeAndSub in typesAndSubs.Value)
                         {
-                            foreach (var typeAndSub in typesAndSubs.Value)
+                            foreach (var action in typeAndSub.Value.Actions)
                             {
-                                foreach (var action in typeAndSub.Value.Actions)
-                                {
-                                    try
-                                    {
-                                        action(message);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Console.WriteLine(ex.Message);
-                                    }
-                                }
+                                //try
+                                //{/
+                                    action(message);
+                                //}
+                               // catch (Exception ex)
+                               // {
+                                //    Console.WriteLine(ex.Message);
+                               // }
                             }
                         }
                     }
                 }
-            });
+            }
+            //});
         }
 
         public void Subscribe<T>(object listener, Func<T, Task> handler)

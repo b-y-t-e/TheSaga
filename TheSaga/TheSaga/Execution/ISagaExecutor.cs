@@ -7,7 +7,7 @@ using TheSaga.SagaStates;
 
 namespace TheSaga.Execution
 {
-    public interface ISagaExecutor
+    internal interface ISagaExecutor
     {
         Task<ISagaState> Handle(Guid correlationID, IEvent @event, Boolean async);
     }
