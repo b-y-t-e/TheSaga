@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TheSaga.Execution;
-using TheSaga.Messages.MessageBus;
+using TheSaga.InternalMessages.MessageBus;
 using TheSaga.Models;
 using TheSaga.Persistance;
 using TheSaga.SagaStates;

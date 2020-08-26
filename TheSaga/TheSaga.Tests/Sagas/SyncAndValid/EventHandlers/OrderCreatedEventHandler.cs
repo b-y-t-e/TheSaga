@@ -8,11 +8,9 @@ namespace TheSaga.Tests.Sagas.SyncAndValid.EventHandlers
 {
     public class OrderCreatedEventHandler : IEventHandler<OrderState, OrderCreatedEvent>
     {
-        private readonly ISagaCoordinator sagaCoordinator;
-
-        public OrderCreatedEventHandler(ISagaCoordinator sagaCoordinator)
+        public OrderCreatedEventHandler()
         {
-            this.sagaCoordinator = sagaCoordinator;
+
         }
 
         public Task Compensate(IEventContext<OrderState, OrderCreatedEvent> context)

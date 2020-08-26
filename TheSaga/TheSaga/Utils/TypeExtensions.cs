@@ -4,6 +4,18 @@ namespace TheSaga.Utils
 {
     internal static class TypeExtensions
     {
+        internal static bool Is<T>(this Type thisType)
+        {
+            return Is(thisType, typeof(T));
+        }
+
+        internal static bool Is(this Type thisType, Type baseType)
+        {
+            return
+                baseType == thisType ||
+                baseType.IsAssignableFrom(thisType);
+        }
+
         internal static string GetFriendlyName(this Type type)
         {
             string friendlyName = type.Name;

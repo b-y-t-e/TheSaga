@@ -6,8 +6,7 @@ using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Execution.Context;
 using TheSaga.Execution.Steps;
-using TheSaga.Messages;
-using TheSaga.Messages.MessageBus;
+using TheSaga.InternalMessages.MessageBus;
 using TheSaga.Models;
 using TheSaga.Persistance;
 using TheSaga.SagaStates;
@@ -75,7 +74,7 @@ namespace TheSaga.Execution.Actions
                 async = true;
 
             await new SagaStepExecutor<TSagaState>(async, @event, state, step, action, internalMessageBus, sagaPersistance).
-                Execute();
+                ExecuteStep();
 
             return new ActionExecutionResult()
             {

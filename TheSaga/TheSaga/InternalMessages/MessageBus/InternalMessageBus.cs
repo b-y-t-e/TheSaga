@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TheSaga.Coordinators;
+using TheSaga.Utils;
 
-namespace TheSaga.Messages.MessageBus
+namespace TheSaga.InternalMessages.MessageBus
 {
     public class InternalMessageBus : IInternalMessageBus
     {
@@ -14,36 +16,36 @@ namespace TheSaga.Messages.MessageBus
 
         public void Publish(IInternalMessage message)
         {
-            //Task.Run(() =>
-            // {
             Type incomingMessageType = message.GetType();
-            lock (typesAndSubscribers)
-            {
-                foreach (var typesAndSubs in typesAndSubscribers)
-                {
-                    Type type = typesAndSubs.Key;
 
-                    if (type == incomingMessageType ||
-                        type.IsAssignableFrom(incomingMessageType))
+            KeyValuePair<Type, Dictionary<object, Subscriber>>[] typesAndSubscribersArr = null;
+
+            lock (typesAndSubscribers)
+                typesAndSubscribersArr = typesAndSubscribers.ToArray();
+
+            foreach (var typesAndSubs in typesAndSubscribersArr)
+            {
+                Type type = typesAndSubs.Key;
+                if (incomingMessageType.Is(type))
+                {
+                    KeyValuePair<object, Subscriber>[] subscribersArr = null;
+
+                    lock (typesAndSubscribers)
+                        subscribersArr = typesAndSubs.Value.ToArray();
+
+                    foreach (KeyValuePair<object, Subscriber> subscriber in subscribersArr)
                     {
-                        foreach (var typeAndSub in typesAndSubs.Value)
-                        {
-                            foreach (var action in typeAndSub.Value.Actions)
-                            {
-                                //try
-                                //{/
-                                    action(message);
-                                //}
-                               // catch (Exception ex)
-                               // {
-                                //    Console.WriteLine(ex.Message);
-                               // }
-                            }
-                        }
+                        Func<IInternalMessage, Task>[] actionsArr = null;
+
+                        lock (typesAndSubscribers)
+                            actionsArr = subscriber.Value.Actions.ToArray();
+
+                        foreach (Func<IInternalMessage, Task> action in actionsArr)
+                            action(message);
                     }
                 }
             }
-            //});
+
         }
 
         public void Subscribe<T>(object listener, Func<T, Task> handler)

@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TheSaga.Coordinators;
 
-namespace TheSaga.Messages.MessageBus
+namespace TheSaga.InternalMessages.MessageBus
 {
     public interface IInternalMessageBus
     {

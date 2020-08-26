@@ -18,6 +18,14 @@ namespace TheSaga.Utils
             }
         }
 
+        internal static bool IsAcquired(this Guid guid)
+        {
+            lock (locks)
+            {
+                return locks.Contains(guid);
+            }
+        }
+
         internal static bool Banish(this Guid guid)
         {
             lock (locks)

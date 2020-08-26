@@ -34,15 +34,6 @@ namespace TheSaga.Builders
         public ISagaBuilderState<TSagaState> After(TimeSpan time)
         {
             throw new NotImplementedException();
-
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
-                new SagaStepForInlineAction<TSagaState>(
-                    uniqueNameGenerator.Generate(currentState, nameof(After)),
-                    ctx => Task.Delay(time),
-                    null,
-                    true));
-
-            return this;
         }
 
         public ISagaModel<TSagaState> Build()
@@ -207,8 +198,13 @@ namespace TheSaga.Builders
         public ISagaBuilderState<TSagaState> Then<TSagaActivity>()
             where TSagaActivity : ISagaActivity<TSagaState>
         {
-            return Then<TSagaActivity>(
-                uniqueNameGenerator.Generate(currentState, nameof(Then), typeof(TSagaActivity).Name));
+            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+                new SagaStepForActivity<TSagaState, TSagaActivity>(
+                    uniqueNameGenerator.Generate(currentState, nameof(Then), typeof(TSagaActivity).Name),
+                    serviceProvider,
+                    false));
+
+            return this;
         }
 
         public ISagaBuilderState<TSagaState> Then<TSagaActivity>(String stepName) where TSagaActivity : ISagaActivity<TSagaState>
@@ -227,9 +223,14 @@ namespace TheSaga.Builders
 
         public ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action)
         {
-            return Then(
-                uniqueNameGenerator.Generate(currentState, nameof(Then)),
-                action);
+            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+                new SagaStepForInlineAction<TSagaState>(
+                    uniqueNameGenerator.Generate(currentState, nameof(Then)),
+                    action,
+                    null,
+                    false));
+
+            return this;
         }
 
         public ISagaBuilderState<TSagaState> Then(String stepName, ThenActionDelegate<TSagaState> action)
@@ -248,10 +249,14 @@ namespace TheSaga.Builders
         }
         public ISagaBuilderState<TSagaState> Then(ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation)
         {
-            return Then(
-                uniqueNameGenerator.Generate(currentState, nameof(Then)),
-                action,
-                compensation);
+            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+                new SagaStepForInlineAction<TSagaState>(
+                    uniqueNameGenerator.Generate(currentState, nameof(Then)),
+                    action,
+                    compensation,
+                    false));
+
+            return this;
         }
 
         public ISagaBuilderState<TSagaState> Then(String stepName, ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation)
@@ -272,8 +277,13 @@ namespace TheSaga.Builders
         public ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>()
                             where TSagaActivity : ISagaActivity<TSagaState>
         {
-            return ThenAsync<TSagaActivity>(
-                uniqueNameGenerator.Generate(currentState, nameof(ThenAsync), typeof(TSagaActivity).Name));
+            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+                new SagaStepForActivity<TSagaState, TSagaActivity>(
+                    uniqueNameGenerator.Generate(currentState, nameof(ThenAsync), typeof(TSagaActivity).Name),
+                    serviceProvider,
+                    true));
+
+            return this;
         }
 
         public ISagaBuilderState<TSagaState> ThenAsync<TSagaActivity>(String stepName) where TSagaActivity : ISagaActivity<TSagaState>
@@ -292,9 +302,14 @@ namespace TheSaga.Builders
 
         public ISagaBuilderState<TSagaState> ThenAsync(ThenActionDelegate<TSagaState> action)
         {
-            return ThenAsync(
+            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+                new SagaStepForInlineAction<TSagaState>(
                 uniqueNameGenerator.Generate(currentState, nameof(ThenAsync)),
-                action);
+                    action,
+                    null,
+                    true));
+
+            return this;
         }
 
         public ISagaBuilderState<TSagaState> ThenAsync(String stepName, ThenActionDelegate<TSagaState> action)
@@ -314,10 +329,14 @@ namespace TheSaga.Builders
 
         public ISagaBuilderState<TSagaState> ThenAsync(ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation)
         {
-            return ThenAsync(
+            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+                new SagaStepForInlineAction<TSagaState>(
                 uniqueNameGenerator.Generate(currentState, nameof(ThenAsync)),
-                action,
-                compensation);
+                    action,
+                    compensation,
+                    true));
+
+            return this;
         }
 
         public ISagaBuilderState<TSagaState> ThenAsync(string stepName, ThenActionDelegate<TSagaState> action, ThenActionDelegate<TSagaState> compensation)

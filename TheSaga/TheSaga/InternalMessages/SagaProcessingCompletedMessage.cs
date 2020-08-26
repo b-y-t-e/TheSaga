@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace TheSaga.Messages
+namespace TheSaga.InternalMessages
 {
-    internal class SagaProcessingStart : IInternalMessage
+    internal class SagaProcessingCompletedMessage : IInternalMessage
     {
-        public SagaProcessingStart(Type sagaStateType, Guid correlationID)
+        public SagaProcessingCompletedMessage(Type sagaStateType, Guid correlationID)
         {
             SagaStateType = sagaStateType;
             CorrelationID = correlationID;

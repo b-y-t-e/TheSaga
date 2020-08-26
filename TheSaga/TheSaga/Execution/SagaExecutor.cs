@@ -6,8 +6,7 @@ using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Execution.Actions;
 using TheSaga.Execution.AsyncHandlers;
-using TheSaga.Messages;
-using TheSaga.Messages.MessageBus;
+using TheSaga.InternalMessages.MessageBus;
 using TheSaga.Models;
 using TheSaga.Persistance;
 using TheSaga.SagaStates;
@@ -34,7 +33,7 @@ namespace TheSaga.Execution
             this.sagaPersistance = sagaPersistance;
             this.internalMessageBus = internalMessageBus;
 
-            new SagaAsyncHandler<TSagaState>(this, sagaPersistance, internalMessageBus).
+            new SagaAsyncStepCompletedHandler<TSagaState>(this, sagaPersistance, internalMessageBus).
                 Subscribe();
         }
 

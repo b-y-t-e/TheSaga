@@ -1,25 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TheSaga.Utils;
 
 namespace TheSaga.States
 {
     internal static class Extensions
     {
-        internal static string GetStateName<TState>()
-            where TState : IState, new()
-        {
-            if (typeof(TState) == typeof(IStateWithCustomName) || typeof(IStateWithCustomName).IsAssignableFrom(typeof(TState)))
-                return ((IStateWithCustomName)new TState()).Name;
-            return nameof(TState);
-        }
-
         internal static string GetStateName<TState>(this TState state)
             where TState : IState
         {
-            if (typeof(TState) == typeof(IStateWithCustomName) || typeof(IStateWithCustomName).IsAssignableFrom(typeof(TState)))
+            if (typeof(TState).Is<IStateWithCustomName>())
                 return ((IStateWithCustomName)state).Name;
-            return nameof(TState);
+
+            return typeof(TState).Name;
         }
     }
 }

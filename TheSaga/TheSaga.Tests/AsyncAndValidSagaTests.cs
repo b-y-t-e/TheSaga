@@ -11,6 +11,7 @@ using TheSaga.States;
 using TheSaga.Tests.Sagas.AsyncAndValid;
 using TheSaga.Tests.Sagas.AsyncAndValid.EventHandlers;
 using TheSaga.Tests.Sagas.AsyncAndValid.Events;
+using TheSaga.Utils;
 using Xunit;
 
 namespace TheSaga.Tests
@@ -18,7 +19,7 @@ namespace TheSaga.Tests
     public class AsyncAndValidSagaTests
     {
         [Fact]
-        public async Task WHEN_sagaRunAsyncMethods_THEN_sagaShouldBeInIntermediateState()
+        public async Task WHEN_runSagaAsynchronous_THEN_sagaShouldBeInIntermediateState()
         {
             // given
             IEvent startEvent = new CreatedEvent();
@@ -40,7 +41,7 @@ namespace TheSaga.Tests
         }
 
         [Fact]
-        public async Task WHEN_sagaWaitForAllAsyncMethods_THEN_sagaShouldBeCompleted()
+        public async Task WHEN_afterAsynchronousSagaRun_THEN_sagaShouldBeCompleted()
         {
             // given
             IEvent startEvent = new CreatedEvent();
