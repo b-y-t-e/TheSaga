@@ -78,7 +78,7 @@ namespace TheSaga.Execution.Actions
             return new ActionExecutionResult()
             {
                 Saga = saga,
-                IsSyncProcessingComplete = async || saga.IsProcessingCompleted()
+                IsSyncProcessingComplete = async || saga.IsIdle()
             };
         }
 
@@ -99,11 +99,9 @@ namespace TheSaga.Execution.Actions
 
         private ISagaStep FindStepForCurrentState(IList<ISagaAction> actions)
         {
-            if (saga.IsProcessingCompleted())
-            {
+            if (saga.IsIdle())
                 throw new Exception("");
-            }
-
+            
             ISagaAction action = actions.
                 FirstOrDefault(a => a.FindStep(saga.State.CurrentStep) != null);
 
@@ -127,7 +125,7 @@ namespace TheSaga.Execution.Actions
             if (action == null)
                 throw new SagaInvalidEventForStateException(saga.State.GetExecutionState(), eventType);
 
-            if (!saga.IsProcessingCompleted())
+            if (!saga.IsIdle())
                 throw new SagaIsBusyHandlingStepException(saga.Data.ID, saga.State.GetExecutionState(), saga.State.CurrentStep);
 
             ISagaStep step = action.Steps.FirstOrDefault();

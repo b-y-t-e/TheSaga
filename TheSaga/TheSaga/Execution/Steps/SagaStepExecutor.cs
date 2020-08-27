@@ -69,12 +69,6 @@ namespace TheSaga.Execution.Steps
             string currentSagaState = saga.State.CurrentState;
             bool hasSagaCompleted = false;
 
-            if (!saga.State.IsCompensating &&
-                sagaStep == sagaAction.Steps.First())
-            {
-                saga.State.CurrentError = null;
-            }
-
             saga.State.CurrentStep = sagaStep.StepName;
             saga.Info.Modified = dateTimeProvider.Now;
 
@@ -154,8 +148,6 @@ namespace TheSaga.Execution.Steps
 
         private String CalculateNextStep()
         {
-            String nextSagaStep = null;
-
             if (saga.State.IsCompensating)
             {
                 StepData latestToCompensate = saga.State.History.
@@ -168,23 +160,21 @@ namespace TheSaga.Execution.Steps
             }
             else
             {
-                nextSagaStep = sagaAction.
+                return sagaAction.
                     FindNextAfter(sagaStep)?.
                     StepName;
             }
-
-            return nextSagaStep;
         }
 
         private void ThrowErrorIfSagaCompletedForSyncCall()
         {
-            if (!@async)
+            if (@async)
+                return;
+
+            if (saga.IsIdle() &&
+                saga.HasError())
             {
-                if (saga.IsProcessingCompleted() &&
-                    saga.State.CurrentError != null)
-                {
-                    throw saga.State.CurrentError;
-                }
+                throw saga.State.CurrentError;
             }
         }
 
@@ -199,7 +189,7 @@ namespace TheSaga.Execution.Steps
             if (hasSagaCompleted)
             {
                 await internalMessageBus.Publish(
-                    new SagaExecutionEndMessage(typeof(TSagaData), SagaID.From(saga.Data.ID)));
+                    new SagaExecutionEndMessage(saga));
             }
             else
             {

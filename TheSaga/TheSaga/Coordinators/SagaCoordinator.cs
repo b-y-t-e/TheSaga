@@ -28,15 +28,23 @@ namespace TheSaga.Coordinators
         private ISagaRegistrator sagaRegistrator;
         private IDateTimeProvider dateTimeProvider;
         private ISagaLocking sagaLocking;
-        public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus, IDateTimeProvider dateTimeProvider, ISagaLocking sagaLocking)
+        private IServiceProvider serviceProvider;
+        public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus, IDateTimeProvider dateTimeProvider, ISagaLocking sagaLocking, IServiceProvider serviceProvider)
         {
             this.sagaRegistrator = sagaRegistrator;
             this.sagaPersistance = sagaPersistance;
             this.internalMessageBus = internalMessageBus;
             this.dateTimeProvider = dateTimeProvider;
             this.sagaLocking = sagaLocking;
+            this.serviceProvider = serviceProvider;
 
-            new SagaLockingHandler(internalMessageBus, sagaLocking).
+            new SagaLockingHandler(serviceProvider).
+                Subscribe();
+
+            new SagaExecutionStartHandler(serviceProvider).
+                Subscribe();
+
+            new SagaExecutionEndHandler(serviceProvider).
                 Subscribe();
         }
 
@@ -44,54 +52,43 @@ namespace TheSaga.Coordinators
         {
             Type eventType = @event.GetType();
             SagaID sagaId = SagaID.From(@event.ID);
-            Boolean newSagaCreated = false;
 
             ISagaModel model = sagaRegistrator.FindModelForEventType(eventType);
             if (model == null)
                 throw new SagaEventNotRegisteredException(eventType);
 
-            SagaID newID = await CreateNewSagaIfRequired(model, sagaId, eventType);
-            if (newID != SagaID.Empty())
-            {
-                sagaId = newID;
-                newSagaCreated = true;
-            }
+            ISaga newSaga = await CreateNewSagaIfRequired(model, sagaId, eventType);
 
             try
             {
-                await PrepareExecutionID(sagaId);
+                ISaga saga =
+                    newSaga ??
+                    await sagaPersistance.Get(sagaId);
 
-                await SendInternalMessages(sagaId, model);
+                await internalMessageBus.Publish(
+                    new SagaExecutionStartMessage(saga));
+
+                await sagaPersistance.
+                    Set(saga);
 
                 ISagaExecutor sagaExecutor = sagaRegistrator.
                     FindExecutorForStateType(model.SagaStateType);
 
                 return await sagaExecutor.
-                    Handle(sagaId, @event, IsExecutionAsync.False());
+                    Handle(SagaID.From(saga.Data.ID), @event, IsExecutionAsync.False());
             }
             catch
             {
-                if (newSagaCreated)
+                if (newSaga != null)
                 {
                     await sagaPersistance.
-                        Remove(sagaId);
+                        Remove(newSaga.Data.ID);
                 }
 
                 throw;
             }
         }
 
-        private async Task PrepareExecutionID(SagaID id)
-        {
-            ISaga saga = await sagaPersistance.
-                Get(id);
-
-            saga.State.
-                ExecutionID = ExecutionID.New();
-
-            await sagaPersistance.
-                Set(saga);
-        }
 
         public async Task WaitForState<TState>(Guid id, SagaWaitOptions waitOptions = null)
             where TState : IState, new()
@@ -136,22 +133,23 @@ namespace TheSaga.Coordinators
             }
         }
 
-        private async Task<SagaID> CreateNewSagaIfRequired(ISagaModel model, SagaID id, Type eventType)
+        private async Task<ISaga> CreateNewSagaIfRequired(ISagaModel model, SagaID id, Type eventType)
         {
+            ISaga saga = null;
+
             if (eventType != null)
             {
-                bool isStartEvent = model.IsStartEvent(eventType);
+                bool isStartEvent = model.
+                    IsStartEvent(eventType);
+
                 if (isStartEvent)
-                {
-                    id = await CreateNewSaga(model, id);
-                    return id;
-                }
+                    saga = await CreateNewSaga(model, id);
             }
 
-            return SagaID.Empty();
+            return saga;
         }
 
-        private async Task<SagaID> CreateNewSaga(ISagaModel model, SagaID id)
+        private async Task<ISaga> CreateNewSaga(ISagaModel model, SagaID id)
         {
             if (id == SagaID.Empty())
                 id = SagaID.New();
@@ -174,16 +172,8 @@ namespace TheSaga.Coordinators
                 }
             };
 
-            await sagaPersistance.
-                Set(saga);
-
-            return id;
+            return saga;
         }
 
-        private async Task SendInternalMessages(SagaID id, ISagaModel model)
-        {
-            await internalMessageBus.Publish(
-                new SagaExecutionStartMessage(model.SagaStateType, id));
-        }
     }
 }

@@ -2,37 +2,32 @@
 using System;
 using System.Threading.Tasks;
 using TheSaga.Exceptions;
+using TheSaga.Execution.Actions;
 using TheSaga.InternalMessages;
 using TheSaga.InternalMessages.MessageBus;
+using TheSaga.SagaStates;
 using TheSaga.Utils;
 
 namespace TheSaga.Coordinators.AsyncHandlers
 {
-    internal class SagaLockingHandler
+    internal class SagaExecutionStartHandler
     {
-        private IServiceProvider serviceProvider;
+        IServiceProvider serviceProvider;
 
-        public SagaLockingHandler(IServiceProvider serviceProvider)
+        public SagaExecutionStartHandler(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
 
-
         async Task OnSagaProcessingStart(SagaExecutionStartMessage msg)
         {
-            var sagaLocking = serviceProvider.
-                GetRequiredService<ISagaLocking>();
+            ISaga saga = msg.Saga;
 
-            if (!await sagaLocking.Acquire(msg.Saga.Data.ID))
-                throw new SagaIsBusyException(msg.Saga.Data.ID);
-        }
+            if (!saga.IsIdle())
+                return;
 
-        async Task OnSagaProcessingEnd(SagaExecutionEndMessage msg)
-        {
-            var sagaLocking = serviceProvider.
-                GetRequiredService<ISagaLocking>();
-
-            await sagaLocking.Banish(msg.Saga.Data.ID);
+            saga.State.CurrentError = null;
+            saga.State.ExecutionID = ExecutionID.New();
         }
 
         public void Subscribe()
@@ -42,9 +37,6 @@ namespace TheSaga.Coordinators.AsyncHandlers
 
             internalMessageBus.
                 Subscribe<SagaExecutionStartMessage>(this, OnSagaProcessingStart);
-
-            internalMessageBus.
-                Subscribe<SagaExecutionEndMessage>(this, OnSagaProcessingEnd);
         }
 
         public void Unsubscribe()
@@ -54,9 +46,6 @@ namespace TheSaga.Coordinators.AsyncHandlers
 
             internalMessageBus.
                 Unsubscribe<SagaExecutionStartMessage>(this);
-            
-            internalMessageBus.
-                Unsubscribe<SagaExecutionEndMessage>(this);
         }
     }
 }

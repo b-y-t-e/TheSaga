@@ -1,20 +1,16 @@
 ﻿using System;
 using TheSaga.Execution.Actions;
+using TheSaga.SagaStates;
 
 namespace TheSaga.InternalMessages
 {
     internal class SagaExecutionEndMessage : IInternalMessage
     {
-        public SagaExecutionEndMessage(Type sagaStateType, SagaID sagaID)
-        {
-            SagaStateType = sagaStateType;
-            SagaID = sagaID;
-        }
+        public ISaga Saga { get; set; }
 
-        /// <summary>
-        /// Correlation ID
-        /// </summary>
-        public SagaID SagaID { get; }
-        public Type SagaStateType { get; }
+        public SagaExecutionEndMessage(ISaga saga)
+        {
+            Saga = saga;
+        }
     }
 }
