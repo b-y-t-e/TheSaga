@@ -67,8 +67,15 @@ namespace TheSaga.Persistance.SqlServer.Utils
             if (sqlScript.Length <= 0)
                 return;
 
-            _con.Connection().Execute(sqlScript.ToString(), dbobjectObject);
-
+            try
+            {
+                _con.Connection().Execute(sqlScript.ToString(), dbobjectObject);
+            }
+            catch
+            {                 
+                _con.Connection().Execute(await generateTableScriptForType());
+                _con.Connection().Execute(sqlScript.ToString(), dbobjectObject);
+            }
         }
 
         public async Task<ISaga> Get(Guid id)
@@ -84,8 +91,6 @@ namespace TheSaga.Persistance.SqlServer.Utils
             }
             catch (Exception ex)
             {
-                var e = ex;
-                e = e;
                 return null;
             }
         }
@@ -117,9 +122,16 @@ namespace TheSaga.Persistance.SqlServer.Utils
 
         async Task<bool> stateExists(Guid id)
         {
-            return (await _con.Connection().ExecuteScalarAsync<int?>(
+            try
+            {
+                return (await _con.Connection().ExecuteScalarAsync<int?>(
                 $"select 1 from {_sqlServerOptions.TableName} where {idColumn} = @id",
                 new { id = id })) != null;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         private string generateInsertScriptForObject(ISaga @state)
@@ -156,7 +168,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             return script.ToString();
         }
 
-        async Task<string> generateTableScriptForType(Type type)
+        async Task<string> generateTableScriptForType()
         {
             StringBuilder script = new StringBuilder();
 

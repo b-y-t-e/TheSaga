@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;SQL_SERVER</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="ISagaRunningState.cs" />
     <Compile Remove="SagaExtensions.cs" />
