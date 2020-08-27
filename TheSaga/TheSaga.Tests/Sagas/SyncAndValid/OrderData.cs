@@ -12,6 +12,5 @@ namespace TheSaga.Tests.Sagas.SyncAndValid
         }
 
         public Guid ID { get; set; }
-        public SagaState SagaState { get; set; }
     }
 }
