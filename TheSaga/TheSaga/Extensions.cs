@@ -28,7 +28,7 @@ namespace TheSaga
             services.AddSingleton<ISagaRegistrator, SagaRegistrator>();
             services.AddSingleton<ISagaCoordinator, SagaCoordinator>();
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
-            services.AddSingleton<ISagaLocking, SagaLocking>();
+            services.AddSingleton<ISagaLocking, InMemorySagaLocking>();
             
             services.AddTransient(typeof(SagaExecutor<>), typeof(SagaExecutor<>));
             services.AddTransient(typeof(SagaActionExecutor<>), typeof(SagaActionExecutor<>));

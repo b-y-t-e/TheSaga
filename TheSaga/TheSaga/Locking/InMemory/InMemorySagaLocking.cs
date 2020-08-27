@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TheSaga.Utils
 {
-    public class SagaLocking : ISagaLocking
+    public class InMemorySagaLocking : ISagaLocking
     {
         private HashSet<Guid> locks =
             new HashSet<Guid>();
