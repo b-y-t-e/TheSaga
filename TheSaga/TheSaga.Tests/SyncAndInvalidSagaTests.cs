@@ -36,31 +36,31 @@ namespace TheSaga.Tests
             });
 
             // then
-            InvalidSagaData persistedState = (InvalidSagaData)await sagaPersistance.
+            InvalidSagaData persistedData = (InvalidSagaData)await sagaPersistance.
                 Get(sagaData.CorrelationID);
 
-            persistedState.ShouldNotBeNull();
-            persistedState.SagaState.CurrentStep.ShouldBe(null);
-            persistedState.SagaState.CurrentState.ShouldBe(nameof(StateCreated));
-            persistedState.SagaState.CurrentError.ShouldNotBeNull();
-            persistedState.CorrelationID.ShouldBe(sagaData.CorrelationID);
+            persistedData.ShouldNotBeNull();
+            persistedData.SagaState.CurrentStep.ShouldBe(null);
+            persistedData.SagaState.CurrentState.ShouldBe(nameof(StateCreated));
+            persistedData.SagaState.CurrentError.ShouldNotBeNull();
+            persistedData.CorrelationID.ShouldBe(sagaData.CorrelationID);
 
-            persistedState.SagaInfo.History.ShouldContain(item =>
+            persistedData.SagaInfo.History.ShouldContain(item =>
                 item.IsCompensating == true && item.StepName == "InvalidCompensationEventStep1");
 
-            persistedState.SagaInfo.History.ShouldContain(item =>
+            persistedData.SagaInfo.History.ShouldContain(item =>
                 item.IsCompensating == false && item.StepName == "InvalidCompensationEventStep1");
 
-            persistedState.SagaInfo.History.ShouldContain(item =>
+            persistedData.SagaInfo.History.ShouldContain(item =>
                 item.IsCompensating == true && item.StepName == "InvalidCompensationEventStep2");
 
-            persistedState.SagaInfo.History.ShouldContain(item =>
+            persistedData.SagaInfo.History.ShouldContain(item =>
                 item.IsCompensating == false && item.StepName == "InvalidCompensationEventStep2");
 
-            persistedState.SagaInfo.History.ShouldContain(item =>
+            persistedData.SagaInfo.History.ShouldContain(item =>
                 item.IsCompensating == true && item.StepName == "InvalidCompensationEventStep3");
 
-            persistedState.SagaInfo.History.ShouldContain(item =>
+            persistedData.SagaInfo.History.ShouldContain(item =>
                 item.IsCompensating == false && item.StepName == "InvalidCompensationEventStep3");
         }
 
@@ -82,8 +82,8 @@ namespace TheSaga.Tests
             });
 
             // then
-            ISagaData persistedState = await sagaPersistance.Get(correlationID);
-            persistedState.ShouldBeNull();
+            ISagaData persistedData = await sagaPersistance.Get(correlationID);
+            persistedData.ShouldBeNull();
         }
 
         [Fact]
@@ -122,31 +122,31 @@ namespace TheSaga.Tests
             });
 
             // then
-            InvalidSagaData persistedState = (InvalidSagaData)await sagaPersistance.
+            InvalidSagaData persistedData = (InvalidSagaData)await sagaPersistance.
                 Get(sagaData.CorrelationID);
 
-            persistedState.ShouldNotBeNull();
-            persistedState.SagaState.CurrentStep.ShouldBe(null);
-            persistedState.SagaState.CurrentState.ShouldBe(nameof(StateCreated));
-            persistedState.SagaState.CurrentError.ShouldNotBeNull();
-            persistedState.CorrelationID.ShouldBe(sagaData.CorrelationID);
+            persistedData.ShouldNotBeNull();
+            persistedData.SagaState.CurrentStep.ShouldBe(null);
+            persistedData.SagaState.CurrentState.ShouldBe(nameof(StateCreated));
+            persistedData.SagaState.CurrentError.ShouldNotBeNull();
+            persistedData.CorrelationID.ShouldBe(sagaData.CorrelationID);
 
-            persistedState.SagaInfo.History.ShouldContain(item =>
+            persistedData.SagaInfo.History.ShouldContain(item =>
                 item.IsCompensating == true && item.StepName == "InvalidUpdateEvent1");
 
-            persistedState.SagaInfo.History.ShouldContain(item =>
+            persistedData.SagaInfo.History.ShouldContain(item =>
                 item.IsCompensating == false && item.StepName == "InvalidUpdateEvent1");
 
-            persistedState.SagaInfo.History.ShouldContain(item =>
+            persistedData.SagaInfo.History.ShouldContain(item =>
                 item.IsCompensating == true && item.StepName == "InvalidUpdateEvent2");
 
-            persistedState.SagaInfo.History.ShouldContain(item =>
+            persistedData.SagaInfo.History.ShouldContain(item =>
                 item.IsCompensating == false && item.StepName == "InvalidUpdateEvent2");
 
-            persistedState.SagaInfo.History.ShouldContain(item =>
+            persistedData.SagaInfo.History.ShouldContain(item =>
                 item.IsCompensating == true && item.StepName == "InvalidUpdateEvent3");
 
-            persistedState.SagaInfo.History.ShouldContain(item =>
+            persistedData.SagaInfo.History.ShouldContain(item =>
                 item.IsCompensating == false && item.StepName == "InvalidUpdateEvent3");
         }
 
@@ -176,14 +176,14 @@ namespace TheSaga.Tests
             });
 
             // then
-            InvalidSagaData persistedState = (InvalidSagaData)await sagaPersistance.
+            InvalidSagaData persistedData = (InvalidSagaData)await sagaPersistance.
                 Get(sagaData.CorrelationID);
 
-            persistedState.ShouldNotBeNull();
-            persistedState.SagaState.CurrentStep.ShouldBe(null);
-            persistedState.SagaState.CurrentState.ShouldBe(nameof(StateUpdated));
-            persistedState.SagaState.CurrentError.ShouldBeNull();
-            persistedState.CorrelationID.ShouldBe(sagaData.CorrelationID);
+            persistedData.ShouldNotBeNull();
+            persistedData.SagaState.CurrentStep.ShouldBe(null);
+            persistedData.SagaState.CurrentState.ShouldBe(nameof(StateUpdated));
+            persistedData.SagaState.CurrentError.ShouldBeNull();
+            persistedData.CorrelationID.ShouldBe(sagaData.CorrelationID);
         }
 
         #region Arrange

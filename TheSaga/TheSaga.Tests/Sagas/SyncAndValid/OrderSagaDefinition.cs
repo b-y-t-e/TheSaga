@@ -41,6 +41,13 @@ namespace TheSaga.Tests.Sagas.SyncAndValid
                 Then("DeliveredEventStep1", ctx => Task.CompletedTask).
                 Finish();
 
+            builder.
+                During<StateCreated>().
+                When<ToAlternative1Event>().                
+                    TransitionTo<StateAlternative1>().
+                When<ToAlternative2Event>().
+                    TransitionTo<StateAlternative2>();
+
             return builder.
                 Build();
         }

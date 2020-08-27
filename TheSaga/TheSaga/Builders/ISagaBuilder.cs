@@ -77,6 +77,6 @@ namespace TheSaga.Builders
 
         ISagaBuilderThen<TSagaData> ThenAsync<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaData>;
 
-        ISagaBuilder<TSagaData> TransitionTo<TState>() where TState : IState;
+        ISagaBuilderWhen<TSagaData> TransitionTo<TState>() where TState : IState;
     }
 }

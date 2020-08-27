@@ -39,14 +39,14 @@ namespace TheSaga.Tests
             );
 
             // then
-            OrderData persistedState = (OrderData)await sagaPersistance.
+            OrderData persistedData = (OrderData)await sagaPersistance.
                 Get(newSagaState.CorrelationID);
 
-            persistedState.ShouldNotBeNull();
-            persistedState.SagaState.CurrentState.ShouldBe(nameof(StateCreated));
-            persistedState.SagaState.CurrentStep.ShouldBe(null);
-            persistedState.SagaInfo.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
-            persistedState.SagaInfo.History.Count.ShouldBe(3);
+            persistedData.ShouldNotBeNull();
+            persistedData.SagaState.CurrentState.ShouldBe(nameof(StateCreated));
+            persistedData.SagaState.CurrentStep.ShouldBe(null);
+            persistedData.SagaInfo.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
+            persistedData.SagaInfo.History.Count.ShouldBe(3);
         }
 
         [Fact]
@@ -66,19 +66,19 @@ namespace TheSaga.Tests
                 Send(skompletowanoEvent);
 
             // then
-            OrderData persistedState = (OrderData)await sagaPersistance.
+            OrderData persistedData = (OrderData)await sagaPersistance.
                 Get(newSagaState.CorrelationID);
 
-            persistedState.ShouldNotBeNull();
-            persistedState.SagaState.CurrentState.ShouldBe(nameof(StateCompleted));
-            persistedState.SagaState.CurrentStep.ShouldBe(null);
-            persistedState.SagaInfo.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep0" && !step.IsCompensating && step.HasSucceeded);
-            persistedState.SagaInfo.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
-            persistedState.SagaInfo.History.ShouldContain(step => step.StepName == "OrderCompletedEventStep1" && !step.IsCompensating && step.HasSucceeded);
-            persistedState.SagaInfo.History.ShouldContain(step => step.StepName == "email" && !step.IsCompensating && step.HasSucceeded);
-            persistedState.SagaInfo.History.ShouldContain(step => step.StepName == "SendMessageToTheManagerEventStep" && !step.IsCompensating && step.HasSucceeded);
-            persistedState.SagaInfo.History.ShouldContain(step => step.StepName == "OrderCourierEventStep" && !step.IsCompensating && step.HasSucceeded);
-            persistedState.SagaInfo.History.Count.ShouldBe(9);
+            persistedData.ShouldNotBeNull();
+            persistedData.SagaState.CurrentState.ShouldBe(nameof(StateCompleted));
+            persistedData.SagaState.CurrentStep.ShouldBe(null);
+            persistedData.SagaInfo.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep0" && !step.IsCompensating && step.HasSucceeded);
+            persistedData.SagaInfo.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
+            persistedData.SagaInfo.History.ShouldContain(step => step.StepName == "OrderCompletedEventStep1" && !step.IsCompensating && step.HasSucceeded);
+            persistedData.SagaInfo.History.ShouldContain(step => step.StepName == "email" && !step.IsCompensating && step.HasSucceeded);
+            persistedData.SagaInfo.History.ShouldContain(step => step.StepName == "SendMessageToTheManagerEventStep" && !step.IsCompensating && step.HasSucceeded);
+            persistedData.SagaInfo.History.ShouldContain(step => step.StepName == "OrderCourierEventStep" && !step.IsCompensating && step.HasSucceeded);
+            persistedData.SagaInfo.History.Count.ShouldBe(9);
         }
 
         [Fact]
@@ -92,14 +92,14 @@ namespace TheSaga.Tests
                 Send(startEvent);
 
             // then
-            OrderData persistedState = (OrderData)await sagaPersistance.
+            OrderData persistedData = (OrderData)await sagaPersistance.
                 Get(sagaData.CorrelationID);
 
-            persistedState.ShouldNotBeNull();
-            persistedState.SagaState.CurrentStep.ShouldBe(null);
-            persistedState.SagaState.CurrentState.ShouldBe(nameof(StateCreated));
-            persistedState.CorrelationID.ShouldBe(sagaData.CorrelationID);
-            persistedState.SagaInfo.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
+            persistedData.ShouldNotBeNull();
+            persistedData.SagaState.CurrentStep.ShouldBe(null);
+            persistedData.SagaState.CurrentState.ShouldBe(nameof(StateCreated));
+            persistedData.CorrelationID.ShouldBe(sagaData.CorrelationID);
+            persistedData.SagaInfo.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
         }
 
         #region Arrange

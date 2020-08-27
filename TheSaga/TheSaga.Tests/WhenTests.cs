@@ -4,67 +4,61 @@ using System;
 using System.Threading.Tasks;
 using TheSaga.Coordinators;
 using TheSaga.Events;
+using TheSaga.Exceptions;
 using TheSaga.Persistance;
 using TheSaga.Persistance.SqlServer;
 using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Registrator;
 using TheSaga.SagaStates;
-using TheSaga.States;
-using TheSaga.Tests.Sagas.AsyncAndValid;
-using TheSaga.Tests.Sagas.AsyncAndValid.Events;
+using TheSaga.Tests.Sagas.SyncAndValid;
+using TheSaga.Tests.Sagas.SyncAndValid.Events;
+using TheSaga.Tests.Sagas.SyncAndValid.States;
 using Xunit;
 
 namespace TheSaga.Tests
 {
-    public class AsyncAndValidSagaTests
+    public class WhenTests
     {
         [Fact]
-        public async Task WHEN_afterAsynchronousSagaRun_THEN_sagaShouldBeCompleted()
+        public async Task WHEN_eventIsSend_THEN_sagaShouldMoveToValidState()
         {
             // given
-            IEvent startEvent = new CreatedEvent();
-
             ISagaData sagaData = await sagaCoordinator.
-                Send(startEvent);
+                Send(new OrderCreatedEvent());
 
             // when
             await sagaCoordinator.
-                WaitForState<SagaFinishState>(sagaData.CorrelationID);
+               Send(new ToAlternative1Event() { CorrelationID = sagaData.CorrelationID });
 
             // then
-            AsyncData persistedData = (AsyncData)await sagaPersistance.
+            ISagaData persistedData = await sagaPersistance.
                 Get(sagaData.CorrelationID);
 
             persistedData.ShouldNotBeNull();
-            persistedData.SagaState.CurrentStep.ShouldBe(new SagaFinishState().Name);
-            persistedData.SagaState.CurrentState.ShouldBe(new SagaFinishState().Name);
+            persistedData.SagaState.CurrentStep.ShouldBe(null);
+            persistedData.SagaState.CurrentState.ShouldBe(nameof(StateAlternative1));
             persistedData.CorrelationID.ShouldBe(sagaData.CorrelationID);
-            persistedData.SagaInfo.History.ShouldContain(step => step.StepName == "CreatedEventStep0" && !step.IsCompensating && step.HasSucceeded);
-            persistedData.SagaInfo.History.ShouldContain(step => step.StepName == "CreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
-            persistedData.SagaInfo.History.ShouldContain(step => step.StepName == "CreatedEventStep2" && !step.IsCompensating && step.HasSucceeded);
-            persistedData.SagaInfo.History.Count.ShouldBe(4);
         }
 
         [Fact]
-        public async Task WHEN_runSagaAsynchronous_THEN_sagaShouldBeInIntermediateState()
+        public async Task WHEN_otherEventIsSend_THEN_sagaShouldMoveToOtherValidState()
         {
             // given
-            IEvent startEvent = new CreatedEvent();
+            ISagaData sagaData = await sagaCoordinator.
+                Send(new OrderCreatedEvent());
 
             // when
-            ISagaData sagaData = await sagaCoordinator.
-                Send(startEvent);
+            await sagaCoordinator.
+               Send(new ToAlternative2Event() { CorrelationID = sagaData.CorrelationID });
 
             // then
-            AsyncData persistedData = (AsyncData)await sagaPersistance.
+            ISagaData persistedData = await sagaPersistance.
                 Get(sagaData.CorrelationID);
 
             persistedData.ShouldNotBeNull();
-            persistedData.SagaState.CurrentStep.ShouldStartWith("CreatedEventStep");
-            persistedData.SagaState.CurrentState.ShouldBe(new SagaStartState().Name);
+            persistedData.SagaState.CurrentStep.ShouldBe(null);
+            persistedData.SagaState.CurrentState.ShouldBe(nameof(StateAlternative2));
             persistedData.CorrelationID.ShouldBe(sagaData.CorrelationID);
-            persistedData.SagaInfo.History.ShouldContain(step => step.StepName == "CreatedEventStep0" && !step.IsCompensating);
-            persistedData.SagaInfo.History.Count.ShouldBe(1);
         }
 
         #region Arrange
@@ -74,7 +68,7 @@ namespace TheSaga.Tests
         private ISagaRegistrator sagaRegistrator;
         private IServiceProvider serviceProvider;
 
-        public AsyncAndValidSagaTests()
+        public WhenTests()
         {
             IServiceCollection services = new ServiceCollection();
             services.AddTheSaga(cfg =>
@@ -99,7 +93,7 @@ namespace TheSaga.Tests
                 GetRequiredService<ISagaCoordinator>();
 
             sagaRegistrator.Register(
-                new AsyncSagaDefinition().GetModel(serviceProvider));
+                new OrderSagaDefinition().GetModel(serviceProvider));
         }
 
         #endregion Arrange
