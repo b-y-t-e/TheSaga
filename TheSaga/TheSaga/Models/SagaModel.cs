@@ -32,20 +32,13 @@ namespace TheSaga.Models
                 FindAction(sagaStep);
         }
 
-        public ISagaAction FindActionOrCreateForStateAndEvent(string state, Type eventType)
+        public ISagaAction FindActionForStateAndEvent(string state, Type eventType)
         {
             SagaAction<TSagaData> action = this.Actions.
                 FindAction(state, eventType);
 
-            if (action == null)
-            {
-                action = new SagaAction<TSagaData>()
-                {
-                    Event = eventType,
-                    State = state
-                };
-                this.Actions.Add(action);
-            }
+            if (action == null)            
+                throw new Exception($"Could not find action for state {state} and event of type {eventType?.Name}");                            
 
             return action;
         }

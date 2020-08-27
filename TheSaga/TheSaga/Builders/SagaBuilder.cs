@@ -51,7 +51,7 @@ namespace TheSaga.Builders
 
         public ISagaBuilder<TSagaData> Finish()
         {
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                   new SagaStepForInlineAction<TSagaData>(
                       uniqueNameGenerator.Generate(currentState, nameof(Finish)),
                       ctx =>
@@ -198,7 +198,7 @@ namespace TheSaga.Builders
         public ISagaBuilderThen<TSagaData> Then<TSagaActivity>()
             where TSagaActivity : ISagaActivity<TSagaData>
         {
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForActivity<TSagaData, TSagaActivity>(
                     uniqueNameGenerator.Generate(currentState, nameof(Then), typeof(TSagaActivity).Name),
                     serviceProvider,
@@ -212,7 +212,7 @@ namespace TheSaga.Builders
             uniqueNameGenerator.
                 ThrowIfNotUnique(stepName);
 
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForActivity<TSagaData, TSagaActivity>(
                     stepName,
                     serviceProvider,
@@ -223,7 +223,7 @@ namespace TheSaga.Builders
 
         public ISagaBuilderThen<TSagaData> Then(ThenActionDelegate<TSagaData> action)
         {
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaData>(
                     uniqueNameGenerator.Generate(currentState, nameof(Then)),
                     action,
@@ -238,7 +238,7 @@ namespace TheSaga.Builders
             uniqueNameGenerator.
                 ThrowIfNotUnique(stepName);
 
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaData>(
                     stepName,
                     action,
@@ -250,7 +250,7 @@ namespace TheSaga.Builders
 
         public ISagaBuilderThen<TSagaData> Then(ThenActionDelegate<TSagaData> action, ThenActionDelegate<TSagaData> compensation)
         {
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaData>(
                     uniqueNameGenerator.Generate(currentState, nameof(Then)),
                     action,
@@ -265,7 +265,7 @@ namespace TheSaga.Builders
             uniqueNameGenerator.
                 ThrowIfNotUnique(stepName);
 
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaData>(
                     stepName,
                     action,
@@ -278,7 +278,7 @@ namespace TheSaga.Builders
         public ISagaBuilderThen<TSagaData> ThenAsync<TSagaActivity>()
                             where TSagaActivity : ISagaActivity<TSagaData>
         {
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForActivity<TSagaData, TSagaActivity>(
                     uniqueNameGenerator.Generate(currentState, nameof(ThenAsync), typeof(TSagaActivity).Name),
                     serviceProvider,
@@ -292,7 +292,7 @@ namespace TheSaga.Builders
             uniqueNameGenerator.
                 ThrowIfNotUnique(stepName);
 
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForActivity<TSagaData, TSagaActivity>(
                     stepName,
                     serviceProvider,
@@ -303,7 +303,7 @@ namespace TheSaga.Builders
 
         public ISagaBuilderThen<TSagaData> ThenAsync(ThenActionDelegate<TSagaData> action)
         {
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaData>(
                 uniqueNameGenerator.Generate(currentState, nameof(ThenAsync)),
                     action,
@@ -318,7 +318,7 @@ namespace TheSaga.Builders
             uniqueNameGenerator.
                 ThrowIfNotUnique(stepName);
 
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaData>(
                     stepName,
                     action,
@@ -330,7 +330,7 @@ namespace TheSaga.Builders
 
         public ISagaBuilderThen<TSagaData> ThenAsync(ThenActionDelegate<TSagaData> action, ThenActionDelegate<TSagaData> compensation)
         {
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaData>(
                 uniqueNameGenerator.Generate(currentState, nameof(ThenAsync)),
                     action,
@@ -345,7 +345,7 @@ namespace TheSaga.Builders
             uniqueNameGenerator.
                 ThrowIfNotUnique(stepName);
 
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaData>(
                     stepName,
                     action,
@@ -357,7 +357,7 @@ namespace TheSaga.Builders
 
         public ISagaBuilderWhen<TSagaData> TransitionTo<TState>() where TState : IState
         {
-            model.FindActionOrCreateForStateAndEvent(currentState, currentEvent).Steps.Add(
+            model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaData>(
                     uniqueNameGenerator.Generate(currentState, nameof(TransitionTo), typeof(TState).Name),
                     ctx =>

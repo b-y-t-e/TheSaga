@@ -19,7 +19,7 @@ namespace TheSaga.Models
 
         ISagaAction FindActionForStep(ISagaStep sagaStep);
 
-        ISagaAction FindActionOrCreateForStateAndEvent(string state, Type eventType);
+        ISagaAction FindActionForStateAndEvent(string state, Type eventType);
 
         IList<ISagaAction> FindActionsForState(string state);
 
