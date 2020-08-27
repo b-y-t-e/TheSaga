@@ -22,7 +22,7 @@ namespace TheSaga.Tests.Sagas.AsyncLockingSaga
             builder.
                 During<New>().
                 When<UpdatedEvent>().
-                    Execute<UpdatedEventHandler>().
+                    HandleBy<UpdatedEventHandler>().
                 ThenAsync(ctx => Task.Delay(TimeSpan.FromSeconds(2))).
                 Finish();
 
