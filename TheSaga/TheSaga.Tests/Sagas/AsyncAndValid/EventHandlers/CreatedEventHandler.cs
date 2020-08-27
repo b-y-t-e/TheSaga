@@ -15,12 +15,12 @@ namespace TheSaga.Tests.Sagas.AsyncAndValid.EventHandlers
             this.sagaCoordinator = sagaCoordinator;
         }
 
-        public Task Compensate(IEventContext<AsyncData, CreatedEvent> context)
+        public Task Compensate(IExecutionContext<AsyncData> context, CreatedEvent @event)
         {
             return Task.CompletedTask;
         }
 
-        public Task Execute(IEventContext<AsyncData, CreatedEvent> context)
+        public Task Execute(IExecutionContext<AsyncData> context, CreatedEvent @event)
         {
             return Task.CompletedTask;
         }

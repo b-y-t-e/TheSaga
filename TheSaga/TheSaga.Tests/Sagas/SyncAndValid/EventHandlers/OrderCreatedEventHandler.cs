@@ -11,12 +11,12 @@ namespace TheSaga.Tests.Sagas.SyncAndValid.EventHandlers
         {
         }
 
-        public Task Compensate(IEventContext<OrderData, OrderCreatedEvent> context)
+        public Task Compensate(IExecutionContext<OrderData> context, OrderCreatedEvent @event)
         {
             return Task.CompletedTask;
         }
 
-        public Task Execute(IEventContext<OrderData, OrderCreatedEvent> context)
+        public Task Execute(IExecutionContext<OrderData> context, OrderCreatedEvent @event)
         {
             return Task.CompletedTask;
         }

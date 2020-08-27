@@ -31,16 +31,24 @@ namespace TheSaga.Builders
            where TEventHandler : IEventHandler<TSagaData, TEvent>;
     }
 
+
+    public interface ISagaBuilderHandle<TSagaData> : ISagaBuilderThen<TSagaData>
+        where TSagaData : ISagaData
+    {
+        ISagaBuilderThen<TSagaData> Handle<TEventHandler>()
+            where TEventHandler : IEventHandler;
+    }
+
     public interface ISagaBuilderWhen<TSagaData> : ISagaBuilder<TSagaData>
         where TSagaData : ISagaData
     {
 
-        ISagaBuilderThen<TSagaData> When<TEvent>() where TEvent : IEvent;
+        ISagaBuilderHandle<TSagaData> When<TEvent>() where TEvent : IEvent;
 
-        ISagaBuilderThen<TSagaData> When<TEvent, TEventHandler>() where TEvent : IEvent
+        ISagaBuilderHandle<TSagaData> When<TEvent, TEventHandler>() where TEvent : IEvent
            where TEventHandler : IEventHandler<TSagaData, TEvent>;
 
-        ISagaBuilderThen<TSagaData> WhenAsync<TEvent, TEventHandler>() where TEvent : IEvent
+        ISagaBuilderHandle<TSagaData> WhenAsync<TEvent, TEventHandler>() where TEvent : IEvent
            where TEventHandler : IEventHandler<TSagaData, TEvent>;
     }
 

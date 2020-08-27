@@ -4,12 +4,16 @@ using TheSaga.SagaStates;
 
 namespace TheSaga.Events
 {
-    public interface IEventHandler<TSagaData, TEvent>
+    public interface IEventHandler<TSagaData, TEvent> : IEventHandler
         where TSagaData : ISagaData
         where TEvent : IEvent
     {
-        Task Compensate(IEventContext<TSagaData, TEvent> context);
+        Task Compensate(IExecutionContext<TSagaData> context, TEvent @event);
 
-        Task Execute(IEventContext<TSagaData, TEvent> context);
+        Task Execute(IExecutionContext<TSagaData> context, TEvent @event);
+    }
+
+    public interface IEventHandler
+    {
     }
 }

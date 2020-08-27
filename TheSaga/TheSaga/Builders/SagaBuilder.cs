@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.Events;
@@ -15,7 +16,8 @@ namespace TheSaga.Builders
     public class SagaBuilder<TSagaData> :
         ISagaBuilder<TSagaData>,
         ISagaBuilderThen<TSagaData>,
-        ISagaBuilderWhen<TSagaData>
+        ISagaBuilderWhen<TSagaData>,
+        ISagaBuilderHandle<TSagaData>
         where TSagaData : ISagaData
     {
         private Type currentEvent;
@@ -97,7 +99,7 @@ namespace TheSaga.Builders
                 Steps = new List<ISagaStep>
                 {
                     new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
-                        uniqueNameGenerator.Generate(currentState, nameof(Start), typeof(TEvent).Name),
+                        uniqueNameGenerator.Generate(currentState, nameof(Start), typeof(TEvent).Name, typeof(TEventHandler).Name),
                         serviceProvider,
                         false)
                 }
@@ -163,7 +165,7 @@ namespace TheSaga.Builders
                 Steps = new List<ISagaStep>
                 {
                     new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
-                        uniqueNameGenerator.Generate(currentState, nameof(StartAsync), typeof(TEvent).Name),
+                        uniqueNameGenerator.Generate(currentState, nameof(StartAsync), typeof(TEvent).Name, typeof(TEventHandler).Name),
                         serviceProvider,
                         true)
                 }
@@ -371,7 +373,7 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public ISagaBuilderThen<TSagaData> When<TEvent>() where TEvent : IEvent
+        public ISagaBuilderHandle<TSagaData> When<TEvent>() where TEvent : IEvent
         {
             currentEvent = typeof(TEvent);
             model.Actions.Add(new SagaAction<TSagaData>()
@@ -387,7 +389,7 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public ISagaBuilderThen<TSagaData> When<TEvent, TEventHandler>() where TEvent : IEvent
+        public ISagaBuilderHandle<TSagaData> When<TEvent, TEventHandler>() where TEvent : IEvent
             where TEventHandler : IEventHandler<TSagaData, TEvent>
         {
             currentEvent = typeof(TEvent);
@@ -398,7 +400,7 @@ namespace TheSaga.Builders
                 Steps = new List<ISagaStep>
                 {
                     new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
-                        uniqueNameGenerator.Generate(currentState, nameof(When), typeof(TEvent).Name),
+                        uniqueNameGenerator.Generate(currentState, nameof(When), typeof(TEvent).Name, typeof(TEventHandler).Name),
                         serviceProvider,
                         false)
                 }
@@ -406,7 +408,7 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public ISagaBuilderThen<TSagaData> WhenAsync<TEvent, TEventHandler>() where TEvent : IEvent
+        public ISagaBuilderHandle<TSagaData> WhenAsync<TEvent, TEventHandler>() where TEvent : IEvent
             where TEventHandler : IEventHandler<TSagaData, TEvent>
         {
             currentEvent = typeof(TEvent);
@@ -417,11 +419,27 @@ namespace TheSaga.Builders
                 Steps = new List<ISagaStep>
                 {
                     new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
-                        uniqueNameGenerator.Generate(currentState, nameof(WhenAsync), typeof(TEvent).Name),
+                        uniqueNameGenerator.Generate(currentState, nameof(WhenAsync), typeof(TEvent).Name, typeof(TEventHandler).Name),
                         serviceProvider,
                         true)
                 }
             });
+            return this;
+        }
+
+        public ISagaBuilderThen<TSagaData> Handle<TEventHandler>()
+            where TEventHandler : IEventHandler
+        {
+            if (currentEvent == null)
+                throw new Exception($"{nameof(Handle)} must be defined after {nameof(When)} / {nameof(WhenAsync)}");
+
+            var action = model.Actions.FindAction(currentState, currentEvent);
+            action.Steps.Clear();
+            action.Steps.Add(new SagaStepForEventHandler<TSagaData, TEventHandler>(
+                        uniqueNameGenerator.Generate(currentState, nameof(Handle), currentEvent.GetType().Name, typeof(TEventHandler).Name),
+                        serviceProvider,
+                        false));
+
             return this;
         }
     }

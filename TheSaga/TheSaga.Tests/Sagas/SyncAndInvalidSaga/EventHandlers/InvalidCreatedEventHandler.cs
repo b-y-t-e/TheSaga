@@ -15,12 +15,12 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga.EventHandlers
             this.sagaCoordinator = sagaCoordinator;
         }
 
-        public Task Compensate(IEventContext<InvalidSagaData, InvalidCreatedEvent> context)
+        public Task Compensate(IExecutionContext<InvalidSagaData> context, InvalidCreatedEvent @event)
         {
             return Task.CompletedTask;
         }
 
-        public Task Execute(IEventContext<InvalidSagaData, InvalidCreatedEvent> context)
+        public Task Execute(IExecutionContext<InvalidSagaData> context, InvalidCreatedEvent @event)
         {
             return Task.CompletedTask;
         }
