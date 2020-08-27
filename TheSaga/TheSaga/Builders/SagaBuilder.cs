@@ -56,9 +56,9 @@ namespace TheSaga.Builders
                       uniqueNameGenerator.Generate(currentState, nameof(Finish)),
                       ctx =>
                       {
-                          ctx.State.SagaState.CurrentState = new SagaFinishState().GetStateName();
-                          ctx.State.SagaState.CurrentStep = null;
-                          ctx.State.SagaState.IsCompensating = false;
+                          ctx.State.CurrentState = new SagaFinishState().GetStateName();
+                          ctx.State.CurrentStep = null;
+                          ctx.State.IsCompensating = false;
                           return Task.CompletedTask;
                       },
                       null,
@@ -362,7 +362,7 @@ namespace TheSaga.Builders
                     uniqueNameGenerator.Generate(currentState, nameof(TransitionTo), typeof(TState).Name),
                     ctx =>
                     {
-                        ctx.State.SagaState.CurrentState = typeof(TState).Name;
+                        ctx.State.CurrentState = typeof(TState).Name;
                         return Task.CompletedTask;
                     },
                     null,

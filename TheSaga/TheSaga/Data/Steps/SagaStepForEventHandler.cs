@@ -29,11 +29,7 @@ namespace TheSaga.SagaStates.Steps
             IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>)context;
 
-            var eventContext = new EventContext<TSagaData, TEvent>()
-            {
-                Event = (TEvent)@event,
-                State = contextForAction.State
-            };
+            var eventContext = new EventContext<TSagaData, TEvent>((TEvent)@event, contextForAction.Data, contextForAction.Info, contextForAction.State);
 
             TEventHandler activity = (TEventHandler)ActivatorUtilities.
                 CreateInstance(serviceProvider, typeof(TEventHandler));
@@ -47,11 +43,7 @@ namespace TheSaga.SagaStates.Steps
             IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>)context;
 
-            var eventContext = new EventContext<TSagaData, TEvent>()
-            {
-                Event = (TEvent)@event,
-                State = contextForAction.State
-            };
+            var eventContext = new EventContext<TSagaData, TEvent>((TEvent)@event, contextForAction.Data, contextForAction.Info, contextForAction.State);
 
             TEventHandler activity = (TEventHandler)ActivatorUtilities.
                 CreateInstance(serviceProvider, typeof(TEventHandler));

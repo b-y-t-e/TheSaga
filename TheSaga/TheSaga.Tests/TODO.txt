@@ -1,4 +1,7 @@
 ﻿TODO:
+ + Command & handler 
+ + Async message 
+
  + wznawianie sag po restarcie
  + dodanie metody BusSend
  + dodanie metody Publish
@@ -10,6 +13,7 @@
  + executors -> command / handlers
 
 DONE:
+ + Info i SagaState poza ISaga
  + sqlserver persistance
  + sprawdzenie lockow
  + likwidacja task.run

@@ -13,6 +13,5 @@ namespace TheSaga.Tests.Sagas.SyncAndValid
 
         public Guid CorrelationID { get; set; }
         public SagaState SagaState { get; set; }
-        public SagaInfo SagaInfo { get; set; }
     }
 }

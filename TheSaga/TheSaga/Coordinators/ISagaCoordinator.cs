@@ -9,7 +9,7 @@ namespace TheSaga.Coordinators
 {
     public interface ISagaCoordinator
     {
-        Task<ISagaData> Send(IEvent @event);
+        Task<ISaga> Send(IEvent @event);
 
         Task WaitForState<TState>(Guid correlationID, SagaWaitOptions waitOptions = null)
             where TState : IState, new();

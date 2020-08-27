@@ -37,7 +37,7 @@ namespace TheSaga.Coordinators
                 Subscribe();
         }
 
-        public async Task<ISagaData> Send(IEvent @event)
+        public async Task<ISaga> Send(IEvent @event)
         {
             Type eventType = @event.GetType();
             Guid correlationID = @event.CorrelationID;
@@ -96,13 +96,13 @@ namespace TheSaga.Coordinators
                     return Task.CompletedTask;
                 });
 
-                ISagaData state = await sagaPersistance.
+                ISaga saga = await sagaPersistance.
                     Get(correlationID);
 
-                if (state == null)
+                if (saga == null)
                     throw new SagaInstanceNotFoundException(correlationID);
 
-                if (state.SagaState.CurrentState == new TState().GetStateName())
+                if (saga.State.CurrentState == new TState().GetStateName())
                     return;
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
@@ -124,18 +124,26 @@ namespace TheSaga.Coordinators
             if (correlationID == Guid.Empty)
                 correlationID = Guid.NewGuid();
 
-            ISagaData newSagaState = (ISagaData)Activator.CreateInstance(model.SagaStateType);
-            newSagaState.CorrelationID = correlationID;
-            newSagaState.SagaState = new SagaState();
-            newSagaState.SagaState.CurrentState = new SagaStartState().GetStateName();
-            newSagaState.SagaState.CurrentStep = null;
-            newSagaState.SagaInfo = new SagaInfo();
-            newSagaState.SagaInfo.History = new List<SagaStepHistory>();
-            newSagaState.SagaInfo.Created = dateTimeProvider.Now;
-            newSagaState.SagaInfo.Modified = dateTimeProvider.Now;
+            ISagaData data = (ISagaData)Activator.CreateInstance(model.SagaStateType);
+            data.CorrelationID = correlationID;
+
+            ISaga saga = new Saga()
+            {
+                Data = data,
+                Info = new SagaInfo()
+                {
+                    Created = dateTimeProvider.Now,
+                    Modified = dateTimeProvider.Now
+                },
+                State = new SagaState()
+                {
+                    CurrentState = new SagaStartState().GetStateName(),
+                    CurrentStep = null
+                }
+            };
 
             await sagaPersistance.
-                Set(newSagaState);
+                Set(saga);
 
             return correlationID;
         }

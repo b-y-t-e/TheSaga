@@ -23,42 +23,42 @@ namespace TheSaga.Tests
         public async Task WHEN_eventIsSend_THEN_sagaShouldMoveToValidState()
         {
             // given
-            ISagaData sagaData = await sagaCoordinator.
+            ISaga saga = await sagaCoordinator.
                 Send(new OrderCreatedEvent());
 
             // when
             await sagaCoordinator.
-               Send(new ToAlternative1Event() { CorrelationID = sagaData.CorrelationID });
+               Send(new ToAlternative1Event() { CorrelationID = saga.Data.CorrelationID });
 
             // then
-            ISagaData persistedData = await sagaPersistance.
-                Get(sagaData.CorrelationID);
+            ISaga persistedSaga = await sagaPersistance.
+                Get(saga.Data.CorrelationID);
 
-            persistedData.ShouldNotBeNull();
-            persistedData.SagaState.CurrentStep.ShouldBe(null);
-            persistedData.SagaState.CurrentState.ShouldBe(nameof(StateAlternative1));
-            persistedData.CorrelationID.ShouldBe(sagaData.CorrelationID);
+            persistedSaga.ShouldNotBeNull();
+            persistedSaga.State.CurrentStep.ShouldBe(null);
+            persistedSaga.State.CurrentState.ShouldBe(nameof(StateAlternative1));
+            persistedSaga.Data.CorrelationID.ShouldBe(saga.Data.CorrelationID);
         }
 
         [Fact]
         public async Task WHEN_otherEventIsSend_THEN_sagaShouldMoveToOtherValidState()
         {
             // given
-            ISagaData sagaData = await sagaCoordinator.
+            ISaga saga = await sagaCoordinator.
                 Send(new OrderCreatedEvent());
 
             // when
             await sagaCoordinator.
-               Send(new ToAlternative2Event() { CorrelationID = sagaData.CorrelationID });
+               Send(new ToAlternative2Event() { CorrelationID = saga.Data.CorrelationID });
 
             // then
-            ISagaData persistedData = await sagaPersistance.
-                Get(sagaData.CorrelationID);
+            ISaga persistedSaga = await sagaPersistance.
+                Get(saga.Data.CorrelationID);
 
-            persistedData.ShouldNotBeNull();
-            persistedData.SagaState.CurrentStep.ShouldBe(null);
-            persistedData.SagaState.CurrentState.ShouldBe(nameof(StateAlternative2));
-            persistedData.CorrelationID.ShouldBe(sagaData.CorrelationID);
+            persistedSaga.ShouldNotBeNull();
+            persistedSaga.State.CurrentStep.ShouldBe(null);
+            persistedSaga.State.CurrentState.ShouldBe(nameof(StateAlternative2));
+            persistedSaga.Data.CorrelationID.ShouldBe(saga.Data.CorrelationID);
         }
 
         #region Arrange

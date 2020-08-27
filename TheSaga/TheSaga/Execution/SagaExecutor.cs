@@ -25,7 +25,7 @@ namespace TheSaga.Execution
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task<ISagaData> Handle(Guid correlationID, IEvent @event, IsExecutionAsync async)
+        public async Task<ISaga> Handle(Guid correlationID, IEvent @event, IsExecutionAsync async)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace TheSaga.Execution
                     ExecuteAction();
 
                 if (stepExecutionResult.IsSyncProcessingComplete)
-                    return stepExecutionResult.State;
+                    return stepExecutionResult.Saga;
 
                 return await Handle(correlationID, null, @async);
             }

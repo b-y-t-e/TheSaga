@@ -24,16 +24,16 @@ namespace TheSaga.Tests
         public async Task WHEN_afterAsynchronousSagaRun_THEN_sagaShouldNotBeLocked()
         {
             // given
-            ISagaData sagaData = await sagaCoordinator.
+            ISaga saga = await sagaCoordinator.
                 Send(new CreatedEvent());
 
             // when
             await sagaCoordinator.
-                WaitForState<New>(sagaData.CorrelationID);
+                WaitForState<New>(saga.Data.CorrelationID);
 
             // then
             CorrelationIdLock.
-                IsAcquired(sagaData.CorrelationID).
+                IsAcquired(saga.Data.CorrelationID).
                 ShouldBeFalse();
         }
 
@@ -44,12 +44,12 @@ namespace TheSaga.Tests
             IEvent startEvent = new CreatedEvent();
 
             // when
-            ISagaData sagaData = await sagaCoordinator.
+            ISaga saga = await sagaCoordinator.
                 Send(startEvent);
 
             // then
             CorrelationIdLock.
-                IsAcquired(sagaData.CorrelationID).
+                IsAcquired(saga.Data.CorrelationID).
                 ShouldBeTrue();
         }
 
@@ -57,20 +57,20 @@ namespace TheSaga.Tests
         public async Task WHEN_sendingMultipleEventToRunningSaga_THEN_shouldThrowSagaIsBusyException()
         {
             // given
-            ISagaData sagaData = await sagaCoordinator.
+            ISaga saga = await sagaCoordinator.
                 Send(new CreatedEvent());
             await sagaCoordinator.
-                WaitForState<New>(sagaData.CorrelationID);
+                WaitForState<New>(saga.Data.CorrelationID);
 
             // when
             await sagaCoordinator.
-                Send(new UpdatedEvent() { CorrelationID = sagaData.CorrelationID });
+                Send(new UpdatedEvent() { CorrelationID = saga.Data.CorrelationID });
 
             // then
             await Assert.ThrowsAsync<SagaIsBusyException>(async () =>
             {
                 await sagaCoordinator.
-                    Send(new UpdatedEvent() { CorrelationID = sagaData.CorrelationID });
+                    Send(new UpdatedEvent() { CorrelationID = saga.Data.CorrelationID });
             });
         }
 

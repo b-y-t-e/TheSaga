@@ -2,8 +2,20 @@
 
 namespace TheSaga.Execution.Context
 {
-    public class ExecutionContext<TState> : IExecutionContext<TState> where TState : ISagaData
+    public class ExecutionContext<TSagaData> : IExecutionContext<TSagaData>
+        where TSagaData : ISagaData
     {
-        public TState State { get; set; }
+        public ExecutionContext(TSagaData data, SagaInfo info, SagaState state)
+        {
+            Data = data;
+            Info = info;
+            State = state;
+        }
+
+        public TSagaData Data { get; set; }
+
+        public SagaInfo Info { get; set; }
+
+        public SagaState State { get; set; }
     }
 }

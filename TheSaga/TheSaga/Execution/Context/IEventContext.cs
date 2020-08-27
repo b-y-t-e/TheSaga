@@ -7,8 +7,10 @@ namespace TheSaga.Execution.Context
         where TSagaData : ISagaData
        where TEvent : IEvent
     {
-        public TEvent Event { get; set; }
-        public TSagaData State { get; set; }
+        TEvent Event { get; set; }
+        TSagaData Data { get; set; }
+        SagaInfo Info { get; }
+        SagaState State { get; }
     }
 
     public interface IEventContext

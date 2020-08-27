@@ -52,18 +52,18 @@ namespace TheSaga.Persistance.SqlServer.Utils
             };
         }
 
-        public async Task Store(ISagaData @state)
+        public async Task Store(ISaga saga)
         {
-            if (@state == null)
+            if (saga == null)
                 return;
 
             StringBuilder sqlScript = new StringBuilder();
-            if (await stateExists(state.CorrelationID))
-                sqlScript.Append(generateUpdateScriptForObject(@state));
+            if (await stateExists(saga.Data.CorrelationID))
+                sqlScript.Append(generateUpdateScriptForObject(saga));
             else
-                sqlScript.Append(generateInsertScriptForObject(@state));
+                sqlScript.Append(generateInsertScriptForObject(saga));
 
-            var dbobjectObject = prepareDbObject(@state);
+            var dbobjectObject = prepareDbObject(saga);
 
             if (sqlScript.Length <= 0)
                 return;
@@ -86,7 +86,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             }*/
         }
 
-        public async Task<ISagaData> Get(Guid correlationId)
+        public async Task<ISaga> Get(Guid correlationId)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
                     new { correlationId = correlationId });
 
                 object stateObject = JsonConvert.DeserializeObject(json, _serializerSettings);
-                return (ISagaData)stateObject;
+                return (ISaga)stateObject;
             }
             catch (Exception ex)
             {
@@ -112,19 +112,19 @@ namespace TheSaga.Persistance.SqlServer.Utils
                 new { correlationId = correlationId });
         }
 
-        private Dictionary<string, object> prepareDbObject(ISagaData @state)
+        private Dictionary<string, object> prepareDbObject(ISaga saga)
         {
-            Type stateType = @state.GetType();
+            Type sagaDataType = saga.Data.GetType();
 
             Dictionary<string, object> dbobject = new Dictionary<string, object>();
-            dbobject[correlationIdColumn] = @state.CorrelationID;
-            dbobject[stateNameColumn] = stateType.Name;
-            dbobject[createdColumn] = @state.SagaInfo.Created;
-            dbobject[modifiedColumn] = @state.SagaInfo.Modified;
-            dbobject[stateColumn] = @state.SagaState.CurrentState;
-            dbobject[stepColumn] = @state.SagaState.CurrentStep;
-            dbobject[compensatingColumn] = @state.SagaState.IsCompensating;
-            dbobject[jsonColumn] = JsonConvert.SerializeObject(@state, _serializerSettings);
+            dbobject[correlationIdColumn] = saga.Data.CorrelationID;
+            dbobject[stateNameColumn] = sagaDataType.Name;
+            dbobject[createdColumn] = saga.Info.Created;
+            dbobject[modifiedColumn] = saga.Info.Modified;
+            dbobject[stateColumn] = saga.State.CurrentState;
+            dbobject[stepColumn] = saga.State.CurrentStep;
+            dbobject[compensatingColumn] = saga.State.IsCompensating;
+            dbobject[jsonColumn] = JsonConvert.SerializeObject(saga, _serializerSettings);
 
             /*foreach (var columnInfo in getColumnsForType(stateType))
             {
@@ -175,7 +175,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
                 new { correlationId = correlationId })) != null;
         }
 
-        private string generateInsertScriptForObject(ISagaData @state)
+        private string generateInsertScriptForObject(ISaga @state)
         {
             Type type = @state.GetType();
             StringBuilder script = new StringBuilder();
@@ -195,7 +195,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             return script.ToString();
         }
 
-        private string generateUpdateScriptForObject(ISagaData @state)
+        private string generateUpdateScriptForObject(ISaga @state)
         {
             Type type = @state.GetType();
             StringBuilder script = new StringBuilder();
