@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Execution\Actions\**" />
+    <EmbeddedResource Remove="Execution\Actions\**" />
+    <None Remove="Execution\Actions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="ISagaRunningState.cs" />
     <Compile Remove="SagaExtensions.cs" />
   </ItemGroup>

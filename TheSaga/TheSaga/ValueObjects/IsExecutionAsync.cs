@@ -21,6 +21,10 @@ namespace TheSaga.Execution.Actions
         {
             return new IsExecutionAsync(true);
         }
+        public static IsExecutionAsync From(bool val)
+        {
+            return new IsExecutionAsync(val);
+        }
 
         ////////////////////////////////
 

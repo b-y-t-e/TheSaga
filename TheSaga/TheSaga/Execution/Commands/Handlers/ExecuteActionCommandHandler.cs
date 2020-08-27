@@ -5,103 +5,86 @@ using System.Linq;
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.Exceptions;
-using TheSaga.Execution.Steps;
-using TheSaga.InternalMessages.MessageBus;
+using TheSaga.Execution.Actions;
 using TheSaga.Models;
 using TheSaga.Persistance;
-using TheSaga.Providers;
 using TheSaga.SagaStates;
 using TheSaga.SagaStates.Actions;
 using TheSaga.SagaStates.Steps;
 using TheSaga.Utils;
 
-namespace TheSaga.Execution.Actions
+namespace TheSaga.Execution.Commands
 {
-    internal class ActionExecutionResult
-    {
-        public bool IsSyncProcessingComplete;
-
-        public ISaga Saga;
-    }
-
-    internal class SagaActionExecutor<TSagaData> : ISagaActionExecutor<TSagaData>
+    internal class ExecuteActionCommandHandler<TSagaData>
         where TSagaData : ISagaData
     {
-        private IsExecutionAsync @async;
-        private IEvent @event;
-        private SagaID id;
-        private ISagaModel<TSagaData> model;
         private ISagaPersistance sagaPersistance;
         private IServiceProvider serviceProvider;
-        private ISaga saga;
 
-        public SagaActionExecutor(
-            SagaID id,
-            IsExecutionAsync async,
-            IEvent @event,
-            ISagaModel<TSagaData> model,
+        public ExecuteActionCommandHandler(
             ISagaPersistance sagaPersistance,
             IServiceProvider serviceProvider)
         {
-            this.id = id;
-            this.@async = async;
-            this.@event = @event;
-            this.model = model;
             this.sagaPersistance = sagaPersistance;
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task<ActionExecutionResult> ExecuteAction()
+        public async Task<ExecuteActionResult> Handle(ExecuteActionCommand<TSagaData> command)
         {
-            if (@event == null)
-                @event = new EmptyEvent();
+            if (command.Event == null)
+                command.Event = new EmptyEvent();
 
-            this.saga = await sagaPersistance.
-                Get(id);
+            ISaga saga = await sagaPersistance.
+                Get(command.ID);
 
             if (saga == null)
-                throw new SagaInstanceNotFoundException(model.SagaStateType, id);
+                throw new SagaInstanceNotFoundException(command.Model.SagaStateType, command.ID);
 
-            IList<ISagaAction> actions = model.FindActionsForState(saga.State.GetExecutionState());
-            ISagaStep step = FindStep(@event.GetType(), actions);
-            ISagaAction action = model.FindActionForStep(step);
+            IList<ISagaAction> actions = command.Model.FindActionsForState(saga.State.GetExecutionState());
+            ISagaStep step = FindStep(saga, command.Event.GetType(), actions);
+            ISagaAction action = command.Model.FindActionForStep(step);
 
+            IsExecutionAsync async = IsExecutionAsync.From(step.Async);
             if (step.Async)
                 async = IsExecutionAsync.True();
 
-            SagaStepExecutor<TSagaData> stepExecutor = ActivatorUtilities.
-               CreateInstance<SagaStepExecutor<TSagaData>>(serviceProvider, async, @event, saga, step, action);
+            ExecuteStepCommandHandler<TSagaData> stepExecutor = ActivatorUtilities.
+               CreateInstance<ExecuteStepCommandHandler<TSagaData>>(serviceProvider);
 
             await stepExecutor.
-                ExecuteStep();
+                Handle(new ExecuteStepCommand<TSagaData>()
+                {
+                    async = async,
+                    @event = command.Event,
+                    saga = saga,
+                    sagaStep = step,
+                    sagaAction = action
+                });
 
-            return new ActionExecutionResult()
+            return new ExecuteActionResult()
             {
                 Saga = saga,
                 IsSyncProcessingComplete = async || saga.IsIdle()
             };
         }
 
-        private ISagaStep FindStep(Type eventType, IList<ISagaAction> actions)
+        private ISagaStep FindStep(ISaga saga, Type eventType, IList<ISagaAction> actions)
         {
-            ISagaStep step = null;
             if (!eventType.Is<EmptyEvent>())
             {
-                step = FindStepForEventType(eventType, actions);
+                return FindStepForEventType(saga, eventType, actions);
             }
             else
             {
-                step = FindStepForCurrentState(actions);
+                return FindStepForCurrentState(saga, actions);
             }
-
-            return step;
         }
 
-        private ISagaStep FindStepForCurrentState(IList<ISagaAction> actions)
+        private ISagaStep FindStepForCurrentState(ISaga saga, IList<ISagaAction> actions)
         {
             if (saga.IsIdle())
                 throw new Exception("");
-            
+
             ISagaAction action = actions.
                 FirstOrDefault(a => a.FindStep(saga.State.CurrentStep) != null);
 
@@ -117,7 +100,7 @@ namespace TheSaga.Execution.Actions
             return step;
         }
 
-        private ISagaStep FindStepForEventType(Type eventType, IList<ISagaAction> actions)
+        private ISagaStep FindStepForEventType(ISaga saga, Type eventType, IList<ISagaAction> actions)
         {
             ISagaAction action = actions.
                 FirstOrDefault(a => a.Event == eventType);
@@ -135,5 +118,11 @@ namespace TheSaga.Execution.Actions
 
             return step;
         }
+    }
+    internal class ExecuteActionResult
+    {
+        public bool IsSyncProcessingComplete;
+
+        public ISaga Saga;
     }
 }

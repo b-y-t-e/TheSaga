@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.Execution.Actions;
 using TheSaga.Execution.AsyncHandlers;
+using TheSaga.Execution.Commands;
 using TheSaga.InternalMessages.MessageBus;
 using TheSaga.Models;
 using TheSaga.Providers;
@@ -32,11 +33,17 @@ namespace TheSaga.Execution
                 if (@event == null)
                     @event = new EmptyEvent();
 
-                SagaActionExecutor<TSagaData> actionExecutor = ActivatorUtilities.
-                   CreateInstance<SagaActionExecutor<TSagaData>>(serviceProvider, id, async, @event, model);
+                ExecuteActionCommandHandler<TSagaData> executeActionHandler = ActivatorUtilities.
+                   CreateInstance<ExecuteActionCommandHandler<TSagaData>>(serviceProvider);
 
-                ActionExecutionResult stepExecutionResult = await actionExecutor.
-                    ExecuteAction();
+                ExecuteActionResult stepExecutionResult = await executeActionHandler.
+                    Handle(new ExecuteActionCommand<TSagaData>()
+                    {
+                        ID = id,
+                        Async = async,
+                        Event = @event,
+                        Model = model
+                    });
 
                 if (stepExecutionResult.IsSyncProcessingComplete)
                     return stepExecutionResult.Saga;
