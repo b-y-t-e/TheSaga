@@ -35,7 +35,7 @@ namespace TheSaga.Builders
     public interface ISagaBuilderHandle<TSagaData> : ISagaBuilderThen<TSagaData>
         where TSagaData : ISagaData
     {
-        ISagaBuilderThen<TSagaData> Handle<TEventHandler>()
+        ISagaBuilderThen<TSagaData> Execute<TEventHandler>()
             where TEventHandler : IEventHandler;
     }
 

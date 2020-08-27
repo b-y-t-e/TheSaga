@@ -427,16 +427,16 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public ISagaBuilderThen<TSagaData> Handle<TEventHandler>()
+        public ISagaBuilderThen<TSagaData> Execute<TEventHandler>()
             where TEventHandler : IEventHandler
         {
             if (currentEvent == null)
-                throw new Exception($"{nameof(Handle)} must be defined after {nameof(When)} / {nameof(WhenAsync)}");
+                throw new Exception($"{nameof(Execute)} must be defined after {nameof(When)} / {nameof(WhenAsync)}");
 
             var action = model.Actions.FindAction(currentState, currentEvent);
             action.Steps.Clear();
             action.Steps.Add(new SagaStepForEventHandler<TSagaData, TEventHandler>(
-                        uniqueNameGenerator.Generate(currentState, nameof(Handle), currentEvent.GetType().Name, typeof(TEventHandler).Name),
+                        uniqueNameGenerator.Generate(currentState, nameof(Execute), currentEvent.GetType().Name, typeof(TEventHandler).Name),
                         serviceProvider,
                         false));
 
