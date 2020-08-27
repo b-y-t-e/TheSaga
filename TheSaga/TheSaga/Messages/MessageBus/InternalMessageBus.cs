@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using TheSaga.Utils;
 
@@ -11,7 +12,7 @@ namespace TheSaga.InternalMessages.MessageBus
         private Dictionary<Type, Dictionary<Object, InternalMessageBus.Subscriber>> typesAndSubscribers =
             new Dictionary<Type, Dictionary<object, Subscriber>>();
 
-        public void Publish(IInternalMessage message)
+        public async Task Publish(IInternalMessage message)
         {
             Type incomingMessageType = message.GetType();
 
@@ -38,7 +39,7 @@ namespace TheSaga.InternalMessages.MessageBus
                             actionsArr = subscriber.Value.Actions.ToArray();
 
                         foreach (Func<IInternalMessage, Task> action in actionsArr)
-                            action(message);
+                            await action(message);
                     }
                 }
             }

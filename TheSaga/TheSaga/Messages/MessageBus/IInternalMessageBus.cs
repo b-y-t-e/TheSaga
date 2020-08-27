@@ -5,7 +5,7 @@ namespace TheSaga.InternalMessages.MessageBus
 {
     public interface IInternalMessageBus
     {
-        void Publish(IInternalMessage message);
+        Task Publish(IInternalMessage message);
 
         void Subscribe<T>(object listener, Func<T, Task> p);
 

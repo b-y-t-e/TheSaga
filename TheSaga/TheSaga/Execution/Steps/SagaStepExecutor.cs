@@ -147,7 +147,7 @@ namespace TheSaga.Execution.Steps
             await sagaPersistance.
                 Set(saga);
 
-            SendInternalMessages(currentSagaState, hasSagaCompleted);
+            await SendInternalMessages(currentSagaState, hasSagaCompleted);
 
             ThrowErrorIfSagaCompletedForSyncCall();
         }
@@ -188,24 +188,24 @@ namespace TheSaga.Execution.Steps
             }
         }
 
-        private void SendInternalMessages(string currentState, bool hasSagaCompleted)
+        private async Task SendInternalMessages(string currentState, bool hasSagaCompleted)
         {
             if (currentState != saga.State.CurrentState)
             {
-                internalMessageBus.Publish(
+                await internalMessageBus.Publish(
                     new SagaStateChangedMessage(typeof(TSagaData), SagaID.From(saga.Data.ID), saga.State.CurrentState, saga.State.CurrentStep, saga.State.IsCompensating));
             }
 
             if (hasSagaCompleted)
             {
-                internalMessageBus.Publish(
-                    new SagaProcessingCompletedMessage(typeof(TSagaData), SagaID.From(saga.Data.ID)));
+                await internalMessageBus.Publish(
+                    new SagaExecutionEndMessage(typeof(TSagaData), SagaID.From(saga.Data.ID)));
             }
             else
             {
                 if (@async)
                 {
-                    internalMessageBus.Publish(
+                    await internalMessageBus.Publish(
                         new SagaAsyncStepCompletedMessage(typeof(TSagaData), SagaID.From(saga.Data.ID), saga.State.CurrentState, saga.State.CurrentStep, saga.State.IsCompensating));
                 }
             }

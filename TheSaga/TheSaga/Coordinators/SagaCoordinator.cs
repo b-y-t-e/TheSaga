@@ -36,7 +36,7 @@ namespace TheSaga.Coordinators
             this.dateTimeProvider = dateTimeProvider;
             this.sagaLocking = sagaLocking;
 
-            new SagaProcessingMessageHandler(internalMessageBus, sagaLocking).
+            new SagaLockingHandler(internalMessageBus, sagaLocking).
                 Subscribe();
         }
 
@@ -61,7 +61,7 @@ namespace TheSaga.Coordinators
             {
                 await PrepareExecutionID(sagaId);
 
-                SendInternalMessages(sagaId, model);
+                await SendInternalMessages(sagaId, model);
 
                 ISagaExecutor sagaExecutor = sagaRegistrator.
                     FindExecutorForStateType(model.SagaStateType);
@@ -180,10 +180,10 @@ namespace TheSaga.Coordinators
             return id;
         }
 
-        private void SendInternalMessages(SagaID id, ISagaModel model)
+        private async Task SendInternalMessages(SagaID id, ISagaModel model)
         {
-            internalMessageBus.Publish(
-                new SagaProcessingStartMessage(model.SagaStateType, id));
+            await internalMessageBus.Publish(
+                new SagaExecutionStartMessage(model.SagaStateType, id));
         }
     }
 }

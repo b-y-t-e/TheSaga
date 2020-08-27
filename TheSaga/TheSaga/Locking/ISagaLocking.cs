@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace TheSaga.Utils
 {
     public interface ISagaLocking
     {
-        bool Acquire(Guid guid);
-        bool Banish(Guid guid);
-        bool IsAcquired(Guid guid);
+        Task<bool> Acquire(Guid guid);
+        Task<bool> Banish(Guid guid);
+        Task<bool> IsAcquired(Guid guid);
     }
 }

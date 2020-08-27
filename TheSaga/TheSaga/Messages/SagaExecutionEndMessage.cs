@@ -3,9 +3,9 @@ using TheSaga.Execution.Actions;
 
 namespace TheSaga.InternalMessages
 {
-    internal class SagaProcessingStartMessage : IInternalMessage
+    internal class SagaExecutionEndMessage : IInternalMessage
     {
-        public SagaProcessingStartMessage(Type sagaStateType, SagaID sagaID)
+        public SagaExecutionEndMessage(Type sagaStateType, SagaID sagaID)
         {
             SagaStateType = sagaStateType;
             SagaID = sagaID;

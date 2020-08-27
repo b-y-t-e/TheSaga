@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace TheSaga.Utils
 {
@@ -8,31 +9,32 @@ namespace TheSaga.Utils
         private HashSet<Guid> locks =
             new HashSet<Guid>();
 
-        public bool Acquire(Guid guid)
+        public Task<bool> Acquire(Guid guid)
         {
             lock (locks)
             {
                 bool hasAcquired = !locks.Contains(guid);
                 if (hasAcquired) locks.Add(guid);
-                return hasAcquired;
+                return Task.FromResult(hasAcquired);
             }
         }
 
-        public bool Banish(Guid guid)
+        public Task<bool> Banish(Guid guid)
         {
             lock (locks)
             {
                 bool hasBanished = locks.Contains(guid);
                 if (hasBanished) locks.Remove(guid);
-                return hasBanished;
+                return Task.FromResult(hasBanished);
             }
         }
 
-        public bool IsAcquired(Guid guid)
+        public Task<bool> IsAcquired(Guid guid)
         {
             lock (locks)
             {
-                return locks.Contains(guid);
+                return Task.FromResult(
+                    locks.Contains(guid));
             }
         }
     }

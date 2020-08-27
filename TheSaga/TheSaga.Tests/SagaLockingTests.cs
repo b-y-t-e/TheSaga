@@ -32,8 +32,8 @@ namespace TheSaga.Tests
                 WaitForState<New>(saga.Data.ID);
 
             // then
-            sagaLocking.
-                IsAcquired(saga.Data.ID).
+            (await sagaLocking.
+                IsAcquired(saga.Data.ID)).
                 ShouldBeFalse();
         }
 
@@ -48,8 +48,8 @@ namespace TheSaga.Tests
                 Send(startEvent);
 
             // then
-            sagaLocking.
-                IsAcquired(saga.Data.ID).
+            (await sagaLocking.
+                IsAcquired(saga.Data.ID)).
                 ShouldBeTrue();
         }
 
