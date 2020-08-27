@@ -45,23 +45,14 @@ namespace TheSaga.Tests
             persistedSaga.State.CurrentError.ShouldNotBeNull();
             persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
 
-            persistedSaga.Info.History.ShouldContain(item =>
-                item.IsCompensating == true && item.StepName == "InvalidCompensationEventStep1");
+            persistedSaga.State.History.ShouldContain(item =>
+                item.CompensationData != null && item.StepName == "InvalidCompensationEventStep1");
 
-            persistedSaga.Info.History.ShouldContain(item =>
-                item.IsCompensating == false && item.StepName == "InvalidCompensationEventStep1");
+            persistedSaga.State.History.ShouldContain(item =>
+                item.CompensationData != null && item.StepName == "InvalidCompensationEventStep2");
 
-            persistedSaga.Info.History.ShouldContain(item =>
-                item.IsCompensating == true && item.StepName == "InvalidCompensationEventStep2");
-
-            persistedSaga.Info.History.ShouldContain(item =>
-                item.IsCompensating == false && item.StepName == "InvalidCompensationEventStep2");
-
-            persistedSaga.Info.History.ShouldContain(item =>
-                item.IsCompensating == true && item.StepName == "InvalidCompensationEventStep3");
-
-            persistedSaga.Info.History.ShouldContain(item =>
-                item.IsCompensating == false && item.StepName == "InvalidCompensationEventStep3");
+            persistedSaga.State.History.ShouldContain(item =>
+                item.CompensationData != null && item.StepName == "InvalidCompensationEventStep3");
         }
 
         [Fact]
@@ -131,23 +122,15 @@ namespace TheSaga.Tests
             persistedSaga.State.CurrentError.ShouldNotBeNull();
             persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
 
-            persistedSaga.Info.History.ShouldContain(item =>
-                item.IsCompensating == true && item.StepName == "InvalidUpdateEvent1");
+            persistedSaga.State.History.ShouldContain(item =>
+                item.CompensationData != null && item.StepName == "InvalidUpdateEvent1");
 
-            persistedSaga.Info.History.ShouldContain(item =>
-                item.IsCompensating == false && item.StepName == "InvalidUpdateEvent1");
+            persistedSaga.State.History.ShouldContain(item =>
+                item.CompensationData != null && item.StepName == "InvalidUpdateEvent2");
 
-            persistedSaga.Info.History.ShouldContain(item =>
-                item.IsCompensating == true && item.StepName == "InvalidUpdateEvent2");
+            persistedSaga.State.History.ShouldContain(item =>
+                item.CompensationData != null && item.StepName == "InvalidUpdateEvent3");
 
-            persistedSaga.Info.History.ShouldContain(item =>
-                item.IsCompensating == false && item.StepName == "InvalidUpdateEvent2");
-
-            persistedSaga.Info.History.ShouldContain(item =>
-                item.IsCompensating == true && item.StepName == "InvalidUpdateEvent3");
-
-            persistedSaga.Info.History.ShouldContain(item =>
-                item.IsCompensating == false && item.StepName == "InvalidUpdateEvent3");
         }
 
         [Fact]

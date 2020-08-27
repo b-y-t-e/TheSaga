@@ -39,10 +39,10 @@ namespace TheSaga.Tests
             persistedSaga.State.CurrentStep.ShouldBe(new SagaFinishState().Name);
             persistedSaga.State.CurrentState.ShouldBe(new SagaFinishState().Name);
             persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
-            persistedSaga.Info.History.ShouldContain(step => step.StepName == "CreatedEventStep0" && !step.IsCompensating && step.HasSucceeded);
-            persistedSaga.Info.History.ShouldContain(step => step.StepName == "CreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
-            persistedSaga.Info.History.ShouldContain(step => step.StepName == "CreatedEventStep2" && !step.IsCompensating && step.HasSucceeded);
-            persistedSaga.Info.History.Count.ShouldBe(4);
+            persistedSaga.State.History.ShouldContain(step => step.StepName == "CreatedEventStep0" && step.CompensationData == null && step.HasSucceeded());
+            persistedSaga.State.History.ShouldContain(step => step.StepName == "CreatedEventStep1" && step.CompensationData == null && step.HasSucceeded());
+            persistedSaga.State.History.ShouldContain(step => step.StepName == "CreatedEventStep2" && step.CompensationData == null && step.HasSucceeded());
+            persistedSaga.State.History.Count.ShouldBe(4);
         }
 
         [Fact]
@@ -63,8 +63,8 @@ namespace TheSaga.Tests
             persistedSaga.State.CurrentStep.ShouldStartWith("CreatedEventStep");
             persistedSaga.State.CurrentState.ShouldBe(new SagaStartState().Name);
             persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
-            persistedSaga.Info.History.ShouldContain(step => step.StepName == "CreatedEventStep0" && !step.IsCompensating);
-            persistedSaga.Info.History.Count.ShouldBe(1);
+            persistedSaga.State.History.ShouldContain(step => step.StepName == "CreatedEventStep0" && step.CompensationData == null);
+            persistedSaga.State.History.Count.ShouldBe(1);
         }
 
         #region Arrange

@@ -1,4 +1,8 @@
 ﻿TODO:
+ + skakanie w compenssatach do tylu po historii (ecexutionid?) 
+ + 
+
+
  + Command & handler 
  + Async message 
 
@@ -8,7 +12,6 @@
  + podpiecie sie do masstransit
  + after
  + retry
- + Skakanie w compenssatach do tylu po historii (ecexutionid?) 
  + If else
  + executors -> command / handlers
 

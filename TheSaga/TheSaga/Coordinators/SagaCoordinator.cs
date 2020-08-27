@@ -40,40 +40,54 @@ namespace TheSaga.Coordinators
         public async Task<ISaga> Send(IEvent @event)
         {
             Type eventType = @event.GetType();
-            Guid id = @event.ID;
+            SagaID sagaId = SagaID.From(@event.ID);
             Boolean newSagaCreated = false;
 
             ISagaModel model = sagaRegistrator.FindModelForEventType(eventType);
             if (model == null)
                 throw new SagaEventNotRegisteredException(eventType);
 
-            Guid? newID = await CreateNewSagaIfRequired(model, id, eventType);
-            if (newID != null)
+            SagaID newID = await CreateNewSagaIfRequired(model, sagaId, eventType);
+            if (newID != SagaID.Empty())
             {
-                id = newID.Value;
+                sagaId = newID;
                 newSagaCreated = true;
             }
 
             try
             {
-                SendInternalMessages(id, model);
+                await PrepareExecutionID(sagaId);
+
+                SendInternalMessages(sagaId, model);
 
                 ISagaExecutor sagaExecutor = sagaRegistrator.
                     FindExecutorForStateType(model.SagaStateType);
 
                 return await sagaExecutor.
-                    Handle(id, @event, IsExecutionAsync.False());
+                    Handle(sagaId, @event, IsExecutionAsync.False());
             }
             catch
             {
                 if (newSagaCreated)
                 {
                     await sagaPersistance.
-                        Remove(id);
+                        Remove(sagaId);
                 }
 
                 throw;
             }
+        }
+
+        private async Task PrepareExecutionID(SagaID id)
+        {
+            ISaga saga = await sagaPersistance.
+                Get(id);
+
+            saga.State.
+                ExecutionID = ExecutionID.New();
+
+            await sagaPersistance.
+                Set(saga);
         }
 
         public async Task WaitForState<TState>(Guid id, SagaWaitOptions waitOptions = null)
@@ -119,10 +133,25 @@ namespace TheSaga.Coordinators
             }
         }
 
-        private async Task<Guid> CreateNewSaga(ISagaModel model, Guid id)
+        private async Task<SagaID> CreateNewSagaIfRequired(ISagaModel model, SagaID id, Type eventType)
         {
-            if (id == Guid.Empty)
-                id = Guid.NewGuid();
+            if (eventType != null)
+            {
+                bool isStartEvent = model.IsStartEvent(eventType);
+                if (isStartEvent)
+                {
+                    id = await CreateNewSaga(model, id);
+                    return id;
+                }
+            }
+
+            return SagaID.Empty();
+        }
+
+        private async Task<SagaID> CreateNewSaga(ISagaModel model, SagaID id)
+        {
+            if (id == SagaID.Empty())
+                id = SagaID.New();
 
             ISagaData data = (ISagaData)Activator.CreateInstance(model.SagaStateType);
             data.ID = id;
@@ -148,22 +177,7 @@ namespace TheSaga.Coordinators
             return id;
         }
 
-        private async Task<Guid?> CreateNewSagaIfRequired(ISagaModel model, Guid id, Type eventType)
-        {
-            if (eventType != null)
-            {
-                bool isStartEvent = model.IsStartEvent(eventType);
-                if (isStartEvent)
-                {
-                    id = await CreateNewSaga(model, id);
-                    return id;
-                }
-            }
-
-            return null;
-        }
-
-        private void SendInternalMessages(Guid id, ISagaModel model)
+        private void SendInternalMessages(SagaID id, ISagaModel model)
         {
             internalMessageBus.Publish(
                 new SagaProcessingStartMessage(model.SagaStateType, id));

@@ -1,10 +1,11 @@
 ﻿using System;
+using TheSaga.Execution.Actions;
 
 namespace TheSaga.InternalMessages
 {
     internal class SagaAsyncStepCompletedMessage : IInternalMessage
     {
-        public SagaAsyncStepCompletedMessage(Type sagaStateType, Guid sagaID, string currentState, string currentStep, bool isCompensating)
+        public SagaAsyncStepCompletedMessage(Type sagaStateType, SagaID sagaID, string currentState, string currentStep, bool isCompensating)
         {
             SagaStateType = sagaStateType;
             SagaID = sagaID;
@@ -16,7 +17,7 @@ namespace TheSaga.InternalMessages
         /// <summary>
         /// Correlation ID
         /// </summary>
-        public Guid SagaID { get; }
+        public SagaID SagaID { get; }
         public string CurrentState { get; }
         public string CurrentStep { get; }
         public bool IsCompensating { get; }

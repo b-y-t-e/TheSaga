@@ -1,10 +1,11 @@
 ﻿using System;
+using TheSaga.Execution.Actions;
 
 namespace TheSaga.InternalMessages
 {
     internal class SagaProcessingCompletedMessage : IInternalMessage
     {
-        public SagaProcessingCompletedMessage(Type sagaStateType, Guid sagaID)
+        public SagaProcessingCompletedMessage(Type sagaStateType, SagaID sagaID)
         {
             SagaStateType = sagaStateType;
             SagaID = sagaID;
@@ -13,7 +14,7 @@ namespace TheSaga.InternalMessages
         /// <summary>
         /// Correlation ID
         /// </summary>
-        public Guid SagaID { get; }
+        public SagaID SagaID { get; }
         public Type SagaStateType { get; }
     }
 }

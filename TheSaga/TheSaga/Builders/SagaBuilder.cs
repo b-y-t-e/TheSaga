@@ -357,7 +357,7 @@ namespace TheSaga.Builders
             return this;
         }
 
-        public ISagaBuilderWhen<TSagaData> TransitionTo<TState>() where TState : IState
+        public ISagaBuilderThen<TSagaData> TransitionTo<TState>() where TState : IState
         {
             model.FindActionForStateAndEvent(currentState, currentEvent).Steps.Add(
                 new SagaStepForInlineAction<TSagaData>(
@@ -367,7 +367,12 @@ namespace TheSaga.Builders
                         ctx.State.CurrentState = typeof(TState).Name;
                         return Task.CompletedTask;
                     },
-                    null,
+                    ctx =>
+                    {
+                        var data = ctx.State.CurrentStepData();
+                        ctx.State.CurrentState = data.StateName;
+                        return Task.CompletedTask;
+                    },
                     false));
 
             return this;

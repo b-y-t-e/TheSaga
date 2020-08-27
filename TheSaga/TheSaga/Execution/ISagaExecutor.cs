@@ -14,6 +14,6 @@ namespace TheSaga.Execution
 
     internal interface ISagaExecutor
     {
-        Task<ISaga> Handle(Guid id, IEvent @event, IsExecutionAsync async);
+        Task<ISaga> Handle(SagaID id, IEvent @event, IsExecutionAsync async);
     }
 }

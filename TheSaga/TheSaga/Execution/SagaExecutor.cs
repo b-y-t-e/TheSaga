@@ -25,7 +25,7 @@ namespace TheSaga.Execution
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task<ISaga> Handle(Guid id, IEvent @event, IsExecutionAsync async)
+        public async Task<ISaga> Handle(SagaID id, IEvent @event, IsExecutionAsync async)
         {
             try
             {
