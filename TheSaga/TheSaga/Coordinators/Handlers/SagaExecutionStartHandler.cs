@@ -28,6 +28,7 @@ namespace TheSaga.Coordinators.AsyncHandlers
 
             saga.State.CurrentError = null;
             saga.State.ExecutionID = ExecutionID.New();
+            saga.State.History.Clear();
         }
 
         public void Subscribe()

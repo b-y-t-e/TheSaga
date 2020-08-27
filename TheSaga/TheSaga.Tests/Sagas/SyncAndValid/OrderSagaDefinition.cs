@@ -17,29 +17,29 @@ namespace TheSaga.Tests.Sagas.SyncAndValid
 
             builder.
                 Start<OrderCreatedEvent, OrderCreatedEventHandler>("OrderCreatedEventStep0").
-                Then("OrderCreatedEventStep1", ctx => Task.CompletedTask).
-                TransitionTo<StateCreated>();
+                    Then("OrderCreatedEventStep1", ctx => Task.CompletedTask).
+                    TransitionTo<StateCreated>();
 
             builder.
                 During<StateCreated>().
                 When<OrderCompletedEvent>().
-                Then("OrderCompletedEventStep1", ctx => Task.CompletedTask).
-                Then<SendEmailToClientEvent>("email").
-                Then<SendMessageToTheManagerEvent>("SendMessageToTheManagerEventStep").
-                Then<OrderCourierEvent>("OrderCourierEventStep").
-                TransitionTo<StateCompleted>();
+                    Then("OrderCompletedEventStep1", ctx => Task.CompletedTask).
+                    Then<SendEmailToClientEvent>("email").
+                    Then<SendMessageToTheManagerEvent>("SendMessageToTheManagerEventStep").
+                    Then<OrderCourierEvent>("OrderCourierEventStep").
+                    TransitionTo<StateCompleted>();
 
             builder.
                 During<StateCompleted>().
                 When<OrderSendEvent>().
-                Then("OrderSendEventStep1", ctx => Task.CompletedTask).
-                TransitionTo<StateOrderSend>();
+                    Then("OrderSendEventStep1", ctx => Task.CompletedTask).
+                    TransitionTo<StateOrderSend>();
 
             builder.
                 During<StateOrderSend>().
                 When<DeliveredEvent>().
-                Then("DeliveredEventStep1", ctx => Task.CompletedTask).
-                Finish();
+                    Then("DeliveredEventStep1", ctx => Task.CompletedTask).
+                    Finish();
 
             builder.
                 During<StateCreated>().
