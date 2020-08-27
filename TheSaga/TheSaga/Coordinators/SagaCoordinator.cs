@@ -17,6 +17,7 @@ using TheSaga.Providers;
 using TheSaga.Registrator;
 using TheSaga.SagaStates;
 using TheSaga.States;
+using TheSaga.Utils;
 
 namespace TheSaga.Coordinators
 {
@@ -26,14 +27,16 @@ namespace TheSaga.Coordinators
         private ISagaPersistance sagaPersistance;
         private ISagaRegistrator sagaRegistrator;
         private IDateTimeProvider dateTimeProvider;
-        public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus, IDateTimeProvider dateTimeProvider)
+        private ISagaLocking sagaLocking;
+        public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus, IDateTimeProvider dateTimeProvider, ISagaLocking sagaLocking)
         {
             this.sagaRegistrator = sagaRegistrator;
             this.sagaPersistance = sagaPersistance;
             this.internalMessageBus = internalMessageBus;
             this.dateTimeProvider = dateTimeProvider;
+            this.sagaLocking = sagaLocking;
 
-            new SagaProcessingMessageHandler(internalMessageBus).
+            new SagaProcessingMessageHandler(internalMessageBus, sagaLocking).
                 Subscribe();
         }
 

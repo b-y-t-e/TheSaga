@@ -10,22 +10,25 @@ namespace TheSaga.Coordinators.AsyncHandlers
     {
         private IInternalMessageBus internalMessageBus;
 
-        public SagaProcessingMessageHandler(IInternalMessageBus internalMessageBus)
+        private ISagaLocking sagaLocking;
+
+        public SagaProcessingMessageHandler(IInternalMessageBus internalMessageBus, ISagaLocking sagaLocking)
         {
             this.internalMessageBus = internalMessageBus;
+            this.sagaLocking = sagaLocking;
         }
 
         public void Subscribe()
         {
             this.internalMessageBus.Subscribe<SagaProcessingStartMessage>(this, msg =>
             {
-                if (!SagaLocking.Acquire(msg.SagaID))
+                if (!sagaLocking.Acquire(msg.SagaID))
                     throw new SagaIsBusyException(msg.SagaID);
                 return Task.CompletedTask;
             });
             this.internalMessageBus.Subscribe<SagaProcessingCompletedMessage>(this, msg =>
             {
-                SagaLocking.Banish(msg.SagaID);
+                sagaLocking.Banish(msg.SagaID);
                 return Task.CompletedTask;
             });
         }

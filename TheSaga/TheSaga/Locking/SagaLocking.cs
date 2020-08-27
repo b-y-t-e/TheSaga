@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace TheSaga.Utils
 {
-    internal static class SagaLocking
+    public class SagaLocking : ISagaLocking
     {
-        private static HashSet<Guid> locks =
+        private HashSet<Guid> locks =
             new HashSet<Guid>();
 
-        internal static bool Acquire(this Guid guid)
+        public bool Acquire(Guid guid)
         {
             lock (locks)
             {
@@ -18,7 +18,7 @@ namespace TheSaga.Utils
             }
         }
 
-        internal static bool Banish(this Guid guid)
+        public bool Banish(Guid guid)
         {
             lock (locks)
             {
@@ -28,7 +28,7 @@ namespace TheSaga.Utils
             }
         }
 
-        internal static bool IsAcquired(this Guid guid)
+        public bool IsAcquired(Guid guid)
         {
             lock (locks)
             {

@@ -11,6 +11,7 @@ using TheSaga.Persistance;
 using TheSaga.Persistance.InMemory;
 using TheSaga.Providers;
 using TheSaga.Registrator;
+using TheSaga.Utils;
 
 [assembly: InternalsVisibleTo("TheSaga.Tests")]
 
@@ -27,6 +28,8 @@ namespace TheSaga
             services.AddSingleton<ISagaRegistrator, SagaRegistrator>();
             services.AddSingleton<ISagaCoordinator, SagaCoordinator>();
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+            services.AddSingleton<ISagaLocking, SagaLocking>();
+            
             services.AddTransient(typeof(SagaExecutor<>), typeof(SagaExecutor<>));
             services.AddTransient(typeof(SagaActionExecutor<>), typeof(SagaActionExecutor<>));
             services.AddTransient(typeof(SagaStepExecutor<>), typeof(SagaStepExecutor<>));
