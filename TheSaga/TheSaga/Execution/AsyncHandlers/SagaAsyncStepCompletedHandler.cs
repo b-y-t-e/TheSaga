@@ -39,7 +39,7 @@ namespace TheSaga.Execution.AsyncHandlers
                 return Task.CompletedTask;
 
             return sagaExecutor.
-                Handle(message.CorrelationID, null, IsExecutionAsync.True());
+                Handle(message.SagaID, null, IsExecutionAsync.True());
         }
     }
 }

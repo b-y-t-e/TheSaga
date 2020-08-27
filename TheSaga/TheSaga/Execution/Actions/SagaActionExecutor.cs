@@ -29,21 +29,21 @@ namespace TheSaga.Execution.Actions
     {
         private IsExecutionAsync @async;
         private IEvent @event;
-        private Guid correlationID;
+        private Guid id;
         private ISagaModel<TSagaData> model;
         private ISagaPersistance sagaPersistance;
         private IServiceProvider serviceProvider;
         private ISaga saga;
 
         public SagaActionExecutor(
-            Guid correlationID,
+            Guid id,
             IsExecutionAsync async,
             IEvent @event,
             ISagaModel<TSagaData> model,
             ISagaPersistance sagaPersistance,
             IServiceProvider serviceProvider)
         {
-            this.correlationID = correlationID;
+            this.id = id;
             this.@async = async;
             this.@event = @event;
             this.model = model;
@@ -59,10 +59,10 @@ namespace TheSaga.Execution.Actions
             Type eventType = @event.GetType();
 
             this.saga = await sagaPersistance.
-                Get(correlationID);
+                Get(id);
 
             if (saga == null)
-                throw new SagaInstanceNotFoundException(model.SagaStateType, correlationID);
+                throw new SagaInstanceNotFoundException(model.SagaStateType, id);
 
             IList<ISagaAction> actions = model.
                 FindActionsForState(saga.State.CurrentState);
@@ -129,7 +129,7 @@ namespace TheSaga.Execution.Actions
                 throw new SagaInvalidEventForStateException(saga.State.CurrentState, eventType);
 
             if (!saga.IsProcessingCompleted())
-                throw new SagaIsBusyHandlingStepException(saga.Data.CorrelationID, saga.State.CurrentState, saga.State.CurrentStep);
+                throw new SagaIsBusyHandlingStepException(saga.Data.ID, saga.State.CurrentState, saga.State.CurrentStep);
 
             ISagaStep step = action.Steps.FirstOrDefault();
 

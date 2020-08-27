@@ -11,6 +11,6 @@ namespace TheSaga.Tests.Sagas.AsyncLockingSaga
 
         }
 
-        public Guid CorrelationID { get; set; }
+        public Guid ID { get; set; }
     }
 }

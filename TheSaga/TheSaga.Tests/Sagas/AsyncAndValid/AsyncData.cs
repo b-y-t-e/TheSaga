@@ -10,6 +10,6 @@ namespace TheSaga.Tests.Sagas.AsyncAndValid
         {
         }
 
-        public Guid CorrelationID { get; set; }
+        public Guid ID { get; set; }
     }
 }

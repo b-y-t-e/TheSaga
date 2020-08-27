@@ -4,6 +4,9 @@ namespace TheSaga.Events
 {
     public interface IEvent
     {
-        Guid CorrelationID { get; }
+        /// <summary>
+        /// Saga's correlation ID
+        /// </summary>
+        Guid ID { get; }
     }
 }

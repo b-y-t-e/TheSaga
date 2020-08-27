@@ -189,20 +189,20 @@ namespace TheSaga.Execution.Steps
             if (currentState != saga.State.CurrentState)
             {
                 internalMessageBus.Publish(
-                    new SagaStateChangedMessage(typeof(TSagaData), saga.Data.CorrelationID, saga.State.CurrentState, saga.State.CurrentStep, saga.State.IsCompensating));
+                    new SagaStateChangedMessage(typeof(TSagaData), saga.Data.ID, saga.State.CurrentState, saga.State.CurrentStep, saga.State.IsCompensating));
             }
 
             if (hasSagaCompleted)
             {
                 internalMessageBus.Publish(
-                    new SagaProcessingCompletedMessage(typeof(TSagaData), saga.Data.CorrelationID));
+                    new SagaProcessingCompletedMessage(typeof(TSagaData), saga.Data.ID));
             }
             else
             {
                 if (@async)
                 {
                     internalMessageBus.Publish(
-                        new SagaAsyncStepCompletedMessage(typeof(TSagaData), saga.Data.CorrelationID, saga.State.CurrentState, saga.State.CurrentStep, saga.State.IsCompensating));
+                        new SagaAsyncStepCompletedMessage(typeof(TSagaData), saga.Data.ID, saga.State.CurrentState, saga.State.CurrentStep, saga.State.IsCompensating));
                 }
             }
         }

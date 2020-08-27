@@ -15,24 +15,24 @@ namespace TheSaga.Persistance.InMemory
             this.instances = new Dictionary<Guid, string>();
         }
 
-        public async Task<ISaga> Get(Guid correlationID)
+        public async Task<ISaga> Get(Guid id)
         {
             string instance = null;
-            instances.TryGetValue(correlationID, out instance);
+            instances.TryGetValue(id, out instance);
             if (instance == null)
                 return null;
             return (ISaga)JsonConvert.DeserializeObject(instance, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All });
         }
 
-        public Task Remove(Guid correlationID)
+        public Task Remove(Guid id)
         {
-            instances.Remove(correlationID);
+            instances.Remove(id);
             return Task.CompletedTask;
         }
 
         public async Task Set(ISaga sagaData)
         {
-            instances[sagaData.Data.CorrelationID] = JsonConvert.SerializeObject(sagaData, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All });
+            instances[sagaData.Data.ID] = JsonConvert.SerializeObject(sagaData, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All });
         }
     }
 }

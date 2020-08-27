@@ -19,13 +19,13 @@ namespace TheSaga.Coordinators.AsyncHandlers
         {
             this.internalMessageBus.Subscribe<SagaProcessingStartMessage>(this, msg =>
             {
-                if (!CorrelationIdLock.Acquire(msg.CorrelationID))
-                    throw new SagaIsBusyException(msg.CorrelationID);
+                if (!SagaLocking.Acquire(msg.SagaID))
+                    throw new SagaIsBusyException(msg.SagaID);
                 return Task.CompletedTask;
             });
             this.internalMessageBus.Subscribe<SagaProcessingCompletedMessage>(this, msg =>
             {
-                CorrelationIdLock.Banish(msg.CorrelationID);
+                SagaLocking.Banish(msg.SagaID);
                 return Task.CompletedTask;
             });
         }

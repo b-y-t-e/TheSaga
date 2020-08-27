@@ -5,12 +5,12 @@ namespace TheSaga.Exceptions
     [Serializable]
     public class SagaInstanceNotFoundException : Exception
     {
-        public SagaInstanceNotFoundException(Type sagaStateType, Guid correlationID) :
-            base($"Saga with correlationID {correlationID} not found (state type {sagaStateType.Name})!")
+        public SagaInstanceNotFoundException(Type sagaStateType, Guid id) :
+            base($"Saga with id {id} not found (state type {sagaStateType.Name})!")
         { }
 
-        public SagaInstanceNotFoundException(Guid correlationID) :
-            base($"Saga with correlationID {correlationID} not found!")
+        public SagaInstanceNotFoundException(Guid id) :
+            base($"Saga with id {id} not found!")
         { }
 
         protected SagaInstanceNotFoundException(

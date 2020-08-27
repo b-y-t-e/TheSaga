@@ -28,16 +28,16 @@ namespace TheSaga.Tests
 
             // when
             await sagaCoordinator.
-               Send(new ToAlternative1Event() { CorrelationID = saga.Data.CorrelationID });
+               Send(new ToAlternative1Event() { ID = saga.Data.ID });
 
             // then
             ISaga persistedSaga = await sagaPersistance.
-                Get(saga.Data.CorrelationID);
+                Get(saga.Data.ID);
 
             persistedSaga.ShouldNotBeNull();
             persistedSaga.State.CurrentStep.ShouldBe(null);
             persistedSaga.State.CurrentState.ShouldBe(nameof(StateAlternative1));
-            persistedSaga.Data.CorrelationID.ShouldBe(saga.Data.CorrelationID);
+            persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
         }
 
         [Fact]
@@ -49,16 +49,16 @@ namespace TheSaga.Tests
 
             // when
             await sagaCoordinator.
-               Send(new ToAlternative2Event() { CorrelationID = saga.Data.CorrelationID });
+               Send(new ToAlternative2Event() { ID = saga.Data.ID });
 
             // then
             ISaga persistedSaga = await sagaPersistance.
-                Get(saga.Data.CorrelationID);
+                Get(saga.Data.ID);
 
             persistedSaga.ShouldNotBeNull();
             persistedSaga.State.CurrentStep.ShouldBe(null);
             persistedSaga.State.CurrentState.ShouldBe(nameof(StateAlternative2));
-            persistedSaga.Data.CorrelationID.ShouldBe(saga.Data.CorrelationID);
+            persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
         }
 
         #region Arrange

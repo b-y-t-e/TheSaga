@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TheSaga.Utils
 {
-    internal static class CorrelationIdLock
+    internal static class SagaLocking
     {
         private static HashSet<Guid> locks =
             new HashSet<Guid>();

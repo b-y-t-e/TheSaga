@@ -5,6 +5,6 @@ namespace TheSaga.Tests.Sagas.SyncAndValid.Events
 {
     public class OrderCompletedEvent : IEvent
     {
-        public Guid CorrelationID { get; set; }
+        public Guid ID { get; set; }
     }
 }

@@ -28,7 +28,7 @@ namespace TheSaga.Tests
 
             IEvent invalidEvent = new OrderSendEvent()
             {
-                CorrelationID = newSagaState.Data.CorrelationID
+                ID = newSagaState.Data.ID
             };
 
             // then
@@ -40,7 +40,7 @@ namespace TheSaga.Tests
 
             // then
             ISaga persistedSaga = await sagaPersistance.
-                Get(newSagaState.Data.CorrelationID);
+                Get(newSagaState.Data.ID);
 
             persistedSaga.ShouldNotBeNull();
             persistedSaga.State.CurrentState.ShouldBe(nameof(StateCreated));
@@ -58,7 +58,7 @@ namespace TheSaga.Tests
 
             IEvent skompletowanoEvent = new OrderCompletedEvent()
             {
-                CorrelationID = newSagaState.Data.CorrelationID
+                ID = newSagaState.Data.ID
             };
 
             // then
@@ -67,7 +67,7 @@ namespace TheSaga.Tests
 
             // then
             ISaga persistedSaga = await sagaPersistance.
-                Get(newSagaState.Data.CorrelationID);
+                Get(newSagaState.Data.ID);
 
             persistedSaga.ShouldNotBeNull();
             persistedSaga.State.CurrentState.ShouldBe(nameof(StateCompleted));
@@ -93,12 +93,12 @@ namespace TheSaga.Tests
 
             // then
             ISaga persistedSaga = await sagaPersistance.
-                Get(saga.Data.CorrelationID);
+                Get(saga.Data.ID);
 
             persistedSaga.ShouldNotBeNull();
             persistedSaga.State.CurrentStep.ShouldBe(null);
             persistedSaga.State.CurrentState.ShouldBe(nameof(StateCreated));
-            persistedSaga.Data.CorrelationID.ShouldBe(saga.Data.CorrelationID);
+            persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
             persistedSaga.Info.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && !step.IsCompensating && step.HasSucceeded);
         }
 

@@ -5,6 +5,6 @@ namespace TheSaga.Tests.Sagas.AsyncLockingSaga.Events
 {
     public class UpdatedEvent : IEvent
     {
-        public Guid CorrelationID { get; set; }
+        public Guid ID { get; set; }
     }
 }

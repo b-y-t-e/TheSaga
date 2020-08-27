@@ -4,13 +4,16 @@ namespace TheSaga.InternalMessages
 {
     internal class SagaProcessingStartMessage : IInternalMessage
     {
-        public SagaProcessingStartMessage(Type sagaStateType, Guid correlationID)
+        public SagaProcessingStartMessage(Type sagaStateType, Guid sagaID)
         {
             SagaStateType = sagaStateType;
-            CorrelationID = correlationID;
+            SagaID = sagaID;
         }
 
-        public Guid CorrelationID { get; }
+        /// <summary>
+        /// Correlation ID
+        /// </summary>
+        public Guid SagaID { get; }
         public Type SagaStateType { get; }
     }
 }

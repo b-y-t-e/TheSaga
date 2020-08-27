@@ -6,9 +6,9 @@ namespace TheSaga.Persistance
 {
     public interface ISagaPersistance
     {
-        Task<ISaga> Get(Guid correlationID);
+        Task<ISaga> Get(Guid id);
 
-        Task Remove(Guid correlationID);
+        Task Remove(Guid id);
 
         Task Set(ISaga sagaData);
     }

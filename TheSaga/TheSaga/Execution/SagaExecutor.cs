@@ -25,7 +25,7 @@ namespace TheSaga.Execution
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task<ISaga> Handle(Guid correlationID, IEvent @event, IsExecutionAsync async)
+        public async Task<ISaga> Handle(Guid id, IEvent @event, IsExecutionAsync async)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace TheSaga.Execution
                     @event = new EmptyEvent();
 
                 SagaActionExecutor<TSagaData> actionExecutor = ActivatorUtilities.
-                   CreateInstance<SagaActionExecutor<TSagaData>>(serviceProvider, correlationID, async, @event, model);
+                   CreateInstance<SagaActionExecutor<TSagaData>>(serviceProvider, id, async, @event, model);
 
                 ActionExecutionResult stepExecutionResult = await actionExecutor.
                     ExecuteAction();
@@ -41,7 +41,7 @@ namespace TheSaga.Execution
                 if (stepExecutionResult.IsSyncProcessingComplete)
                     return stepExecutionResult.Saga;
 
-                return await Handle(correlationID, null, @async);
+                return await Handle(id, null, @async);
             }
             catch
             {

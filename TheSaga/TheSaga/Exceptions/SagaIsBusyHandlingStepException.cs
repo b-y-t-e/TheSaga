@@ -5,8 +5,8 @@ namespace TheSaga.Exceptions
     [Serializable]
     public class SagaIsBusyHandlingStepException : Exception
     {
-        public SagaIsBusyHandlingStepException(Guid correlationID, string state, string step) :
-            base($"Saga {correlationID} in state {state} is busy (handling step {step})")
+        public SagaIsBusyHandlingStepException(Guid id, string state, string step) :
+            base($"Saga {id} in state {state} is busy (handling step {step})")
         { }
 
         protected SagaIsBusyHandlingStepException(

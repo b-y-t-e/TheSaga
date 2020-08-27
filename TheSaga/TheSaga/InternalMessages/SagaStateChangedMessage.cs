@@ -4,16 +4,19 @@ namespace TheSaga.InternalMessages
 {
     internal class SagaStateChangedMessage : IInternalMessage
     {
-        public SagaStateChangedMessage(Type sagaStateType, Guid correlationID, string currentState, string currentStep, bool isCompensating)
+        public SagaStateChangedMessage(Type sagaStateType, Guid sagaID, string currentState, string currentStep, bool isCompensating)
         {
             SagaStateType = sagaStateType;
-            CorrelationID = correlationID;
+            SagaID = sagaID;
             CurrentState = currentState;
             CurrentStep = currentStep;
             IsCompensating = isCompensating;
         }
 
-        public Guid CorrelationID { get; }
+        /// <summary>
+        /// Correlation ID
+        /// </summary>
+        public Guid SagaID { get; }
         public string CurrentState { get; }
         public string CurrentStep { get; }
         public bool IsCompensating { get; }

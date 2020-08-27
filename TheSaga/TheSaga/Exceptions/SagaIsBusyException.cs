@@ -5,8 +5,8 @@ namespace TheSaga.Exceptions
     [Serializable]
     public class SagaIsBusyException : Exception
     {
-        public SagaIsBusyException(Guid correlationID) :
-            base($"Saga {correlationID} is busy")
+        public SagaIsBusyException(Guid id) :
+            base($"Saga {id} is busy")
         { }
 
         protected SagaIsBusyException(

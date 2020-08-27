@@ -29,11 +29,11 @@ namespace TheSaga.Tests
 
             // when
             await sagaCoordinator.
-                WaitForState<New>(saga.Data.CorrelationID);
+                WaitForState<New>(saga.Data.ID);
 
             // then
-            CorrelationIdLock.
-                IsAcquired(saga.Data.CorrelationID).
+            SagaLocking.
+                IsAcquired(saga.Data.ID).
                 ShouldBeFalse();
         }
 
@@ -48,8 +48,8 @@ namespace TheSaga.Tests
                 Send(startEvent);
 
             // then
-            CorrelationIdLock.
-                IsAcquired(saga.Data.CorrelationID).
+            SagaLocking.
+                IsAcquired(saga.Data.ID).
                 ShouldBeTrue();
         }
 
@@ -60,17 +60,17 @@ namespace TheSaga.Tests
             ISaga saga = await sagaCoordinator.
                 Send(new CreatedEvent());
             await sagaCoordinator.
-                WaitForState<New>(saga.Data.CorrelationID);
+                WaitForState<New>(saga.Data.ID);
 
             // when
             await sagaCoordinator.
-                Send(new UpdatedEvent() { CorrelationID = saga.Data.CorrelationID });
+                Send(new UpdatedEvent() { ID = saga.Data.ID });
 
             // then
             await Assert.ThrowsAsync<SagaIsBusyException>(async () =>
             {
                 await sagaCoordinator.
-                    Send(new UpdatedEvent() { CorrelationID = saga.Data.CorrelationID });
+                    Send(new UpdatedEvent() { ID = saga.Data.ID });
             });
         }
 

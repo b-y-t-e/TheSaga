@@ -11,7 +11,7 @@ namespace TheSaga.Coordinators
     {
         Task<ISaga> Send(IEvent @event);
 
-        Task WaitForState<TState>(Guid correlationID, SagaWaitOptions waitOptions = null)
+        Task WaitForState<TState>(Guid id, SagaWaitOptions waitOptions = null)
             where TState : IState, new();
     }
 }

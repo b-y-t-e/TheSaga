@@ -11,6 +11,6 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga
 
         }
 
-        public Guid CorrelationID { get; set; }
+        public Guid ID { get; set; }
     }
 }
