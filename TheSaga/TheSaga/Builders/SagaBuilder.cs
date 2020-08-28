@@ -5,9 +5,10 @@ using TheSaga.Activities;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Models;
-using TheSaga.Models.Actions;
-using TheSaga.Models.Steps;
 using TheSaga.SagaModels;
+using TheSaga.SagaModels.Actions;
+using TheSaga.SagaModels.Steps;
+using TheSaga.SagaModels.Steps.Delegates;
 using TheSaga.States;
 using TheSaga.Utils;
 

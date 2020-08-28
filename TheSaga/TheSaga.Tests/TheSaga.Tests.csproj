@@ -30,4 +30,8 @@
     <ProjectReference Include="..\TheSaga\TheSaga.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="SagaTests\Sagas" />
+  </ItemGroup>
+
 </Project>

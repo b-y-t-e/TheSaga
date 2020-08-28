@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Exceptions;
 using TheSaga.Locking;
 using TheSaga.Messages;
-using TheSaga.Messages.MessageBus;
 
 namespace TheSaga.Observables.Registrator
 {

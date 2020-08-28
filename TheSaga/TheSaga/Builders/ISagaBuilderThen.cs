@@ -2,8 +2,8 @@
 using TheSaga.Activities;
 using TheSaga.Events;
 using TheSaga.Models;
-using TheSaga.Models.Steps;
 using TheSaga.SagaModels;
+using TheSaga.SagaModels.Steps.Delegates;
 using TheSaga.States;
 
 namespace TheSaga.Builders

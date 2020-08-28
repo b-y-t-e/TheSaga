@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Exceptions;
 using TheSaga.Locking;
+using TheSaga.MessageBus;
 using TheSaga.Messages;
-using TheSaga.Messages.MessageBus;
 
 namespace TheSaga.Observables
 {

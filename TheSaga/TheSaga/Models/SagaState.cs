@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using TheSaga.Models.Steps;
+using TheSaga.SagaModels.History;
 using TheSaga.ValueObjects;
 
 namespace TheSaga.Models

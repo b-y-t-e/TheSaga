@@ -1,8 +1,8 @@
 ﻿using TheSaga.Events;
 using TheSaga.Models;
-using TheSaga.Models.Actions;
-using TheSaga.Models.Steps;
 using TheSaga.SagaModels;
+using TheSaga.SagaModels.Actions;
+using TheSaga.SagaModels.Steps;
 using TheSaga.ValueObjects;
 
 namespace TheSaga.Commands

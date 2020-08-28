@@ -1,4 +1,4 @@
-﻿using TheSaga.Messages.MessageBus;
+﻿using TheSaga.MessageBus;
 using TheSaga.SagaModels;
 using TheSaga.ValueObjects;
 

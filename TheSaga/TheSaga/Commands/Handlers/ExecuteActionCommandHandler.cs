@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Models;
-using TheSaga.Models.Actions;
-using TheSaga.Models.Steps;
 using TheSaga.Persistance;
+using TheSaga.SagaModels.Actions;
+using TheSaga.SagaModels.Steps;
 using TheSaga.Utils;
 using TheSaga.ValueObjects;
 
@@ -122,12 +122,5 @@ namespace TheSaga.Commands.Handlers
 
             return step;
         }
-    }
-
-    internal class ExecuteActionResult
-    {
-        public bool IsSyncProcessingComplete;
-
-        public ISaga Saga;
     }
 }

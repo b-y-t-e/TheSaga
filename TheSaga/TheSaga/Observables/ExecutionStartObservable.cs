@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using TheSaga.MessageBus;
 using TheSaga.Messages;
-using TheSaga.Messages.MessageBus;
 using TheSaga.Models;
 using TheSaga.ValueObjects;
 

@@ -1,28 +1,21 @@
 ﻿TODO:
 
- problem w przypadku kooejnej akcji w gdy wystapi blad:
-            if (saga.IsIdle() &&
-                saga.HasError())
-            {
-                throw saga.State.CurrentError;
-            }
-
  + poprawienie sqlserver'a
- + IServiceScopeFactory->CreateScope dla celj sagi i ascynhandlerze
  + publishasync!
 
  + wolanie ExecuteStepCommand w publishasync?
  + Async message 
 
  + dodanie metody BusSend
- + dodanie metody Publish
  + podpiecie sie do masstransit
  + after
  + retry
  + If else
- + executors -> command / handlers
 
 DONE:
+ + dodanie metody Publish
+ + executors -> command / handlers
+ + IServiceScopeFactory->CreateScope dla celj sagi i ascynhandlerze
  + metoda Send
  + wznawianie sag po restarcie
  + Command & handler 

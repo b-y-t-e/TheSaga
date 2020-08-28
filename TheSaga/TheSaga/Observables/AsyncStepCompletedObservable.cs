@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using TheSaga.Commands;
 using TheSaga.Commands.Handlers;
 using TheSaga.Events;
+using TheSaga.MessageBus;
 using TheSaga.Messages;
-using TheSaga.Messages.MessageBus;
 using TheSaga.ValueObjects;
 
 namespace TheSaga.Observables
