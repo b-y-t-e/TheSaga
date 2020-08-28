@@ -105,26 +105,36 @@ namespace TheSaga.Coordinators
 
         private async Task<ISaga> ExecuteSaga(IEvent @event, ISagaModel model, ISaga saga)
         {
-            serviceProvider.
-                GetRequiredService<ObservableRegistrator>().
-                Initialize();
-
-            await internalMessageBus.
-                Publish(new ExecutionStartMessage(saga));
-
-            await sagaPersistance.
-                Set(saga);
-
-            ExecuteSagaCommandHandler handler = serviceProvider.
-                GetRequiredService<ExecuteSagaCommandHandler>();
-
-            return await handler.Handle(new ExecuteSagaCommand()
+            try
             {
-                Async = AsyncExecution.False(),
-                Event = @event,
-                ID = SagaID.From(saga.Data.ID),
-                Model = model
-            });
+                serviceProvider.
+                    GetRequiredService<ObservableRegistrator>().
+                    Initialize();
+
+                await internalMessageBus.
+                    Publish(new ExecutionStartMessage(saga));
+
+                await sagaPersistance.
+                    Set(saga);
+
+                ExecuteSagaCommandHandler handler = serviceProvider.
+                    GetRequiredService<ExecuteSagaCommandHandler>();
+
+                return await handler.Handle(new ExecuteSagaCommand()
+                {
+                    Async = AsyncExecution.False(),
+                    Event = @event,
+                    ID = SagaID.From(saga.Data.ID),
+                    Model = model
+                });
+            }
+            catch
+            {
+                await internalMessageBus.Publish(
+                    new ExecutionEndMessage(saga));
+
+                throw;
+            }
         }
 
         public async Task WaitForState<TState>(Guid id, SagaWaitOptions waitOptions = null)
