@@ -118,4 +118,10 @@ namespace TheSaga.Execution.Commands.Handlers
             return step;
         }
     }
+    internal class ExecuteActionResult
+    {
+        public bool IsSyncProcessingComplete;
+
+        public ISaga Saga;
+    }
 }

@@ -18,38 +18,31 @@ namespace TheSaga.Execution.Commands.Handlers
 
         public async Task<ISaga> Handle(ExecuteSagaCommand command)
         {
-            try
-            {
-                if (command.Event == null)
-                    command.Event = new EmptyEvent();
+            if (command.Event == null)
+                command.Event = new EmptyEvent();
 
-                ExecuteActionCommandHandler executeActionHandler = ActivatorUtilities.
-                   CreateInstance<ExecuteActionCommandHandler>(serviceProvider);
+            ExecuteActionCommandHandler executeActionHandler = ActivatorUtilities.
+               CreateInstance<ExecuteActionCommandHandler>(serviceProvider);
 
-                ExecuteActionResult stepExecutionResult = await executeActionHandler.Handle(
-                    new ExecuteActionCommand()
-                    {
-                        ID = command.ID,
-                        Async = command.Async,
-                        Event = command.Event,
-                        Model = command.Model
-                    });
-
-                if (stepExecutionResult.IsSyncProcessingComplete)
-                    return stepExecutionResult.Saga;
-
-                return await Handle(new ExecuteSagaCommand()
+            ExecuteActionResult stepExecutionResult = await executeActionHandler.Handle(
+                new ExecuteActionCommand()
                 {
-                    Model = command.Model,
                     ID = command.ID,
-                    Event = new EmptyEvent(),
-                    Async = command.Async
+                    Async = command.Async,
+                    Event = command.Event,
+                    Model = command.Model
                 });
-            }
-            catch
+
+            if (stepExecutionResult.IsSyncProcessingComplete)
+                return stepExecutionResult.Saga;
+
+            return await Handle(new ExecuteSagaCommand()
             {
-                throw;
-            }
+                Model = command.Model,
+                ID = command.ID,
+                Event = new EmptyEvent(),
+                Async = command.Async
+            });
         }
     }
 }
