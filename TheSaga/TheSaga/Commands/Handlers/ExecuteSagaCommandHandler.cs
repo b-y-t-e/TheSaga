@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Events;
 using TheSaga.Models;
 
-namespace TheSaga.Execution.Commands.Handlers
+namespace TheSaga.Commands.Handlers
 {
     internal class ExecuteSagaCommandHandler
     {

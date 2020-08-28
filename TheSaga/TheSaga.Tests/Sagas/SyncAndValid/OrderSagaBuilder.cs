@@ -21,6 +21,9 @@ namespace TheSaga.Tests.Sagas.SyncAndValid
         public ISagaModel<OrderData> Build()
         {
             builder.
+                Name(nameof(OrderSagaBuilder));
+
+            builder.
                 Start<OrderCreatedEvent, OrderCreatedEventHandler>("OrderCreatedEventStep0").
                     Then("OrderCreatedEventStep1", ctx => Task.CompletedTask).
                     TransitionTo<StateCreated>();

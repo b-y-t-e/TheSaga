@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Models;
@@ -12,7 +12,7 @@ using TheSaga.Persistance;
 using TheSaga.Utils;
 using TheSaga.ValueObjects;
 
-namespace TheSaga.Execution.Commands.Handlers
+namespace TheSaga.Commands.Handlers
 {
     internal class ExecuteActionCommandHandler
     {
@@ -118,6 +118,7 @@ namespace TheSaga.Execution.Commands.Handlers
             return step;
         }
     }
+
     internal class ExecuteActionResult
     {
         public bool IsSyncProcessingComplete;

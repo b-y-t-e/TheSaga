@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.Events;
+using TheSaga.Exceptions;
 using TheSaga.Models;
 using TheSaga.Models.Actions;
 using TheSaga.Models.Steps;
@@ -23,13 +24,11 @@ namespace TheSaga.Builders
         public SagaBuilder(IServiceProvider serviceProvider) :
             base(serviceProvider)
         {
-
         }
 
         public SagaBuilder(SagaBuilderState<TSagaData> sagaBuilderState) :
             base(sagaBuilderState)
         {
-
         }
 
         public ISagaBuilderThen<TSagaData> HandleBy<TEventHandler>()
@@ -53,7 +52,6 @@ namespace TheSaga.Builders
         ISagaBuilder<TSagaData>,
         ISagaBuilderThen<TSagaData>,
         ISagaBuilderWhen<TSagaData>
-        // ISagaBuilderHandle<TSagaData>
         where TSagaData : ISagaData
     {
         protected SagaBuilderState<TSagaData> s;
@@ -80,6 +78,9 @@ namespace TheSaga.Builders
 
         public ISagaModel<TSagaData> Build()
         {
+            if (String.IsNullOrEmpty(s.Model.Name))
+                throw new InvalidSagaModelNameException();
+
             return s.Model;
         }
 
@@ -105,6 +106,12 @@ namespace TheSaga.Builders
                       },
                       null,
                       false));
+            return new SagaBuilder<TSagaData>(s);
+        }
+
+        public ISagaBuilder<TSagaData> Name(string name)
+        {
+            s.Model.Name = name;
             return new SagaBuilder<TSagaData>(s);
         }
 

@@ -18,6 +18,9 @@ namespace TheSaga.Tests.Sagas.TransitionsSaga
         public ISagaModel<TransitionsSagaData> Build()
         {
             builder.
+                Name(nameof(TransitionsSagaBuilder));
+
+            builder.
                 Start<CreateEvent>().
                 TransitionTo<Init>();
 

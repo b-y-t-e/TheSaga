@@ -33,6 +33,11 @@ namespace TheSaga.Persistance.SqlServer
             }
         }
 
+        public Task<IList<Guid>> GetUnfinished()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task Remove(Guid id)
         {
             using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))

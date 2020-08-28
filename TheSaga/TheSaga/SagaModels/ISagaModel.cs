@@ -17,6 +17,8 @@ namespace TheSaga.SagaModels
 
         bool ContainsEvent(Type type);
 
+        string Name { get; }
+
         ISagaAction FindActionForStep(ISagaStep sagaStep);
 
         ISagaAction FindActionForStateAndEvent(string state, Type eventType);

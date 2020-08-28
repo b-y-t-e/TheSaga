@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.Exceptions;
-using TheSaga.Execution;
 using TheSaga.Options;
 using TheSaga.Persistance;
 using TheSaga.Providers;
@@ -12,9 +12,9 @@ using TheSaga.Registrator;
 using TheSaga.States;
 using TheSaga.Utils;
 using Microsoft.Extensions.DependencyInjection;
+using TheSaga.Commands;
+using TheSaga.Commands.Handlers;
 using TheSaga.Coordinators.Observables;
-using TheSaga.Execution.Commands;
-using TheSaga.Execution.Commands.Handlers;
 using TheSaga.Locking;
 using TheSaga.Messages;
 using TheSaga.Messages.MessageBus;
@@ -32,7 +32,10 @@ namespace TheSaga.Coordinators
         private IDateTimeProvider dateTimeProvider;
         private ISagaLocking sagaLocking;
         private IServiceProvider serviceProvider;
-        public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance, IInternalMessageBus internalMessageBus, IDateTimeProvider dateTimeProvider, ISagaLocking sagaLocking, IServiceProvider serviceProvider)
+
+        public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance,
+            IInternalMessageBus internalMessageBus, IDateTimeProvider dateTimeProvider, ISagaLocking sagaLocking,
+            IServiceProvider serviceProvider)
         {
             this.sagaRegistrator = sagaRegistrator;
             this.sagaPersistance = sagaPersistance;
@@ -41,17 +44,48 @@ namespace TheSaga.Coordinators
             this.sagaLocking = sagaLocking;
             this.serviceProvider = serviceProvider;
 
-            new LockingObservable(serviceProvider).
-                Subscribe();
+            new LockingObservable(serviceProvider).Subscribe();
 
-            new ExecutionStartObservable(serviceProvider).
-                Subscribe();
+            new ExecutionStartObservable(serviceProvider).Subscribe();
 
-            new ExecutionEndObservable(serviceProvider).
-                Subscribe();
+            new ExecutionEndObservable(serviceProvider).Subscribe();
 
-            new AsyncStepCompletedObservable(serviceProvider).
-                Subscribe();
+            new AsyncStepCompletedObservable(serviceProvider).Subscribe();
+        }
+
+        public async Task ResumeAll()
+        {
+            IList<Guid> ids = await sagaPersistance.GetUnfinished();
+
+            ExecuteSagaCommandHandler sagaExecutionHandler = serviceProvider.
+                GetRequiredService<ExecuteSagaCommandHandler>();
+
+            List<string> invalidModels = new List<string>();
+            foreach (Guid id in ids)
+            {
+                ISaga saga = await sagaPersistance.Get(id);
+                ISagaModel model = sagaRegistrator.FindModelByName(saga.Info.ModelName);
+
+                if (model == null)
+                    invalidModels.Add(saga.Info.ModelName);
+            }
+
+            if(invalidModels.Count > 0)
+                throw new Exception($"Saga models {String.Join(", ",invalidModels.Distinct().ToArray())} not found");
+
+            foreach (Guid id in ids)
+            {
+                ISaga saga = await sagaPersistance.Get(id);
+                ISagaModel model = sagaRegistrator.FindModelByName(saga.Info.ModelName);
+
+                await sagaExecutionHandler.Handle(new ExecuteSagaCommand()
+                {
+                    Async = AsyncExecution.True(),
+                    Event = new EmptyEvent(),
+                    ID = SagaID.From(id),
+                    Model = model
+                });
+            }
         }
 
         public async Task<ISaga> Send(IEvent @event)
@@ -74,30 +108,23 @@ namespace TheSaga.Coordinators
                 await internalMessageBus.Publish(
                     new ExecutionStartMessage(saga));
 
-                await sagaPersistance.
-                    Set(saga);
+                await sagaPersistance.Set(saga);
 
-                ExecuteSagaCommandHandler handler = serviceProvider.
-                    GetRequiredService<ExecuteSagaCommandHandler>();
+                ExecuteSagaCommandHandler handler = serviceProvider.GetRequiredService<ExecuteSagaCommandHandler>();
 
-                //ISagaExecutor sagaExecutor = sagaRegistrator.
-                //FindExecutorForStateType(model.GetType());
-
-                return await handler.
-                    Handle(new ExecuteSagaCommand()
-                    {
-                        Async = AsyncExecution.False(),
-                        Event = @event,
-                        ID = SagaID.From(saga.Data.ID),
-                        Model = model
-                    });
+                return await handler.Handle(new ExecuteSagaCommand()
+                {
+                    Async = AsyncExecution.False(),
+                    Event = @event,
+                    ID = SagaID.From(saga.Data.ID),
+                    Model = model
+                });
             }
             catch
             {
                 if (newSaga != null)
                 {
-                    await sagaPersistance.
-                        Remove(newSaga.Data.ID);
+                    await sagaPersistance.Remove(newSaga.Data.ID);
                 }
 
                 throw;
@@ -121,11 +148,11 @@ namespace TheSaga.Coordinators
                     {
                         stateChanged = true;
                     }
+
                     return Task.CompletedTask;
                 });
 
-                ISaga saga = await sagaPersistance.
-                    Get(id);
+                ISaga saga = await sagaPersistance.Get(id);
 
                 if (saga == null)
                     throw new SagaInstanceNotFoundException(id);
@@ -153,8 +180,7 @@ namespace TheSaga.Coordinators
 
             if (eventType != null)
             {
-                bool isStartEvent = model.
-                    IsStartEvent(eventType);
+                bool isStartEvent = model.IsStartEvent(eventType);
 
                 if (isStartEvent)
                     saga = await CreateNewSaga(model, id);
@@ -168,7 +194,7 @@ namespace TheSaga.Coordinators
             if (id == SagaID.Empty())
                 id = SagaID.New();
 
-            ISagaData data = (ISagaData)Activator.CreateInstance(model.SagaStateType);
+            ISagaData data = (ISagaData) Activator.CreateInstance(model.SagaStateType);
             data.ID = id;
 
             ISaga saga = new Saga()
@@ -176,6 +202,7 @@ namespace TheSaga.Coordinators
                 Data = data,
                 Info = new SagaInfo()
                 {
+                    ModelName = model.Name,
                     Created = dateTimeProvider.Now,
                     Modified = dateTimeProvider.Now
                 },
@@ -188,6 +215,5 @@ namespace TheSaga.Coordinators
 
             return saga;
         }
-
     }
 }

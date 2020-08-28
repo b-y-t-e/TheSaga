@@ -1,6 +1,4 @@
-﻿using TheSaga.Models;
-
-namespace TheSaga.Execution.Context
+﻿namespace TheSaga.Models.Context
 {
     public interface IExecutionContext<TSagaData> : IExecutionContext
         where TSagaData : ISagaData

@@ -6,6 +6,8 @@ namespace TheSaga.Models
     {
         public DateTime Created { get; set; }
         public DateTime Modified { get; set; }
+        public string ModelName { get; set; }
+
         public SagaInfo()
         {
         }

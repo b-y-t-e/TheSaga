@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using TheSaga.Execution.Context;
+using TheSaga.Models.Context;
 
 namespace TheSaga.Models.Steps
 {

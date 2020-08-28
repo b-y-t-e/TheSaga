@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TheSaga.Models;
 
@@ -11,5 +12,7 @@ namespace TheSaga.Persistance
         Task Remove(Guid id);
 
         Task Set(ISaga sagaData);
+
+        Task<IList<Guid>> GetUnfinished();
     }
 }

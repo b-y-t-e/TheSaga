@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using TheSaga.Execution;
 using TheSaga.Messages.MessageBus;
 using TheSaga.Models;
 using TheSaga.Persistance;
@@ -16,53 +15,32 @@ namespace TheSaga.Registrator
     public class SagaRegistrator : ISagaRegistrator
     {
         private IInternalMessageBus internalMessageBus;
-        //private Dictionary<Type, ISagaExecutor> registeredExecutors;
-        private List<ISagaModel> registeredModels;
         private IServiceProvider serviceProvider;
+
+        private List<ISagaModel> registeredModels;
         private bool wasInitialized;
 
         public SagaRegistrator(
             IInternalMessageBus internalMessageBus,
             IServiceProvider serviceProvider)
         {
-            //this.registeredExecutors = new Dictionary<Type, ISagaExecutor>();
             this.registeredModels = new List<ISagaModel>();
             this.internalMessageBus = internalMessageBus;
             this.serviceProvider = serviceProvider;
             RegisterAllModelWithBuilders();
         }
 
-
-        public void Register<TSagaData>(ISagaModel<TSagaData> model)
-            where TSagaData : ISagaData
+        public ISagaModel FindModelByName(string name)
         {
-            Register(
-                model,
-                typeof(TSagaData));
+            return registeredModels.
+                FirstOrDefault(v => v.Name == name);
         }
 
-        public void Register(ISagaModel model, Type sagaDataType)
+        public void Register(ISagaModel model)
         {
             registeredModels.
                 Add(model);
-
-            //Type sagaExecuterType = typeof(SagaExecutor<>).
-            //    ConstructGenericType(sagaDataType);
-
-            //Type asyncStepCompletedObservableType = typeof(SagaAsyncStepCompletedObservable).
-              //  ConstructGenericType(sagaDataType);
-
-            //ISagaExecutor sagaExecutor = (ISagaExecutor)ActivatorUtilities.
-            //   CreateInstance(serviceProvider, sagaExecuterType, model);
-
         }
-
-        /*   ISagaExecutor ISagaRegistrator.FindExecutorForStateType(Type stateType)
-           {
-               ISagaExecutor sagaExecutor = null;
-               registeredExecutors.TryGetValue(stateType, out sagaExecutor);
-               return sagaExecutor;
-           }*/
 
         ISagaModel ISagaRegistrator.FindModelForEventType(Type eventType)
         {
@@ -90,13 +68,7 @@ namespace TheSaga.Registrator
                 MethodInfo buildMethodInfo = modelBuilderType.GetMethod(buildMethodName, BindingFlags.Public | BindingFlags.Instance);
                 ISagaModel model = (ISagaModel)buildMethodInfo.Invoke(modelBuilder, new object[0]);
 
-                Type sagaDataType = modelBuilderType.
-                    GetInterfaceOf(typeof(ISagaModelBuilder<>)).
-                    GetFirstGenericArgument();
-
-                Register(
-                    model,
-                    sagaDataType);
+                Register(model);
             }
 
             wasInitialized = true;

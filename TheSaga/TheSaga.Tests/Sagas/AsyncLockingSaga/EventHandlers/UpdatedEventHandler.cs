@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using TheSaga.Events;
-using TheSaga.Execution.Context;
+using TheSaga.Models.Context;
 using TheSaga.Tests.Sagas.AsyncLockingSaga.Events;
 
 namespace TheSaga.Tests.Sagas.AsyncLockingSaga.EventHandlers

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using TheSaga.Activities;
-using TheSaga.Execution.Context;
+using TheSaga.Models.Context;
 
 namespace TheSaga.Tests.Sagas.SyncAndValid.Activities
 {

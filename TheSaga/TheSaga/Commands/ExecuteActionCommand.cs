@@ -1,9 +1,8 @@
-﻿using System;
-using TheSaga.Events;
+﻿using TheSaga.Events;
 using TheSaga.SagaModels;
 using TheSaga.ValueObjects;
 
-namespace TheSaga.Execution.Commands
+namespace TheSaga.Commands
 {
     internal class ExecuteActionCommand
     {

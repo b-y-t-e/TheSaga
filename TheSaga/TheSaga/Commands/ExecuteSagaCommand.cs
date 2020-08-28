@@ -1,15 +1,14 @@
-﻿using System;
-using TheSaga.Events;
+﻿using TheSaga.Events;
 using TheSaga.SagaModels;
 using TheSaga.ValueObjects;
 
-namespace TheSaga.Execution.Commands
+namespace TheSaga.Commands
 {
     internal class ExecuteSagaCommand
     {
-        public SagaID ID;
-        public IEvent Event;
         public AsyncExecution Async;
+        public IEvent Event;
+        public SagaID ID;
         public ISagaModel Model;
     }
 }

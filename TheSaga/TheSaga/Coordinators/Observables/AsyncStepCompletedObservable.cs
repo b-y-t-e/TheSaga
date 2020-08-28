@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+using TheSaga.Commands;
+using TheSaga.Commands.Handlers;
 using TheSaga.Events;
-using TheSaga.Execution.Commands;
-using TheSaga.Execution.Commands.Handlers;
 using TheSaga.Messages;
 using TheSaga.Messages.MessageBus;
 using TheSaga.ValueObjects;
@@ -12,27 +12,12 @@ namespace TheSaga.Coordinators.Observables
 {
     internal class AsyncStepCompletedObservable : IObservable
     {
-        IServiceProvider serviceProvider;
+        private IServiceProvider serviceProvider;
 
         public AsyncStepCompletedObservable(
             IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
-        }
-
-        private Task HandleAsyncStepCompletedMessage(AsyncStepCompletedMessage message)
-        {
-            ExecuteSagaCommandHandler handler = serviceProvider.
-                GetRequiredService<ExecuteSagaCommandHandler>();
-
-            return handler.Handle(
-                new ExecuteSagaCommand()
-                {
-                    Async = AsyncExecution.True(),
-                    Event = new EmptyEvent(),
-                    ID = message.SagaID,
-                    Model = message.Model
-                });
         }
 
         public void Subscribe()
@@ -53,5 +38,19 @@ namespace TheSaga.Coordinators.Observables
                 Unsubscribe<AsyncStepCompletedMessage>(this);
         }
 
+        private Task HandleAsyncStepCompletedMessage(AsyncStepCompletedMessage message)
+        {
+            ExecuteSagaCommandHandler handler = serviceProvider.
+                GetRequiredService<ExecuteSagaCommandHandler>();
+
+            return handler.Handle(
+                new ExecuteSagaCommand()
+                {
+                    Async = AsyncExecution.True(),
+                    Event = new EmptyEvent(),
+                    ID = message.SagaID,
+                    Model = message.Model
+                });
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using TheSaga.Events;
-using TheSaga.Execution.Context;
+using TheSaga.Models.Context;
 using TheSaga.Tests.Sagas.SyncAndValid.Events;
 
 namespace TheSaga.Tests.Sagas.SyncAndValid.EventHandlers

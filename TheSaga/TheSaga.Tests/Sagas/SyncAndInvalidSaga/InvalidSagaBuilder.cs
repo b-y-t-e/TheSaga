@@ -21,6 +21,9 @@ namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga
         public ISagaModel<InvalidSagaData> Build()
         {
             builder.
+                Name(nameof(InvalidSagaData));
+
+            builder.
                 Start<InvalidCreatedEvent, InvalidCreatedEventHandler>().
                 Then(
                     "InvalidCreatedEvent1",

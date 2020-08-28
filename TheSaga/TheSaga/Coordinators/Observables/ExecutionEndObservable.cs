@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Messages;
 using TheSaga.Messages.MessageBus;
 
@@ -13,10 +13,6 @@ namespace TheSaga.Coordinators.Observables
         public ExecutionEndObservable(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
-        }
-
-        async Task OnSagaProcessingEnd(ExecutionEndMessage msg)
-        {
         }
 
         public void Subscribe()
@@ -35,6 +31,10 @@ namespace TheSaga.Coordinators.Observables
 
             internalMessageBus.
                 Unsubscribe<ExecutionEndMessage>(this);
+        }
+
+        private async Task OnSagaProcessingEnd(ExecutionEndMessage msg)
+        {
         }
     }
 }

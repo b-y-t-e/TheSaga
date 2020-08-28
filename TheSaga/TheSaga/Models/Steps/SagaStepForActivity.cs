@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Activities;
 using TheSaga.Events;
-using TheSaga.Execution.Context;
+using TheSaga.Models.Context;
 
 namespace TheSaga.Models.Steps
 {

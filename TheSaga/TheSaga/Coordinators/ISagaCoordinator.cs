@@ -11,6 +11,8 @@ namespace TheSaga.Coordinators
     {
         Task<ISaga> Send(IEvent @event);
 
+        Task ResumeAll();
+
         Task WaitForState<TState>(Guid id, SagaWaitOptions waitOptions = null)
             where TState : IState, new();
     }

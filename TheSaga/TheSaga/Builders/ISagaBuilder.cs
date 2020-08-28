@@ -11,6 +11,8 @@ namespace TheSaga.Builders
 
         ISagaBuilderWhen<TSagaData> During<TState>() where TState : IState;
 
+        ISagaBuilder<TSagaData> Name(string name);
+
         ISagaBuilderThen<TSagaData> Start<TEvent>() where TEvent : IEvent;
 
         ISagaBuilderThen<TSagaData> Start<TEvent, TEventHandler>() where TEvent : IEvent
@@ -18,15 +20,15 @@ namespace TheSaga.Builders
 
         ISagaBuilderThen<TSagaData> Start<TEvent>(string stepName) where TEvent : IEvent;
 
-        ISagaBuilderThen<TSagaData> Start<TEvent, TEventHandler>(string stepName) 
+        ISagaBuilderThen<TSagaData> Start<TEvent, TEventHandler>(string stepName)
             where TEvent : IEvent
             where TEventHandler : IEventHandler<TSagaData, TEvent>;
 
-        ISagaBuilderThen<TSagaData> StartAsync<TEvent, TEventHandler>() 
+        ISagaBuilderThen<TSagaData> StartAsync<TEvent, TEventHandler>()
             where TEvent : IEvent
             where TEventHandler : IEventHandler<TSagaData, TEvent>;
 
-        ISagaBuilderThen<TSagaData> StartAsync<TEvent, TEventHandler>(string stepName) 
+        ISagaBuilderThen<TSagaData> StartAsync<TEvent, TEventHandler>(string stepName)
             where TEvent : IEvent
            where TEventHandler : IEventHandler<TSagaData, TEvent>;
     }
