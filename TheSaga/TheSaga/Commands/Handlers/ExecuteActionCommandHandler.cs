@@ -18,13 +18,15 @@ namespace TheSaga.Commands.Handlers
     {
         private ISagaPersistance sagaPersistance;
         private IServiceProvider serviceProvider;
-
+        IServiceScopeFactory serviceScopeFactory;
         public ExecuteActionCommandHandler(
             ISagaPersistance sagaPersistance,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider, 
+            IServiceScopeFactory serviceScopeFactory)
         {
             this.sagaPersistance = sagaPersistance;
             this.serviceProvider = serviceProvider;
+            this.serviceScopeFactory = serviceScopeFactory;
         }
 
         public async Task<ExecuteActionResult> Handle(ExecuteActionCommand command)
@@ -46,25 +48,28 @@ namespace TheSaga.Commands.Handlers
             if (step.Async)
                 async = AsyncExecution.True();
 
-            ExecuteStepCommandHandler stepExecutor = ActivatorUtilities.
-               CreateInstance<ExecuteStepCommandHandler>(serviceProvider);
-
-            ISaga sagaFinalState = await stepExecutor.
-                Handle(new ExecuteStepCommand()
-                {
-                    Async = async,
-                    Event = command.Event,
-                    Saga = saga,
-                    SagaStep = step,
-                    SagaAction = action,
-                    Model = command.Model
-                });
-
-            return new ExecuteActionResult()
+            using (var scope = serviceScopeFactory.CreateScope())
             {
-                Saga = sagaFinalState ?? saga,
-                IsSyncProcessingComplete = sagaFinalState == null || async || saga.IsIdle()
-            };
+                ExecuteStepCommandHandler stepExecutor = ActivatorUtilities.
+                   CreateInstance<ExecuteStepCommandHandler>(scope.ServiceProvider);
+
+                ISaga sagaFinalState = await stepExecutor.
+                    Handle(new ExecuteStepCommand()
+                    {
+                        Async = async,
+                        Event = command.Event,
+                        Saga = saga,
+                        SagaStep = step,
+                        SagaAction = action,
+                        Model = command.Model
+                    });
+
+                return new ExecuteActionResult()
+                {
+                    Saga = sagaFinalState ?? saga,
+                    IsSyncProcessingComplete = sagaFinalState == null || async || saga.IsIdle()
+                };
+            }
         }
 
         private ISagaStep FindStep(ISaga saga, Type eventType, IList<ISagaAction> actions)
