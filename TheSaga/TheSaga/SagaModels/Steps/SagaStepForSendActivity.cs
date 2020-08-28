@@ -14,11 +14,10 @@ namespace TheSaga.SagaModels.Steps
         where TExecuteEvent : IEvent, new()
         where TCompensateEvent : IEvent, new()
     {
-        private readonly IServiceProvider serviceProvider;
-
         private readonly SendActionDelegate<TSagaData, TExecuteEvent> action;
 
         private readonly SendActionDelegate<TSagaData, TCompensateEvent> compensate;
+        private readonly IServiceProvider serviceProvider;
 
         public SagaStepForSendActivity(
             SendActionDelegate<TSagaData, TExecuteEvent> action,
@@ -40,22 +39,20 @@ namespace TheSaga.SagaModels.Steps
             if (typeof(TCompensateEvent) == typeof(EmptyEvent))
                 return;
 
-            var contextForAction =
+            IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>) context;
 
-            var activity =
+            SendMessageCompensate<TSagaData, TCompensateEvent> activity =
                 ActivatorUtilities.CreateInstance<SendMessageCompensate<TSagaData, TCompensateEvent>>(serviceProvider);
 
-            var eventToSend = new TCompensateEvent();
+            TCompensateEvent eventToSend = new TCompensateEvent();
             if (action != null)
                 await compensate(contextForAction, eventToSend);
 
             if (activity != null)
-            {
                 await activity.Compensate(
                     contextForAction,
                     eventToSend);
-            }
         }
 
         public async Task Execute(IExecutionContext context, IEvent @event)
@@ -63,22 +60,20 @@ namespace TheSaga.SagaModels.Steps
             if (typeof(TExecuteEvent) == typeof(EmptyEvent))
                 return;
 
-            var contextForAction =
+            IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>) context;
 
-            var activity =
+            SendMessageExecute<TSagaData, TExecuteEvent> activity =
                 ActivatorUtilities.CreateInstance<SendMessageExecute<TSagaData, TExecuteEvent>>(serviceProvider);
 
-            var eventToSend = new TExecuteEvent();
+            TExecuteEvent eventToSend = new TExecuteEvent();
             if (action != null)
                 await action(contextForAction, eventToSend);
 
             if (activity != null)
-            {
                 await activity.Execute(
                     contextForAction,
                     eventToSend);
-            }
         }
     }
 }

@@ -17,8 +17,8 @@ namespace TheSaga.Commands.Handlers
     internal class ExecuteActionCommandHandler
     {
         private readonly ISagaPersistance sagaPersistance;
-        private IServiceProvider serviceProvider;
         private readonly IServiceScopeFactory serviceScopeFactory;
+        private IServiceProvider serviceProvider;
 
         public ExecuteActionCommandHandler(
             ISagaPersistance sagaPersistance,
@@ -35,24 +35,24 @@ namespace TheSaga.Commands.Handlers
             if (command.Event == null)
                 command.Event = new EmptyEvent();
 
-            var saga = await sagaPersistance.Get(command.ID);
+            ISaga saga = await sagaPersistance.Get(command.ID);
 
             if (saga == null)
                 throw new SagaInstanceNotFoundException(command.Model.SagaStateType, command.ID);
 
-            var actions = command.Model.FindActionsForState(saga.State.GetExecutionState());
-            var step = FindStep(saga, command.Event.GetType(), actions);
-            var action = command.Model.FindActionForStep(step);
+            IList<ISagaAction> actions = command.Model.FindActionsForState(saga.State.GetExecutionState());
+            ISagaStep step = FindStep(saga, command.Event.GetType(), actions);
+            ISagaAction action = command.Model.FindActionForStep(step);
 
-            var async = AsyncExecution.From(step.Async);
+            AsyncExecution async = AsyncExecution.From(step.Async);
             if (step.Async)
                 async = AsyncExecution.True();
 
-            using (var scope = serviceScopeFactory.CreateScope())
+            using (IServiceScope scope = serviceScopeFactory.CreateScope())
             {
-                var stepExecutor = ActivatorUtilities.CreateInstance<ExecuteStepCommandHandler>(scope.ServiceProvider);
+                ExecuteStepCommandHandler stepExecutor = ActivatorUtilities.CreateInstance<ExecuteStepCommandHandler>(scope.ServiceProvider);
 
-                var sagaFinalState = await stepExecutor.Handle(new ExecuteStepCommand
+                ISaga sagaFinalState = await stepExecutor.Handle(new ExecuteStepCommand
                 {
                     Async = async,
                     Event = command.Event,
@@ -82,12 +82,12 @@ namespace TheSaga.Commands.Handlers
             if (saga.IsIdle())
                 throw new Exception("");
 
-            var action = actions.FirstOrDefault(a => a.FindStep(saga.State.CurrentStep) != null);
+            ISagaAction action = actions.FirstOrDefault(a => a.FindStep(saga.State.CurrentStep) != null);
 
             if (action == null)
                 throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
 
-            var step = action.FindStep(saga.State.CurrentStep);
+            ISagaStep step = action.FindStep(saga.State.CurrentStep);
 
             if (step == null)
                 throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
@@ -97,7 +97,7 @@ namespace TheSaga.Commands.Handlers
 
         private ISagaStep FindStepForEventType(ISaga saga, Type eventType, IList<ISagaAction> actions)
         {
-            var action = actions.FirstOrDefault(a => a.Event == eventType);
+            ISagaAction action = actions.FirstOrDefault(a => a.Event == eventType);
 
             if (action == null)
                 throw new SagaInvalidEventForStateException(saga.State.GetExecutionState(), eventType);
@@ -106,7 +106,7 @@ namespace TheSaga.Commands.Handlers
                 throw new SagaIsBusyHandlingStepException(saga.Data.ID, saga.State.GetExecutionState(),
                     saga.State.CurrentStep);
 
-            var step = action.Steps.FirstOrDefault();
+            ISagaStep step = action.Steps.FirstOrDefault();
 
             if (step == null)
                 throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);

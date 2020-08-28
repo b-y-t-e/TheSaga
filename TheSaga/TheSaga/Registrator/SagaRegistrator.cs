@@ -12,10 +12,9 @@ namespace TheSaga.Registrator
 {
     public class SagaRegistrator : ISagaRegistrator
     {
-        private IMessageBus internalMessageBus;
-
         private readonly List<ISagaModel> registeredModels;
         private readonly IServiceProvider serviceProvider;
+        private IMessageBus internalMessageBus;
         private bool wasInitialized;
 
         public SagaRegistrator(
@@ -48,18 +47,18 @@ namespace TheSaga.Registrator
             if (wasInitialized)
                 return;
 
-            var modelBuildersTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
+            Type[] modelBuildersTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes())
                 .Where(t => t.IsClass && t.Is(typeof(ISagaModelBuilder<>))).ToArray();
 
-            foreach (var modelBuilderType in modelBuildersTypes)
+            foreach (Type modelBuilderType in modelBuildersTypes)
             {
-                var modelBuilder = ActivatorUtilities.CreateInstance(serviceProvider, modelBuilderType);
+                object modelBuilder = ActivatorUtilities.CreateInstance(serviceProvider, modelBuilderType);
 
                 ISagaModelBuilder<ISagaData> emptyBuildModel = null;
-                var buildMethodName = nameof(emptyBuildModel.Build);
-                var buildMethodInfo =
+                string buildMethodName = nameof(emptyBuildModel.Build);
+                MethodInfo? buildMethodInfo =
                     modelBuilderType.GetMethod(buildMethodName, BindingFlags.Public | BindingFlags.Instance);
-                var model = (ISagaModel) buildMethodInfo.Invoke(modelBuilder, new object[0]);
+                ISagaModel model = (ISagaModel) buildMethodInfo.Invoke(modelBuilder, new object[0]);
 
                 Register(model);
             }
