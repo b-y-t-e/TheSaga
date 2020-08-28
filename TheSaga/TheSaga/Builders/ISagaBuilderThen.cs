@@ -1,5 +1,6 @@
 ﻿using System;
 using TheSaga.Activities;
+using TheSaga.Events;
 using TheSaga.Models;
 using TheSaga.Models.Steps;
 using TheSaga.SagaModels;
@@ -15,6 +16,20 @@ namespace TheSaga.Builders
         ISagaModel<TSagaData> Build();
 
         ISagaBuilder<TSagaData> Finish();
+
+        ISagaBuilderThen<TSagaData> Send<TEvent>()
+            where TEvent : IEvent, new();
+
+        ISagaBuilderThen<TSagaData> Send<TEvent>(SendActionDelegate<TSagaData, TEvent> action)
+            where TEvent : IEvent, new();
+
+        ISagaBuilderThen<TSagaData> Send<TEvent, TCompensateEvent>()
+            where TEvent : IEvent, new()
+            where TCompensateEvent : IEvent, new();
+
+        ISagaBuilderThen<TSagaData> Send<TEvent, TCompensateEvent>(SendActionDelegate<TSagaData, TEvent> action, SendActionDelegate<TSagaData, TCompensateEvent> compensation)
+            where TEvent : IEvent, new()
+            where TCompensateEvent : IEvent, new();
 
         ISagaBuilderThen<TSagaData> Then(ThenActionDelegate<TSagaData> action);
 

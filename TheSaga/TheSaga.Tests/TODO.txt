@@ -1,12 +1,11 @@
 ﻿TODO:
- + SagaExecutor -> ExecuteSagaCommand
+ + IServiceScopeFactory->CreateScope dla celj sagi i ascynhandlerze
+ + publishasync!
+ + metoda Send
+
  + wolanie ExecuteStepCommand w publishasync?
-
-
- + Command & handler 
  + Async message 
 
- + wznawianie sag po restarcie
  + dodanie metody BusSend
  + dodanie metody Publish
  + podpiecie sie do masstransit
@@ -16,6 +15,9 @@
  + executors -> command / handlers
 
 DONE:
+ + wznawianie sag po restarcie
+ + Command & handler 
+ + SagaExecutor -> ExecuteSagaCommand
  + skakanie w compenssatach do tylu po historii (ecexutionid?) 
  + Info i SagaState poza ISaga
  + sqlserver persistance

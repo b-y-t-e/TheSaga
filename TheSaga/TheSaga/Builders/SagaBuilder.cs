@@ -282,6 +282,64 @@ namespace TheSaga.Builders
             return new SagaBuilder<TSagaData>(s);
         }
 
+        public ISagaBuilderThen<TSagaData> Send<TEvent, TCompensateEvent>()
+            where TEvent : IEvent, new()
+            where TCompensateEvent : IEvent, new()
+        {
+            s.Model.FindActionForStateAndEvent(s.CurrentState, s.CurrentEvent).Steps.Add(
+                new SagaStepForSendActivity<TSagaData, TEvent, TCompensateEvent>(
+                    null,
+                    null,
+                    s.UniqueNameGenerator.Generate(s.CurrentState, nameof(Send), typeof(TEvent).Name),
+                    s.ServiceProvider,
+                    false));
+
+            return new SagaBuilder<TSagaData>(s);
+        }
+
+        public ISagaBuilderThen<TSagaData> Send<TEvent, TCompensateEvent>(SendActionDelegate<TSagaData, TEvent> action, SendActionDelegate<TSagaData, TCompensateEvent> compensation)
+            where TEvent : IEvent, new()
+            where TCompensateEvent : IEvent, new()
+        {
+            s.Model.FindActionForStateAndEvent(s.CurrentState, s.CurrentEvent).Steps.Add(
+                new SagaStepForSendActivity<TSagaData, TEvent, TCompensateEvent>(
+                    action,
+                    compensation,
+                    s.UniqueNameGenerator.Generate(s.CurrentState, nameof(Send), typeof(TEvent).Name),
+                    s.ServiceProvider,
+                    false));
+
+            return new SagaBuilder<TSagaData>(s);
+        }
+
+        public ISagaBuilderThen<TSagaData> Send<TEvent>()
+            where TEvent : IEvent, new()
+        {
+            s.Model.FindActionForStateAndEvent(s.CurrentState, s.CurrentEvent).Steps.Add(
+                new SagaStepForSendActivity<TSagaData, TEvent, EmptyEvent>(
+                    null,
+                    null,
+                    s.UniqueNameGenerator.Generate(s.CurrentState, nameof(Send), typeof(TEvent).Name),
+                    s.ServiceProvider,
+                    false));
+
+            return new SagaBuilder<TSagaData>(s);
+        }
+
+        public ISagaBuilderThen<TSagaData> Send<TEvent>(SendActionDelegate<TSagaData, TEvent> action)
+            where TEvent : IEvent, new()
+        {
+            s.Model.FindActionForStateAndEvent(s.CurrentState, s.CurrentEvent).Steps.Add(
+                new SagaStepForSendActivity<TSagaData, TEvent, EmptyEvent>(
+                    action,
+                    null,
+                    s.UniqueNameGenerator.Generate(s.CurrentState, nameof(Send), typeof(TEvent).Name),
+                    s.ServiceProvider,
+                    false));
+
+            return new SagaBuilder<TSagaData>(s);
+        }
+
         public ISagaBuilderThen<TSagaData> Then(String stepName, ThenActionDelegate<TSagaData> action)
         {
             s.UniqueNameGenerator.
