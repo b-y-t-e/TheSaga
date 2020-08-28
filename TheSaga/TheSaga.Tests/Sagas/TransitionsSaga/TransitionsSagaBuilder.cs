@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using TheSaga.Builders;
 using TheSaga.SagaModels;
 using TheSaga.Tests.Sagas.TransitionsSaga.Events;
@@ -26,7 +27,7 @@ namespace TheSaga.Tests.Sagas.TransitionsSaga
 
             builder.
                 During<Init>().
-                When<UpdateEvent>().
+                When<InvalidUpdateEvent>().
                 TransitionTo<SecondState>().
                 Then(ctx => { throw new Exception(); }).
                 Finish();

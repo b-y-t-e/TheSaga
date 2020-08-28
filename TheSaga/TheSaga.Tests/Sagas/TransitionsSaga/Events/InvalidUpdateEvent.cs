@@ -3,7 +3,7 @@ using TheSaga.Events;
 
 namespace TheSaga.Tests.Sagas.TransitionsSaga.Events
 {
-    public class UpdateEvent : IEvent
+    public class InvalidUpdateEvent : IEvent
     {
         public Guid ID { get; set; }
     }

@@ -57,9 +57,6 @@ namespace TheSaga.Coordinators
         {
             IList<Guid> ids = await sagaPersistance.GetUnfinished();
 
-            ExecuteSagaCommandHandler sagaExecutionHandler = serviceProvider.
-                GetRequiredService<ExecuteSagaCommandHandler>();
-
             List<string> invalidModels = new List<string>();
             foreach (Guid id in ids)
             {
@@ -70,21 +67,21 @@ namespace TheSaga.Coordinators
                     invalidModels.Add(saga.Info.ModelName);
             }
 
-            if(invalidModels.Count > 0)
-                throw new Exception($"Saga models {String.Join(", ",invalidModels.Distinct().ToArray())} not found");
+            if (invalidModels.Count > 0)
+                throw new Exception($"Saga models {String.Join(", ", invalidModels.Distinct().ToArray())} not found");
 
             foreach (Guid id in ids)
             {
-                ISaga saga = await sagaPersistance.Get(id);
-                ISagaModel model = sagaRegistrator.FindModelByName(saga.Info.ModelName);
+                ISaga saga = await sagaPersistance.
+                    Get(id);
 
-                await sagaExecutionHandler.Handle(new ExecuteSagaCommand()
-                {
-                    Async = AsyncExecution.True(),
-                    Event = new EmptyEvent(),
-                    ID = SagaID.From(id),
-                    Model = model
-                });
+                ISagaModel model = sagaRegistrator.
+                    FindModelByName(saga.Info.ModelName);
+
+                await ExecuteSaga(
+                    new EmptyEvent(),
+                    model,
+                    saga);
             }
         }
 
@@ -105,30 +102,35 @@ namespace TheSaga.Coordinators
                     newSaga ??
                     await sagaPersistance.Get(sagaId);
 
-                await internalMessageBus.Publish(
-                    new ExecutionStartMessage(saga));
-
-                await sagaPersistance.Set(saga);
-
-                ExecuteSagaCommandHandler handler = serviceProvider.GetRequiredService<ExecuteSagaCommandHandler>();
-
-                return await handler.Handle(new ExecuteSagaCommand()
-                {
-                    Async = AsyncExecution.False(),
-                    Event = @event,
-                    ID = SagaID.From(saga.Data.ID),
-                    Model = model
-                });
+                return await ExecuteSaga(@event, model, saga);
             }
             catch
             {
                 if (newSaga != null)
-                {
                     await sagaPersistance.Remove(newSaga.Data.ID);
-                }
 
                 throw;
             }
+        }
+
+        private async Task<ISaga> ExecuteSaga(IEvent @event, ISagaModel model, ISaga saga)
+        {
+            await internalMessageBus.
+                Publish(new ExecutionStartMessage(saga));
+
+            await sagaPersistance.
+                Set(saga);
+
+            ExecuteSagaCommandHandler handler = serviceProvider.
+                GetRequiredService<ExecuteSagaCommandHandler>();
+
+            return await handler.Handle(new ExecuteSagaCommand()
+            {
+                Async = AsyncExecution.False(),
+                Event = @event,
+                ID = SagaID.From(saga.Data.ID),
+                Model = model
+            });
         }
 
         public async Task WaitForState<TState>(Guid id, SagaWaitOptions waitOptions = null)
@@ -194,7 +196,7 @@ namespace TheSaga.Coordinators
             if (id == SagaID.Empty())
                 id = SagaID.New();
 
-            ISagaData data = (ISagaData) Activator.CreateInstance(model.SagaStateType);
+            ISagaData data = (ISagaData)Activator.CreateInstance(model.SagaStateType);
             data.ID = id;
 
             ISaga saga = new Saga()

@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using TheSaga.Events;
+using TheSaga.Exceptions;
 using TheSaga.Messages;
 using TheSaga.Messages.MessageBus;
 using TheSaga.Models;
@@ -34,15 +35,16 @@ namespace TheSaga.Commands.Handlers
             this.internalMessageBus = internalMessageBus;
         }
 
-        public async Task Handle(ExecuteStepCommand command)
+        public async Task<ISaga> Handle(ExecuteStepCommand command)
         {
             if (command.Async)
             {
                 ExecuteStepAsync(command);
+                return null;
             }
             else
             {
-                await ExecuteStepSync(command);
+                return await ExecuteStepSync(command);
             }
         }
 
@@ -71,7 +73,7 @@ namespace TheSaga.Commands.Handlers
             Task.Run(() => ExecuteStepSync(command));
         }
 
-        private async Task ExecuteStepSync(ExecuteStepCommand command)
+        private async Task<ISaga> ExecuteStepSync(ExecuteStepCommand command)
         {
             ISaga saga = command.Saga;
             ISagaStep sagaStep = command.SagaStep;
@@ -117,6 +119,10 @@ namespace TheSaga.Commands.Handlers
                 executionData.
                     Succeeded(dateTimeProvider);
             }
+            catch (SagaStopException)
+            {
+                return null;
+            }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
@@ -158,6 +164,8 @@ namespace TheSaga.Commands.Handlers
             await SendInternalMessages(saga, model, currentSagaState, hasSagaCompleted, async);
 
             ThrowErrorIfSagaCompletedForSyncCall(saga, async);
+
+            return saga;
         }
 
         private async Task SendInternalMessages(

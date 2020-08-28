@@ -70,21 +70,15 @@ namespace TheSaga
             return services;
         }
 
-       /* public static IServiceProvider RegisterSagaModelDefinitions(
+        public static IServiceProvider ResumeSagas(
             this IServiceProvider provider)
         {
-            var modelDefinitions = AppDomain.CurrentDomain.GetAssemblies().
-                SelectMany(a => a.GetTypes()).
-                Where(t => t.Is(typeof(ISagaModelDefintion<>))).
-                ToArray();
+            ISagaCoordinator coordinator = provider.
+                GetRequiredService<ISagaCoordinator>();
 
-            var registrator = provider.GetRequiredService<ISagaRegistrator>();
-            foreach (var modelDefinition in modelDefinitions)
-            {
-                registrator.Register(
-             }
+            coordinator.ResumeAll();
 
             return provider;
-        }*/
+        }
     }
 }

@@ -49,7 +49,7 @@ namespace TheSaga.Commands.Handlers
             ExecuteStepCommandHandler stepExecutor = ActivatorUtilities.
                CreateInstance<ExecuteStepCommandHandler>(serviceProvider);
 
-            await stepExecutor.
+            ISaga sagaFinalState = await stepExecutor.
                 Handle(new ExecuteStepCommand()
                 {
                     Async = async,
@@ -62,8 +62,8 @@ namespace TheSaga.Commands.Handlers
 
             return new ExecuteActionResult()
             {
-                Saga = saga,
-                IsSyncProcessingComplete = async || saga.IsIdle()
+                Saga = sagaFinalState ?? saga,
+                IsSyncProcessingComplete = sagaFinalState == null || async || saga.IsIdle()
             };
         }
 

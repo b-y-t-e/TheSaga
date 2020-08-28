@@ -1,4 +1,7 @@
-﻿namespace TheSaga.Models.Context
+﻿using System.Threading.Tasks;
+using TheSaga.Exceptions;
+
+namespace TheSaga.Models.Context
 {
     public class ExecutionContext<TSagaData> : IExecutionContext<TSagaData>
         where TSagaData : ISagaData
@@ -15,5 +18,10 @@
         public SagaInfo Info { get; set; }
 
         public SagaState State { get; set; }
+
+        Task IExecutionContext<TSagaData>.Stop()
+        {
+            throw new SagaStopException();
+        }
     }
 }
