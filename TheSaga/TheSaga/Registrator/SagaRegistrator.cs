@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using TheSaga.Execution;
-using TheSaga.Execution.AsyncHandlers;
-using TheSaga.InternalMessages.MessageBus;
+using TheSaga.Messages.MessageBus;
 using TheSaga.Models;
 using TheSaga.Persistance;
 using TheSaga.Providers;
-using TheSaga.SagaStates;
+using TheSaga.SagaModels;
 using TheSaga.Utils;
 
 namespace TheSaga.Registrator
@@ -17,7 +16,7 @@ namespace TheSaga.Registrator
     public class SagaRegistrator : ISagaRegistrator
     {
         private IInternalMessageBus internalMessageBus;
-        private Dictionary<Type, ISagaExecutor> registeredExecutors;
+        //private Dictionary<Type, ISagaExecutor> registeredExecutors;
         private List<ISagaModel> registeredModels;
         private IServiceProvider serviceProvider;
         private bool wasInitialized;
@@ -26,7 +25,7 @@ namespace TheSaga.Registrator
             IInternalMessageBus internalMessageBus,
             IServiceProvider serviceProvider)
         {
-            this.registeredExecutors = new Dictionary<Type, ISagaExecutor>();
+            //this.registeredExecutors = new Dictionary<Type, ISagaExecutor>();
             this.registeredModels = new List<ISagaModel>();
             this.internalMessageBus = internalMessageBus;
             this.serviceProvider = serviceProvider;
@@ -47,27 +46,23 @@ namespace TheSaga.Registrator
             registeredModels.
                 Add(model);
 
-            Type sagaExecuterType = typeof(SagaExecutor<>).
-                ConstructGenericType(sagaDataType);
+            //Type sagaExecuterType = typeof(SagaExecutor<>).
+            //    ConstructGenericType(sagaDataType);
 
-            Type asyncStepCompletedObservableType = typeof(SagaAsyncStepCompletedObservable<>).
-                ConstructGenericType(sagaDataType);
+            //Type asyncStepCompletedObservableType = typeof(SagaAsyncStepCompletedObservable).
+              //  ConstructGenericType(sagaDataType);
 
-            ISagaExecutor sagaExecutor = (ISagaExecutor)ActivatorUtilities.
-               CreateInstance(serviceProvider, sagaExecuterType, model);
+            //ISagaExecutor sagaExecutor = (ISagaExecutor)ActivatorUtilities.
+            //   CreateInstance(serviceProvider, sagaExecuterType, model);
 
-            IObservable asyncStepCompletedObservable = (IObservable)ActivatorUtilities.
-               CreateInstance(serviceProvider, asyncStepCompletedObservableType, sagaExecutor);
-
-            registeredExecutors[model.GetType()] = sagaExecutor;
-            asyncStepCompletedObservable.Subscribe();
         }
-        ISagaExecutor ISagaRegistrator.FindExecutorForStateType(Type stateType)
-        {
-            ISagaExecutor sagaExecutor = null;
-            registeredExecutors.TryGetValue(stateType, out sagaExecutor);
-            return sagaExecutor;
-        }
+
+        /*   ISagaExecutor ISagaRegistrator.FindExecutorForStateType(Type stateType)
+           {
+               ISagaExecutor sagaExecutor = null;
+               registeredExecutors.TryGetValue(stateType, out sagaExecutor);
+               return sagaExecutor;
+           }*/
 
         ISagaModel ISagaRegistrator.FindModelForEventType(Type eventType)
         {

@@ -1,7 +1,7 @@
 ﻿using System;
 using TheSaga.Execution;
 using TheSaga.Models;
-using TheSaga.SagaStates;
+using TheSaga.SagaModels;
 
 namespace TheSaga.Registrator
 {
@@ -14,6 +14,6 @@ namespace TheSaga.Registrator
 
         // void Register(ISagaModel model, Type sagaData);
 
-        internal ISagaExecutor FindExecutorForStateType(Type stateType);
+        //internal ISagaExecutor FindExecutorForStateType(Type stateType);
     }
 }

@@ -1,22 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Events;
 using TheSaga.Exceptions;
-using TheSaga.Execution.Actions;
 using TheSaga.Models;
+using TheSaga.Models.Actions;
+using TheSaga.Models.Steps;
 using TheSaga.Persistance;
-using TheSaga.SagaStates;
-using TheSaga.SagaStates.Actions;
-using TheSaga.SagaStates.Steps;
 using TheSaga.Utils;
+using TheSaga.ValueObjects;
 
-namespace TheSaga.Execution.Commands
+namespace TheSaga.Execution.Commands.Handlers
 {
-    internal class ExecuteActionCommandHandler<TSagaData>
-        where TSagaData : ISagaData
+    internal class ExecuteActionCommandHandler
     {
         private ISagaPersistance sagaPersistance;
         private IServiceProvider serviceProvider;
@@ -29,7 +27,7 @@ namespace TheSaga.Execution.Commands
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task<ExecuteActionResult> Handle(ExecuteActionCommand<TSagaData> command)
+        public async Task<ExecuteActionResult> Handle(ExecuteActionCommand command)
         {
             if (command.Event == null)
                 command.Event = new EmptyEvent();
@@ -44,21 +42,22 @@ namespace TheSaga.Execution.Commands
             ISagaStep step = FindStep(saga, command.Event.GetType(), actions);
             ISagaAction action = command.Model.FindActionForStep(step);
 
-            IsExecutionAsync async = IsExecutionAsync.From(step.Async);
+            AsyncExecution async = AsyncExecution.From(step.Async);
             if (step.Async)
-                async = IsExecutionAsync.True();
+                async = AsyncExecution.True();
 
-            ExecuteStepCommandHandler<TSagaData> stepExecutor = ActivatorUtilities.
-               CreateInstance<ExecuteStepCommandHandler<TSagaData>>(serviceProvider);
+            ExecuteStepCommandHandler stepExecutor = ActivatorUtilities.
+               CreateInstance<ExecuteStepCommandHandler>(serviceProvider);
 
             await stepExecutor.
-                Handle(new ExecuteStepCommand<TSagaData>()
+                Handle(new ExecuteStepCommand()
                 {
-                    async = async,
-                    @event = command.Event,
-                    saga = saga,
-                    sagaStep = step,
-                    sagaAction = action
+                    Async = async,
+                    Event = command.Event,
+                    Saga = saga,
+                    SagaStep = step,
+                    SagaAction = action,
+                    Model = command.Model
                 });
 
             return new ExecuteActionResult()
@@ -118,11 +117,5 @@ namespace TheSaga.Execution.Commands
 
             return step;
         }
-    }
-    internal class ExecuteActionResult
-    {
-        public bool IsSyncProcessingComplete;
-
-        public ISaga Saga;
     }
 }

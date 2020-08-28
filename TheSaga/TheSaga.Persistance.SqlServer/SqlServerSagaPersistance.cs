@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TheSaga.Models;
 using TheSaga.Persistance.SqlServer.Connection;
 using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Persistance.SqlServer.Utils;
 using TheSaga.Providers;
-using TheSaga.SagaStates;
 
 namespace TheSaga.Persistance.SqlServer
 {

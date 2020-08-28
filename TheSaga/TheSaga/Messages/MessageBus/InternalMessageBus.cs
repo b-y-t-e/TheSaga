@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using TheSaga.Utils;
 
-namespace TheSaga.InternalMessages.MessageBus
+namespace TheSaga.Messages.MessageBus
 {
     public class InternalMessageBus : IInternalMessageBus
     {

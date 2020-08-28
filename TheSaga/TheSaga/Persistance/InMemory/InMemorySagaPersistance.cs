@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TheSaga.SagaStates;
+using TheSaga.Models;
 
 namespace TheSaga.Persistance.InMemory
 {

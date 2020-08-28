@@ -10,7 +10,6 @@ using TheSaga.Persistance;
 using TheSaga.Persistance.SqlServer;
 using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Registrator;
-using TheSaga.SagaStates;
 using TheSaga.States;
 using TheSaga.Tests.Sagas.AsyncAndValid;
 using TheSaga.Tests.Sagas.AsyncAndValid.Events;

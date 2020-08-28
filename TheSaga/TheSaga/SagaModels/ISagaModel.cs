@@ -1,0 +1,28 @@
+﻿using System;
+using System.Collections.Generic;
+using TheSaga.Models;
+using TheSaga.Models.Actions;
+using TheSaga.Models.Steps;
+
+namespace TheSaga.SagaModels
+{
+    public interface ISagaModel<TSagaData> : ISagaModel where TSagaData : ISagaData
+    {
+        SagaActions<TSagaData> Actions { get; }
+    }
+
+    public interface ISagaModel
+    {
+        Type SagaStateType { get; }
+
+        bool ContainsEvent(Type type);
+
+        ISagaAction FindActionForStep(ISagaStep sagaStep);
+
+        ISagaAction FindActionForStateAndEvent(string state, Type eventType);
+
+        IList<ISagaAction> FindActionsForState(string state);
+
+        bool IsStartEvent(Type type);
+    }
+}

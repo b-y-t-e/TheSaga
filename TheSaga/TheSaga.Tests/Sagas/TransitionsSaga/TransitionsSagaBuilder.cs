@@ -1,6 +1,6 @@
 ﻿using System;
 using TheSaga.Builders;
-using TheSaga.Models;
+using TheSaga.SagaModels;
 using TheSaga.Tests.Sagas.TransitionsSaga.Events;
 using TheSaga.Tests.Sagas.TransitionsSaga.States;
 

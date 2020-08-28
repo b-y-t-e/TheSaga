@@ -2,22 +2,25 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using TheSaga.Coordinators.AsyncHandlers;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Execution;
-using TheSaga.Execution.Actions;
-using TheSaga.Execution.AsyncHandlers;
-using TheSaga.InternalMessages;
-using TheSaga.InternalMessages.MessageBus;
-using TheSaga.Models;
 using TheSaga.Options;
 using TheSaga.Persistance;
 using TheSaga.Providers;
 using TheSaga.Registrator;
-using TheSaga.SagaStates;
 using TheSaga.States;
 using TheSaga.Utils;
+using Microsoft.Extensions.DependencyInjection;
+using TheSaga.Coordinators.Observables;
+using TheSaga.Execution.Commands;
+using TheSaga.Execution.Commands.Handlers;
+using TheSaga.Locking;
+using TheSaga.Messages;
+using TheSaga.Messages.MessageBus;
+using TheSaga.Models;
+using TheSaga.SagaModels;
+using TheSaga.ValueObjects;
 
 namespace TheSaga.Coordinators
 {
@@ -38,13 +41,16 @@ namespace TheSaga.Coordinators
             this.sagaLocking = sagaLocking;
             this.serviceProvider = serviceProvider;
 
-            new SagaLockingObservable(serviceProvider).
+            new LockingObservable(serviceProvider).
                 Subscribe();
 
-            new SagaExecutionStartObservable(serviceProvider).
+            new ExecutionStartObservable(serviceProvider).
                 Subscribe();
 
-            new SagaExecutionEndObservable(serviceProvider).
+            new ExecutionEndObservable(serviceProvider).
+                Subscribe();
+
+            new AsyncStepCompletedObservable(serviceProvider).
                 Subscribe();
         }
 
@@ -66,16 +72,25 @@ namespace TheSaga.Coordinators
                     await sagaPersistance.Get(sagaId);
 
                 await internalMessageBus.Publish(
-                    new SagaExecutionStartMessage(saga));
+                    new ExecutionStartMessage(saga));
 
                 await sagaPersistance.
                     Set(saga);
 
-                ISagaExecutor sagaExecutor = sagaRegistrator.
-                    FindExecutorForStateType(model.GetType());
+                ExecuteSagaCommandHandler handler = serviceProvider.
+                    GetRequiredService<ExecuteSagaCommandHandler>();
 
-                return await sagaExecutor.
-                    Handle(SagaID.From(saga.Data.ID), @event, IsExecutionAsync.False());
+                //ISagaExecutor sagaExecutor = sagaRegistrator.
+                //FindExecutorForStateType(model.GetType());
+
+                return await handler.
+                    Handle(new ExecuteSagaCommand()
+                    {
+                        Async = AsyncExecution.False(),
+                        Event = @event,
+                        ID = SagaID.From(saga.Data.ID),
+                        Model = model
+                    });
             }
             catch
             {
@@ -88,7 +103,7 @@ namespace TheSaga.Coordinators
                 throw;
             }
         }
-        
+
         public async Task WaitForState<TState>(Guid id, SagaWaitOptions waitOptions = null)
             where TState : IState, new()
         {
@@ -99,7 +114,7 @@ namespace TheSaga.Coordinators
             {
                 bool stateChanged = false;
 
-                internalMessageBus.Subscribe<SagaStateChangedMessage>(this, (mesage) =>
+                internalMessageBus.Subscribe<StateChangedMessage>(this, (mesage) =>
                 {
                     if (mesage.SagaID == id &&
                         mesage.CurrentState == new TState().GetStateName())
@@ -128,7 +143,7 @@ namespace TheSaga.Coordinators
             }
             finally
             {
-                internalMessageBus.Unsubscribe<SagaStateChangedMessage>(this);
+                internalMessageBus.Unsubscribe<StateChangedMessage>(this);
             }
         }
 

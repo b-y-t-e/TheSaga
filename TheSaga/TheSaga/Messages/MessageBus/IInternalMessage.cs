@@ -1,4 +1,4 @@
-﻿namespace TheSaga.InternalMessages
+﻿namespace TheSaga.Messages.MessageBus
 {
     public interface IInternalMessage
     {

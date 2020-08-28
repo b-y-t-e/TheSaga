@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.Events;
 using TheSaga.Models;
-using TheSaga.SagaStates;
-using TheSaga.SagaStates.Actions;
-using TheSaga.SagaStates.Steps;
+using TheSaga.Models.Actions;
+using TheSaga.Models.Steps;
+using TheSaga.SagaModels;
 using TheSaga.States;
 using TheSaga.Utils;
 
@@ -470,24 +470,6 @@ namespace TheSaga.Builders
                 }
             });
             return new SagaBuilder<TSagaData, TEvent>(s);
-        }
-    }
-    internal class SagaBuilderState<TSagaData>
-        where TSagaData : ISagaData
-    {
-        public Type CurrentEvent;
-        public String CurrentState;
-        public SagaModel<TSagaData> Model;
-        public IServiceProvider ServiceProvider;
-        public UniqueNameGenerator UniqueNameGenerator;
-
-        public SagaBuilderState(Type currentEvent, string currentState, SagaModel<TSagaData> model, IServiceProvider serviceProvider, UniqueNameGenerator uniqueNameGenerator)
-        {
-            this.CurrentEvent = currentEvent;
-            this.CurrentState = currentState;
-            this.Model = model;
-            this.ServiceProvider = serviceProvider;
-            this.UniqueNameGenerator = uniqueNameGenerator;
         }
     }
 }

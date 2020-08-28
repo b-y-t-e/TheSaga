@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TheSaga.Builders;
-using TheSaga.Models;
+using TheSaga.SagaModels;
 using TheSaga.Tests.Sagas.AsyncLockingSaga.EventHandlers;
 using TheSaga.Tests.Sagas.AsyncLockingSaga.Events;
 using TheSaga.Tests.Sagas.AsyncLockingSaga.States;

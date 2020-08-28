@@ -1,4 +1,4 @@
-﻿using TheSaga.SagaStates;
+﻿using TheSaga.Models;
 
 namespace TheSaga.Execution.Context
 {

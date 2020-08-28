@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace TheSaga.Utils
+namespace TheSaga.Locking
 {
     public interface ISagaLocking
     {

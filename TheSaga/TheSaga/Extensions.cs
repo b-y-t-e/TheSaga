@@ -6,14 +6,16 @@ using TheSaga.Builders;
 using TheSaga.Config;
 using TheSaga.Coordinators;
 using TheSaga.Execution;
-using TheSaga.Execution.Actions;
 using TheSaga.Execution.Commands;
-using TheSaga.InternalMessages.MessageBus;
-using TheSaga.Models;
+using TheSaga.Execution.Commands.Handlers;
+using TheSaga.Locking;
+using TheSaga.Locking.InMemory;
+using TheSaga.Messages.MessageBus;
 using TheSaga.Persistance;
 using TheSaga.Persistance.InMemory;
 using TheSaga.Providers;
 using TheSaga.Registrator;
+using TheSaga.SagaModels;
 using TheSaga.Utils;
 
 [assembly: InternalsVisibleTo("TheSaga.Tests")]
@@ -34,9 +36,9 @@ namespace TheSaga
             services.AddSingleton<ISagaLocking, InMemorySagaLocking>();
 
             services.AddSingleton(typeof(ISagaBuilder<>), typeof(SagaBuilder<>));
-            services.AddTransient(typeof(SagaExecutor<>), typeof(SagaExecutor<>));
-            services.AddTransient(typeof(ExecuteActionCommandHandler<>), typeof(ExecuteActionCommandHandler<>));
-            services.AddTransient(typeof(ExecuteStepCommandHandler<>), typeof(ExecuteStepCommandHandler<>));
+            services.AddTransient(typeof(ExecuteSagaCommandHandler), typeof(ExecuteSagaCommandHandler));
+            services.AddTransient(typeof(ExecuteActionCommandHandler), typeof(ExecuteActionCommandHandler));
+            services.AddTransient(typeof(ExecuteStepCommandHandler), typeof(ExecuteStepCommandHandler));
 
             services.AddSagaModelDefinitions();
 

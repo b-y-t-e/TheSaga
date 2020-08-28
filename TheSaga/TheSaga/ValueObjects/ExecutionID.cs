@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheSaga.Execution.Actions
+namespace TheSaga.ValueObjects
 {
     public readonly struct ExecutionID : IEquatable<ExecutionID>
     {

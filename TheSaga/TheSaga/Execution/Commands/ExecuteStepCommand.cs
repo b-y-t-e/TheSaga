@@ -1,20 +1,20 @@
 ﻿using System;
 using TheSaga.Events;
-using TheSaga.Execution.Actions;
 using TheSaga.Models;
-using TheSaga.SagaStates;
-using TheSaga.SagaStates.Actions;
-using TheSaga.SagaStates.Steps;
+using TheSaga.Models.Actions;
+using TheSaga.Models.Steps;
+using TheSaga.SagaModels;
+using TheSaga.ValueObjects;
 
 namespace TheSaga.Execution.Commands
 {
-    internal class ExecuteStepCommand<TSagaData> 
-        where TSagaData : ISagaData
+    internal class ExecuteStepCommand
     {
-        public ISaga saga;
-        public ISagaAction sagaAction;
-        public ISagaStep sagaStep;
-        public IEvent @event;
-        public IsExecutionAsync @async;
+        public ISaga Saga;
+        public ISagaAction SagaAction;
+        public ISagaStep SagaStep;
+        public IEvent Event;
+        public AsyncExecution Async;
+        public ISagaModel Model;       
     }
 }

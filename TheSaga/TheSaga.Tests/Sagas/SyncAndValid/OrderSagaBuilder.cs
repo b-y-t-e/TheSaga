@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TheSaga.Builders;
-using TheSaga.Models;
+using TheSaga.SagaModels;
 using TheSaga.Tests.Sagas.SyncAndValid.Activities;
 using TheSaga.Tests.Sagas.SyncAndValid.EventHandlers;
 using TheSaga.Tests.Sagas.SyncAndValid.Events;

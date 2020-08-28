@@ -1,5 +1,4 @@
 ﻿TODO:
- + skakanie w compenssatach do tylu po historii (ecexutionid?) 
  + SagaExecutor -> ExecuteSagaCommand
  + wolanie ExecuteStepCommand w publishasync?
 
@@ -17,6 +16,7 @@
  + executors -> command / handlers
 
 DONE:
+ + skakanie w compenssatach do tylu po historii (ecexutionid?) 
  + Info i SagaState poza ISaga
  + sqlserver persistance
  + sprawdzenie lockow

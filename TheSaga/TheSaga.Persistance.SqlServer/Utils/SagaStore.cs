@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using TheSaga.Models;
 using TheSaga.Persistance.SqlServer.Connection;
 using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Providers;
-using TheSaga.SagaStates;
 
 namespace TheSaga.Persistance.SqlServer.Utils
 {

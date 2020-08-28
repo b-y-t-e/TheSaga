@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace TheSaga.Utils
+namespace TheSaga.Locking.InMemory
 {
     public class InMemorySagaLocking : ISagaLocking
     {

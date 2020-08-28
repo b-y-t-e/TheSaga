@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using TheSaga.Execution.Context;
-using TheSaga.SagaStates;
+using TheSaga.Models;
 
 namespace TheSaga.Events
 {
