@@ -111,7 +111,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             dbobject[stateNameColumn] = sagaDataType.Name;
             dbobject[createdColumn] = saga.Info.Created;
             dbobject[modifiedColumn] = saga.Info.Modified;
-            dbobject[stateColumn] = saga.State.GetExecutionState();
+            dbobject[stateColumn] = saga.State.CurrentState;
             dbobject[stepColumn] = saga.State.CurrentStep;
             dbobject[compensatingColumn] = saga.State.IsCompensating;
             dbobject[jsonColumn] = JsonConvert.SerializeObject(saga, _serializerSettings);
