@@ -39,7 +39,7 @@ namespace TheSaga.Builders
 
             var action = s.Model.Actions.FindAction(s.CurrentState, s.CurrentEvent);
             action.Steps.Clear();
-            action.Steps.Add(new SagaStepForEventHandler<TSagaData, TEventHandler>(
+            action.Steps.Add(new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
                         s.UniqueNameGenerator.Generate(s.CurrentState, nameof(HandleBy), s.CurrentEvent.GetType().Name, typeof(TEventHandler).Name),
                         s.ServiceProvider,
                         false));

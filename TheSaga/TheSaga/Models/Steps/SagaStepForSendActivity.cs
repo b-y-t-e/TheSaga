@@ -52,11 +52,9 @@ namespace TheSaga.Models.Steps
 
             if (activity != null)
             {
-                var compensateMethod = activity.GetType().
-                    GetMethod("Compensate", BindingFlags.Public | BindingFlags.Instance);
-
-                if (compensateMethod != null)
-                    compensateMethod.Invoke(activity, new object[] { contextForAction, eventToSend });
+                await activity.Compensate(
+                    contextForAction,
+                    eventToSend);
             }
         }
 
@@ -77,11 +75,9 @@ namespace TheSaga.Models.Steps
 
             if (activity != null)
             {
-                var executeMethod = activity.GetType().
-                    GetMethod("Execute", BindingFlags.Public | BindingFlags.Instance);
-
-                if (executeMethod != null)
-                    executeMethod.Invoke(activity, new object[] { contextForAction, eventToSend });
+                await activity.Execute(
+                    contextForAction,
+                    eventToSend);
             }
         }
     }
