@@ -6,12 +6,17 @@ using TheSaga.Tests.Sagas.TransitionsSaga.States;
 
 namespace TheSaga.Tests.Sagas.TransitionsSaga
 {
-    public class TransitionsSagaDefinition : ISagaModelDefintion<TransitionsSagaData>
+    public class TransitionsSagaBuilder : ISagaModelBuilder<TransitionsSagaData>
     {
-        public ISagaModel<TransitionsSagaData> GetModel(IServiceProvider serviceProvider)
-        {
-            ISagaBuilder<TransitionsSagaData> builder = new SagaBuilder<TransitionsSagaData>(serviceProvider);
+        ISagaBuilder<TransitionsSagaData> builder;
 
+        public TransitionsSagaBuilder(ISagaBuilder<TransitionsSagaData> builder)
+        {
+            this.builder = builder;
+        }
+
+        public ISagaModel<TransitionsSagaData> Build()
+        {
             builder.
                 Start<CreateEvent>().
                 TransitionTo<Init>();

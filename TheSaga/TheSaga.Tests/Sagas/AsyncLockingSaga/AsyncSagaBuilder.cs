@@ -8,12 +8,17 @@ using TheSaga.Tests.Sagas.AsyncLockingSaga.States;
 
 namespace TheSaga.Tests.Sagas.AsyncLockingSaga
 {
-    public class AsyncSagaDefinition : ISagaModelDefintion<AsyncData>
+    public class AsyncSagaBuilder : ISagaModelBuilder<AsyncData>
     {
-        public ISagaModel<AsyncData> GetModel(IServiceProvider serviceProvider)
-        {
-            ISagaBuilder<AsyncData> builder = new SagaBuilder<AsyncData>(serviceProvider);
+        ISagaBuilder<AsyncData> builder;
 
+        public AsyncSagaBuilder(ISagaBuilder<AsyncData> builder)
+        {
+            this.builder = builder;
+        }
+
+        public ISagaModel<AsyncData> Build()
+        {
             builder.
                 Start<CreatedEvent, CreatedEventHandler>().
                 ThenAsync(ctx => Task.Delay(TimeSpan.FromSeconds(1))).

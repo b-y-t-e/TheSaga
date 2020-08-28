@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using TheSaga.Execution.Actions;
 using TheSaga.InternalMessages;
 using TheSaga.InternalMessages.MessageBus;
@@ -7,13 +8,13 @@ using TheSaga.SagaStates;
 
 namespace TheSaga.Execution.AsyncHandlers
 {
-    internal class SagaAsyncStepCompletedHandler<TSagaData>
+    internal class SagaAsyncStepCompletedObservable<TSagaData> : IObservable
         where TSagaData : ISagaData
     {
         private IInternalMessageBus internalMessageBus;
         private ISagaExecutor sagaExecutor;
 
-        public SagaAsyncStepCompletedHandler(
+        public SagaAsyncStepCompletedObservable(
             ISagaExecutor sagaExecutor, 
             IInternalMessageBus internalMessageBus)
         {

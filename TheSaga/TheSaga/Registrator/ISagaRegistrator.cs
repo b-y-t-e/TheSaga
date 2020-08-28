@@ -12,6 +12,8 @@ namespace TheSaga.Registrator
         void Register<TSagaData>(ISagaModel<TSagaData> model)
             where TSagaData : ISagaData;
 
+        // void Register(ISagaModel model, Type sagaData);
+
         internal ISagaExecutor FindExecutorForStateType(Type stateType);
     }
 }

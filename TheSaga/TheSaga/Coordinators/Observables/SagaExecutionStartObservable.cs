@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using TheSaga.Exceptions;
 using TheSaga.Execution.Actions;
+using TheSaga.Execution.AsyncHandlers;
 using TheSaga.InternalMessages;
 using TheSaga.InternalMessages.MessageBus;
 using TheSaga.SagaStates;
@@ -10,11 +11,12 @@ using TheSaga.Utils;
 
 namespace TheSaga.Coordinators.AsyncHandlers
 {
-    internal class SagaExecutionStartHandler
+    internal class SagaExecutionStartObservable : IObservable
+
     {
         IServiceProvider serviceProvider;
 
-        public SagaExecutionStartHandler(IServiceProvider serviceProvider)
+        public SagaExecutionStartObservable(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }

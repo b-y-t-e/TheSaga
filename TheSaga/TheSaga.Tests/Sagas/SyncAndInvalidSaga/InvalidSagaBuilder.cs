@@ -9,12 +9,17 @@ using TheSaga.Tests.Sagas.SyncAndInvalidSaga.States;
 
 namespace TheSaga.Tests.Sagas.SyncAndInvalidSaga
 {
-    public class InvalidSagaDefinition : ISagaModelDefintion<InvalidSagaData>
+    public class InvalidSagaBuilder : ISagaModelBuilder<InvalidSagaData>
     {
-        public ISagaModel<InvalidSagaData> GetModel(IServiceProvider serviceProvider)
-        {
-            ISagaBuilder<InvalidSagaData> builder = new SagaBuilder<InvalidSagaData>(serviceProvider);
+        ISagaBuilder<InvalidSagaData> builder;
 
+        public InvalidSagaBuilder(ISagaBuilder<InvalidSagaData> builder)
+        {
+            this.builder = builder;
+        }
+
+        public ISagaModel<InvalidSagaData> Build()
+        {
             builder.
                 Start<InvalidCreatedEvent, InvalidCreatedEventHandler>().
                 Then(

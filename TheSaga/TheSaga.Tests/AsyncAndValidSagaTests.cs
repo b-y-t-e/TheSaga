@@ -2,8 +2,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using System;
 using System.Threading.Tasks;
+using TheSaga.Builders;
 using TheSaga.Coordinators;
 using TheSaga.Events;
+using TheSaga.Models;
 using TheSaga.Persistance;
 using TheSaga.Persistance.SqlServer;
 using TheSaga.Persistance.SqlServer.Options;
@@ -71,13 +73,11 @@ namespace TheSaga.Tests
 
         private ISagaCoordinator sagaCoordinator;
         private ISagaPersistance sagaPersistance;
-        private ISagaRegistrator sagaRegistrator;
-        private IServiceProvider serviceProvider;
 
         public AsyncAndValidSagaTests()
         {
             IServiceCollection services = new ServiceCollection();
-            services.AddTheSaga(cfg =>
+            services.AddSaga(cfg =>
             {
 #if SQL_SERVER
                 cfg.UseSqlServer(new SqlServerOptions()
@@ -87,19 +87,13 @@ namespace TheSaga.Tests
 #endif
             });
 
-            serviceProvider = services.BuildServiceProvider();
-
-            sagaRegistrator = serviceProvider.
-                GetRequiredService<ISagaRegistrator>();
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
 
             sagaPersistance = serviceProvider.
                 GetRequiredService<ISagaPersistance>();
 
             sagaCoordinator = serviceProvider.
                 GetRequiredService<ISagaCoordinator>();
-
-            sagaRegistrator.Register(
-                new AsyncSagaDefinition().GetModel(serviceProvider));
         }
 
         #endregion Arrange

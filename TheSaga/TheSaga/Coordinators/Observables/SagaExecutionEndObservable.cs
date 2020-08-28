@@ -2,17 +2,18 @@
 using System;
 using System.Threading.Tasks;
 using TheSaga.Exceptions;
+using TheSaga.Execution.AsyncHandlers;
 using TheSaga.InternalMessages;
 using TheSaga.InternalMessages.MessageBus;
 using TheSaga.Utils;
 
 namespace TheSaga.Coordinators.AsyncHandlers
 {
-    internal class SagaExecutionEndHandler
+    internal class SagaExecutionEndObservable : IObservable
     {
         private IServiceProvider serviceProvider;
 
-        public SagaExecutionEndHandler(IServiceProvider serviceProvider)
+        public SagaExecutionEndObservable(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }

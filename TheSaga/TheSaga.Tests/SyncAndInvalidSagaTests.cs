@@ -169,13 +169,11 @@ namespace TheSaga.Tests
 
         private ISagaCoordinator sagaCoordinator;
         private ISagaPersistance sagaPersistance;
-        private ISagaRegistrator sagaRegistrator;
-        private IServiceProvider serviceProvider;
 
         public SyncAndInvalidSagaTests()
         {
             IServiceCollection services = new ServiceCollection();
-            services.AddTheSaga(cfg =>
+            services.AddSaga(cfg =>
             {
 #if SQL_SERVER
                 cfg.UseSqlServer(new SqlServerOptions()
@@ -185,19 +183,13 @@ namespace TheSaga.Tests
 #endif
             });
 
-            serviceProvider = services.BuildServiceProvider();
-
-            sagaRegistrator = serviceProvider.
-                GetRequiredService<ISagaRegistrator>();
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
 
             sagaPersistance = serviceProvider.
                 GetRequiredService<ISagaPersistance>();
 
             sagaCoordinator = serviceProvider.
                 GetRequiredService<ISagaCoordinator>();
-
-            sagaRegistrator.Register(
-                new InvalidSagaDefinition().GetModel(serviceProvider));
         }
 
         #endregion Arrange

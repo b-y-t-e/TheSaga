@@ -21,34 +21,36 @@ namespace TheSaga.Builders
 
         ISagaBuilderThen<TSagaData> Start<TEvent>(string stepName) where TEvent : IEvent;
 
-        ISagaBuilderThen<TSagaData> Start<TEvent, TEventHandler>(string stepName) where TEvent : IEvent
-           where TEventHandler : IEventHandler<TSagaData, TEvent>;
+        ISagaBuilderThen<TSagaData> Start<TEvent, TEventHandler>(string stepName) 
+            where TEvent : IEvent
+            where TEventHandler : IEventHandler<TSagaData, TEvent>;
 
-        ISagaBuilderThen<TSagaData> StartAsync<TEvent, TEventHandler>() where TEvent : IEvent
-                           where TEventHandler : IEventHandler<TSagaData, TEvent>;
+        ISagaBuilderThen<TSagaData> StartAsync<TEvent, TEventHandler>() 
+            where TEvent : IEvent
+            where TEventHandler : IEventHandler<TSagaData, TEvent>;
 
-        ISagaBuilderThen<TSagaData> StartAsync<TEvent, TEventHandler>(string stepName) where TEvent : IEvent
+        ISagaBuilderThen<TSagaData> StartAsync<TEvent, TEventHandler>(string stepName) 
+            where TEvent : IEvent
            where TEventHandler : IEventHandler<TSagaData, TEvent>;
     }
 
-
-    public interface ISagaBuilderHandle<TSagaData> : ISagaBuilderThen<TSagaData>
+    public interface ISagaBuilderHandle<TSagaData, TEvent> : ISagaBuilderThen<TSagaData>
         where TSagaData : ISagaData
+        where TEvent : IEvent
     {
         ISagaBuilderThen<TSagaData> HandleBy<TEventHandler>()
-            where TEventHandler : IEventHandler;
+            where TEventHandler : IEventHandler<TSagaData, TEvent>;
     }
 
     public interface ISagaBuilderWhen<TSagaData> : ISagaBuilder<TSagaData>
         where TSagaData : ISagaData
     {
+        ISagaBuilderHandle<TSagaData, TEvent> When<TEvent>() where TEvent : IEvent;
 
-        ISagaBuilderHandle<TSagaData> When<TEvent>() where TEvent : IEvent;
-
-        ISagaBuilderHandle<TSagaData> When<TEvent, TEventHandler>() where TEvent : IEvent
+        ISagaBuilderHandle<TSagaData, TEvent> When<TEvent, TEventHandler>() where TEvent : IEvent
            where TEventHandler : IEventHandler<TSagaData, TEvent>;
 
-        ISagaBuilderHandle<TSagaData> WhenAsync<TEvent, TEventHandler>() where TEvent : IEvent
+        ISagaBuilderHandle<TSagaData, TEvent> WhenAsync<TEvent, TEventHandler>() where TEvent : IEvent
            where TEventHandler : IEventHandler<TSagaData, TEvent>;
     }
 

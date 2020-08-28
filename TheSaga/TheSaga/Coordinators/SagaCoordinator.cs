@@ -38,13 +38,13 @@ namespace TheSaga.Coordinators
             this.sagaLocking = sagaLocking;
             this.serviceProvider = serviceProvider;
 
-            new SagaLockingHandler(serviceProvider).
+            new SagaLockingObservable(serviceProvider).
                 Subscribe();
 
-            new SagaExecutionStartHandler(serviceProvider).
+            new SagaExecutionStartObservable(serviceProvider).
                 Subscribe();
 
-            new SagaExecutionEndHandler(serviceProvider).
+            new SagaExecutionEndObservable(serviceProvider).
                 Subscribe();
         }
 
@@ -72,7 +72,7 @@ namespace TheSaga.Coordinators
                     Set(saga);
 
                 ISagaExecutor sagaExecutor = sagaRegistrator.
-                    FindExecutorForStateType(model.SagaStateType);
+                    FindExecutorForStateType(model.GetType());
 
                 return await sagaExecutor.
                     Handle(SagaID.From(saga.Data.ID), @event, IsExecutionAsync.False());
@@ -88,8 +88,7 @@ namespace TheSaga.Coordinators
                 throw;
             }
         }
-
-
+        
         public async Task WaitForState<TState>(Guid id, SagaWaitOptions waitOptions = null)
             where TState : IState, new()
         {
