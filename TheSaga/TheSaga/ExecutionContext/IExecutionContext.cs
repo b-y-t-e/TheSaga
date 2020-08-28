@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
+using TheSaga.Models;
 
-namespace TheSaga.Models.Context
+namespace TheSaga.ExecutionContext
 {
     public interface IExecutionContext<TSagaData> : IExecutionContext
         where TSagaData : ISagaData

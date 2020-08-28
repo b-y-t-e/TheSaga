@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
+using TheSaga.ExecutionContext;
 using TheSaga.Models;
-using TheSaga.Models.Context;
 
 namespace TheSaga.SagaModels.Steps.Delegates
 {

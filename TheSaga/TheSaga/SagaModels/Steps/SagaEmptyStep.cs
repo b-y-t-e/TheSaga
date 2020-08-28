@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TheSaga.Events;
-using TheSaga.Models.Context;
+using TheSaga.ExecutionContext;
 
 namespace TheSaga.SagaModels.Steps
 {

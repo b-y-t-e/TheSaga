@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
 using TheSaga.Exceptions;
+using TheSaga.Models;
 
-namespace TheSaga.Models.Context
+namespace TheSaga.ExecutionContext
 {
     public class ExecutionContext<TSagaData> : IExecutionContext<TSagaData>
         where TSagaData : ISagaData
