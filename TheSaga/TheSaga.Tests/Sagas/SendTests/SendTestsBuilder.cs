@@ -34,10 +34,7 @@ namespace TheSaga.Tests.Sagas.SendTests
                 During<Init>().
                 When<TestSendActionEvent>().
                 Send<SendAlternativeCreateEvent>(async (ctx, ev) =>
-                {
-                    ctx.Data.CreatedSagaID = ev.ID = Guid.NewGuid();
-                    return ev;
-                }).
+                    ctx.Data.CreatedSagaID = ev.ID = Guid.NewGuid()).
                 TransitionTo<AfterInit>();
 
             return builder.

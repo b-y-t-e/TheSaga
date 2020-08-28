@@ -7,7 +7,7 @@ namespace TheSaga.Models.Steps
     public delegate Task ThenActionDelegate<TSagaData>(IExecutionContext<TSagaData> context)
         where TSagaData : ISagaData;
 
-    public delegate Task<TEvent> SendActionDelegate<TSagaData, TEvent>(IExecutionContext<TSagaData> context, TEvent @event)
+    public delegate Task SendActionDelegate<TSagaData, TEvent>(IExecutionContext<TSagaData> context, TEvent @event)
         where TSagaData : ISagaData
         where TEvent : IEvent;
 }

@@ -47,7 +47,7 @@ namespace TheSaga.Models.Steps
 
             TCompensateEvent eventToSend = new TCompensateEvent();
             if (action != null)
-                eventToSend = await compensate(contextForAction, eventToSend);
+                await compensate(contextForAction, eventToSend);
 
             if (activity != null)
             {
@@ -72,7 +72,7 @@ namespace TheSaga.Models.Steps
 
             TExecuteEvent eventToSend = new TExecuteEvent();
             if (action != null)
-                eventToSend = await action(contextForAction, eventToSend);
+                await action(contextForAction, eventToSend);
 
             if (activity != null)
             {
