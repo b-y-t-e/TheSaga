@@ -1,4 +1,12 @@
 ﻿TODO:
+
+ problem w przypadku kooejnej akcji w gdy wystapi blad:
+            if (saga.IsIdle() &&
+                saga.HasError())
+            {
+                throw saga.State.CurrentError;
+            }
+
  + poprawienie sqlserver'a
  + IServiceScopeFactory->CreateScope dla celj sagi i ascynhandlerze
  + publishasync!
