@@ -9,6 +9,7 @@ using TheSaga.Coordinators;
 using TheSaga.Locking;
 using TheSaga.Locking.InMemory;
 using TheSaga.Messages.MessageBus;
+using TheSaga.Observables.Registrator;
 using TheSaga.Persistance;
 using TheSaga.Persistance.InMemory;
 using TheSaga.Providers;
@@ -26,17 +27,19 @@ namespace TheSaga
             this IServiceCollection services,
             Action<ITheSagaConfig> configAction = null)
         {
-            services.AddSingleton<IInternalMessageBus, InternalMessageBus>();
+            services.AddSingleton<ObservableRegistrator>();
+            services.AddSingleton<IMessageBus, InMemoryMessageBus>();
             services.AddSingleton<ISagaPersistance, InMemorySagaPersistance>();
-            services.AddSingleton<ISagaRegistrator, SagaRegistrator>();
-            services.AddSingleton<ISagaCoordinator, SagaCoordinator>();
-            services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
             services.AddSingleton<ISagaLocking, InMemorySagaLocking>();
+            services.AddSingleton<IDateTimeProvider, LocalDateTimeProvider>();
 
-            services.AddSingleton(typeof(ISagaBuilder<>), typeof(SagaBuilder<>));
-            services.AddTransient(typeof(ExecuteSagaCommandHandler), typeof(ExecuteSagaCommandHandler));
-            services.AddTransient(typeof(ExecuteActionCommandHandler), typeof(ExecuteActionCommandHandler));
-            services.AddTransient(typeof(ExecuteStepCommandHandler), typeof(ExecuteStepCommandHandler));
+            services.AddTransient<ISagaRegistrator, SagaRegistrator>();
+            services.AddTransient<ISagaCoordinator, SagaCoordinator>();
+
+            services.AddTransient(typeof(ISagaBuilder<>), typeof(SagaBuilder<>));
+            services.AddTransient<ExecuteSagaCommandHandler>();
+            services.AddTransient<ExecuteActionCommandHandler>();
+            services.AddTransient<ExecuteStepCommandHandler>();
 
             services.AddSagaModelDefinitions();
 

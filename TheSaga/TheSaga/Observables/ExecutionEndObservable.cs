@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using TheSaga.Messages;
 using TheSaga.Messages.MessageBus;
 
-namespace TheSaga.Coordinators.Observables
+namespace TheSaga.Observables
 {
     internal class ExecutionEndObservable : IObservable
     {
@@ -18,7 +18,7 @@ namespace TheSaga.Coordinators.Observables
         public void Subscribe()
         {
             var internalMessageBus = serviceProvider.
-                GetRequiredService<IInternalMessageBus>();
+                GetRequiredService<IMessageBus>();
 
             internalMessageBus.
                 Subscribe<ExecutionEndMessage>(this, OnSagaProcessingEnd);
@@ -27,7 +27,7 @@ namespace TheSaga.Coordinators.Observables
         public void Unsubscribe()
         {
             var internalMessageBus = serviceProvider.
-                GetRequiredService<IInternalMessageBus>();
+                GetRequiredService<IMessageBus>();
 
             internalMessageBus.
                 Unsubscribe<ExecutionEndMessage>(this);

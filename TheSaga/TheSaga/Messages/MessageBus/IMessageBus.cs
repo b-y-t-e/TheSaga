@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace TheSaga.Messages.MessageBus
 {
-    public interface IInternalMessageBus
+    public interface IMessageBus
     {
         Task Publish(IInternalMessage message);
 

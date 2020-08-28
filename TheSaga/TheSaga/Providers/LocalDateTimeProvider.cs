@@ -2,7 +2,7 @@
 
 namespace TheSaga.Providers
 {
-    public class DateTimeProvider : IDateTimeProvider
+    public class LocalDateTimeProvider : IDateTimeProvider
     {
         public DateTime Now => DateTime.Now;
     }

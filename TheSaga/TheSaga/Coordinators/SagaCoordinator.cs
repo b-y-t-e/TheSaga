@@ -14,43 +14,33 @@ using TheSaga.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Commands;
 using TheSaga.Commands.Handlers;
-using TheSaga.Coordinators.Observables;
 using TheSaga.Locking;
 using TheSaga.Messages;
 using TheSaga.Messages.MessageBus;
 using TheSaga.Models;
 using TheSaga.SagaModels;
 using TheSaga.ValueObjects;
+using TheSaga.Observables.Registrator;
 
 namespace TheSaga.Coordinators
 {
     public class SagaCoordinator : ISagaCoordinator
     {
-        private IInternalMessageBus internalMessageBus;
+        private IMessageBus internalMessageBus;
         private ISagaPersistance sagaPersistance;
         private ISagaRegistrator sagaRegistrator;
         private IDateTimeProvider dateTimeProvider;
-        private ISagaLocking sagaLocking;
         private IServiceProvider serviceProvider;
 
         public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance,
-            IInternalMessageBus internalMessageBus, IDateTimeProvider dateTimeProvider, ISagaLocking sagaLocking,
+            IMessageBus internalMessageBus, IDateTimeProvider dateTimeProvider,
             IServiceProvider serviceProvider)
         {
             this.sagaRegistrator = sagaRegistrator;
             this.sagaPersistance = sagaPersistance;
             this.internalMessageBus = internalMessageBus;
             this.dateTimeProvider = dateTimeProvider;
-            this.sagaLocking = sagaLocking;
             this.serviceProvider = serviceProvider;
-
-            new LockingObservable(serviceProvider).Subscribe();
-
-            new ExecutionStartObservable(serviceProvider).Subscribe();
-
-            new ExecutionEndObservable(serviceProvider).Subscribe();
-
-            new AsyncStepCompletedObservable(serviceProvider).Subscribe();
         }
 
         public async Task ResumeAll()
@@ -115,6 +105,10 @@ namespace TheSaga.Coordinators
 
         private async Task<ISaga> ExecuteSaga(IEvent @event, ISagaModel model, ISaga saga)
         {
+            serviceProvider.
+                GetRequiredService<ObservableRegistrator>().
+                Initialize();
+
             await internalMessageBus.
                 Publish(new ExecutionStartMessage(saga));
 

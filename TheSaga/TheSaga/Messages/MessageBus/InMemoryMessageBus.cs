@@ -6,10 +6,14 @@ using TheSaga.Utils;
 
 namespace TheSaga.Messages.MessageBus
 {
-    public class InternalMessageBus : IInternalMessageBus
+    public class InMemoryMessageBus : IMessageBus
     {
-        private Dictionary<Type, Dictionary<Object, InternalMessageBus.Subscriber>> typesAndSubscribers =
-            new Dictionary<Type, Dictionary<object, Subscriber>>();
+        private Dictionary<Type, Dictionary<Object, InMemoryMessageBus.Subscriber>> typesAndSubscribers;
+
+        public InMemoryMessageBus()
+        {
+            typesAndSubscribers = new Dictionary<Type, Dictionary<object, Subscriber>>();
+        }
 
         public async Task Publish(IInternalMessage message)
         {

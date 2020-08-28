@@ -6,7 +6,7 @@ using TheSaga.Messages.MessageBus;
 using TheSaga.Models;
 using TheSaga.ValueObjects;
 
-namespace TheSaga.Coordinators.Observables
+namespace TheSaga.Observables
 {
     internal class ExecutionStartObservable : IObservable
 
@@ -33,7 +33,7 @@ namespace TheSaga.Coordinators.Observables
         public void Subscribe()
         {
             var internalMessageBus = serviceProvider.
-                GetRequiredService<IInternalMessageBus>();
+                GetRequiredService<IMessageBus>();
 
             internalMessageBus.
                 Subscribe<ExecutionStartMessage>(this, OnSagaProcessingStart);
@@ -42,7 +42,7 @@ namespace TheSaga.Coordinators.Observables
         public void Unsubscribe()
         {
             var internalMessageBus = serviceProvider.
-                GetRequiredService<IInternalMessageBus>();
+                GetRequiredService<IMessageBus>();
 
             internalMessageBus.
                 Unsubscribe<ExecutionStartMessage>(this);

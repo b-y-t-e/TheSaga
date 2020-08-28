@@ -20,14 +20,14 @@ namespace TheSaga.Commands.Handlers
     internal class ExecuteStepCommandHandler
     {
         private IDateTimeProvider dateTimeProvider;
-        private IInternalMessageBus internalMessageBus;
+        private IMessageBus internalMessageBus;
         private ISagaPersistance sagaPersistance;
         private IServiceProvider serviceProvider;
 
         public ExecuteStepCommandHandler(
             ISagaPersistance sagaPersistance,
             IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider,
-            IInternalMessageBus internalMessageBus)
+            IMessageBus internalMessageBus)
         {
             this.sagaPersistance = sagaPersistance;
             this.serviceProvider = serviceProvider;

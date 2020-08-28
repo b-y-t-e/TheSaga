@@ -14,14 +14,14 @@ namespace TheSaga.Registrator
 {
     public class SagaRegistrator : ISagaRegistrator
     {
-        private IInternalMessageBus internalMessageBus;
+        private IMessageBus internalMessageBus;
         private IServiceProvider serviceProvider;
 
         private List<ISagaModel> registeredModels;
         private bool wasInitialized;
 
         public SagaRegistrator(
-            IInternalMessageBus internalMessageBus,
+            IMessageBus internalMessageBus,
             IServiceProvider serviceProvider)
         {
             this.registeredModels = new List<ISagaModel>();
