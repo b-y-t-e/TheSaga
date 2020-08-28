@@ -23,8 +23,9 @@ namespace TheSaga.Observables
             var sagaLocking = serviceProvider.
                 GetRequiredService<ISagaLocking>();
 
-            if (!await sagaLocking.Acquire(msg.Saga.Data.ID))
-                throw new SagaIsBusyException(msg.Saga.Data.ID);
+            if (msg.Saga?.Data?.ID != null)
+                if (!await sagaLocking.Acquire(msg.Saga.Data.ID))
+                    throw new SagaIsBusyException(msg.Saga.Data.ID);
         }
 
         async Task OnSagaProcessingEnd(ExecutionEndMessage msg)
@@ -32,7 +33,8 @@ namespace TheSaga.Observables
             var sagaLocking = serviceProvider.
                 GetRequiredService<ISagaLocking>();
 
-            await sagaLocking.Banish(msg.Saga.Data.ID);
+            if (msg.Saga?.Data?.ID != null)
+                await sagaLocking.Banish(msg.Saga.Data.ID);
         }
 
         public void Subscribe()
@@ -54,7 +56,7 @@ namespace TheSaga.Observables
 
             internalMessageBus.
                 Unsubscribe<ExecutionStartMessage>(this);
-            
+
             internalMessageBus.
                 Unsubscribe<ExecutionEndMessage>(this);
         }

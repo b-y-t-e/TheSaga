@@ -71,7 +71,8 @@ namespace TheSaga.Coordinators
                 await ExecuteSaga(
                     new EmptyEvent(),
                     model,
-                    saga);
+                    saga,
+                    SagaID.From(id));
             }
         }
 
@@ -92,7 +93,11 @@ namespace TheSaga.Coordinators
                     newSaga ??
                     await sagaPersistance.Get(sagaId);
 
-                return await ExecuteSaga(@event, model, saga);
+                return await ExecuteSaga(
+                    @event, 
+                    model, 
+                    saga, 
+                    SagaID.From(saga?.Data?.ID ?? sagaId));
             }
             catch
             {
@@ -103,10 +108,13 @@ namespace TheSaga.Coordinators
             }
         }
 
-        private async Task<ISaga> ExecuteSaga(IEvent @event, ISagaModel model, ISaga saga)
+        private async Task<ISaga> ExecuteSaga(IEvent @event, ISagaModel model, ISaga saga, SagaID id)
         {
             try
             {
+                if (saga == null)
+                    throw new SagaInstanceNotFoundException(id);
+
                 serviceProvider.
                     GetRequiredService<ObservableRegistrator>().
                     Initialize();
