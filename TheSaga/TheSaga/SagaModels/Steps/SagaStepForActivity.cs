@@ -27,10 +27,10 @@ namespace TheSaga.SagaModels.Steps
 
         public async Task Compensate(IExecutionContext context, IEvent @event)
         {
-            var contextForAction =
+            IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>) context;
 
-            var activity = (TSagaActivity) ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaActivity));
+            TSagaActivity activity = (TSagaActivity) ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaActivity));
 
             if (activity != null)
                 await activity.Compensate(contextForAction);
@@ -38,10 +38,10 @@ namespace TheSaga.SagaModels.Steps
 
         public async Task Execute(IExecutionContext context, IEvent @event)
         {
-            var contextForAction =
+            IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>) context;
 
-            var activity = (TSagaActivity) ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaActivity));
+            TSagaActivity activity = (TSagaActivity) ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaActivity));
 
             if (activity != null)
                 await activity.Execute(contextForAction);

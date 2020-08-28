@@ -17,7 +17,7 @@ namespace TheSaga.MessageBus.InMemory
 
         public async Task Publish(IInternalMessage message)
         {
-            var incomingMessageType = message.GetType();
+            Type incomingMessageType = message.GetType();
 
             KeyValuePair<Type, Dictionary<object, Subscriber>>[] typesAndSubscribersArr = null;
 
@@ -26,9 +26,9 @@ namespace TheSaga.MessageBus.InMemory
                 typesAndSubscribersArr = typesAndSubscribers.ToArray();
             }
 
-            foreach (var typesAndSubs in typesAndSubscribersArr)
+            foreach (KeyValuePair<Type, Dictionary<object, Subscriber>> typesAndSubs in typesAndSubscribersArr)
             {
-                var type = typesAndSubs.Key;
+                Type type = typesAndSubs.Key;
                 if (incomingMessageType.Is(type))
                 {
                     KeyValuePair<object, Subscriber>[] subscribersArr = null;
@@ -38,7 +38,7 @@ namespace TheSaga.MessageBus.InMemory
                         subscribersArr = typesAndSubs.Value.ToArray();
                     }
 
-                    foreach (var subscriber in subscribersArr)
+                    foreach (KeyValuePair<object, Subscriber> subscriber in subscribersArr)
                     {
                         Func<IInternalMessage, Task>[] actionsArr = null;
 
@@ -47,7 +47,7 @@ namespace TheSaga.MessageBus.InMemory
                             actionsArr = subscriber.Value.Actions.ToArray();
                         }
 
-                        foreach (var action in actionsArr)
+                        foreach (Func<IInternalMessage, Task> action in actionsArr)
                             await action(message);
                     }
                 }

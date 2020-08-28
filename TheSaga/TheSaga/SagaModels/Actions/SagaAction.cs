@@ -20,8 +20,8 @@ namespace TheSaga.SagaModels.Actions
 
         public ISagaStep FindNextAfter(ISagaStep step)
         {
-            var stepFound = false;
-            foreach (var curStep in Steps)
+            bool stepFound = false;
+            foreach (ISagaStep curStep in Steps)
             {
                 if (stepFound)
                     return curStep;
@@ -35,7 +35,7 @@ namespace TheSaga.SagaModels.Actions
 
         public ISagaStep FindPrevBefore(ISagaStep step)
         {
-            var stepIndex = Steps.IndexOf(step);
+            int stepIndex = Steps.IndexOf(step);
             if (stepIndex > 0)
                 return Steps[stepIndex - 1];
             return null;
@@ -43,7 +43,7 @@ namespace TheSaga.SagaModels.Actions
 
         public ISagaStep FindStep(string stepName)
         {
-            var step = Steps.FirstOrDefault(s => s.StepName == stepName);
+            ISagaStep step = Steps.FirstOrDefault(s => s.StepName == stepName);
 
             return step;
         }

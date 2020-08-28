@@ -19,7 +19,7 @@ namespace TheSaga.Observables
 
         public void Subscribe()
         {
-            var internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
+            IMessageBus internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
 
             internalMessageBus.Subscribe<ExecutionStartMessage>(this, OnSagaProcessingStart);
 
@@ -28,7 +28,7 @@ namespace TheSaga.Observables
 
         public void Unsubscribe()
         {
-            var internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
+            IMessageBus internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
 
             internalMessageBus.Unsubscribe<ExecutionStartMessage>(this);
 
@@ -38,7 +38,7 @@ namespace TheSaga.Observables
 
         private async Task OnSagaProcessingStart(ExecutionStartMessage msg)
         {
-            var sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
+            ISagaLocking sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
 
             if (msg.Saga?.Data?.ID != null)
                 if (!await sagaLocking.Acquire(msg.Saga.Data.ID))
@@ -47,7 +47,7 @@ namespace TheSaga.Observables
 
         private async Task OnSagaProcessingEnd(ExecutionEndMessage msg)
         {
-            var sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
+            ISagaLocking sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
 
             if (msg.Saga?.Data?.ID != null)
                 await sagaLocking.Banish(msg.Saga.Data.ID);

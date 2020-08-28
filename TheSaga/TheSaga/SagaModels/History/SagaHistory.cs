@@ -12,7 +12,7 @@ namespace TheSaga.SagaModels.History
             ExecutionID executionID,
             string stepName)
         {
-            var executionData = this.LastOrDefault(s =>
+            StepData executionData = this.LastOrDefault(s =>
                 s.ExecutionID == executionID &&
                 s.CompensationData == null &&
                 s.StepName == stepName);
@@ -24,7 +24,7 @@ namespace TheSaga.SagaModels.History
             ExecutionID executionID,
             string stepName)
         {
-            var executionData = this.LastOrDefault(s =>
+            StepData executionData = this.LastOrDefault(s =>
                 s.ExecutionID == executionID &&
                 s.StepName == stepName);
 
@@ -34,7 +34,7 @@ namespace TheSaga.SagaModels.History
         public StepData GetLatestToCompensate(
             ExecutionID executionID)
         {
-            var executionData = this.LastOrDefault(s =>
+            StepData executionData = this.LastOrDefault(s =>
                 s.ExecutionID == executionID &&
                 s.CompensationData == null);
 

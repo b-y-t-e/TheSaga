@@ -51,7 +51,7 @@ namespace TheSaga.SagaModels.Actions
             DuringEvents = new List<Type>();
             StartEvents = new List<Type>();
 
-            foreach (var action in actions)
+            foreach (SagaAction<TSagaData> action in actions)
             {
                 if (action.Event != null)
                 {

@@ -43,13 +43,13 @@ namespace TheSaga.Coordinators
 
         public async Task ResumeAll()
         {
-            var ids = await sagaPersistance.GetUnfinished();
+            IList<Guid> ids = await sagaPersistance.GetUnfinished();
 
-            var invalidModels = new List<string>();
-            foreach (var id in ids)
+            List<string> invalidModels = new List<string>();
+            foreach (Guid id in ids)
             {
-                var saga = await sagaPersistance.Get(id);
-                var model = sagaRegistrator.FindModelByName(saga.Info.ModelName);
+                ISaga saga = await sagaPersistance.Get(id);
+                ISagaModel model = sagaRegistrator.FindModelByName(saga.Info.ModelName);
 
                 if (model == null)
                     invalidModels.Add(saga.Info.ModelName);
@@ -58,11 +58,11 @@ namespace TheSaga.Coordinators
             if (invalidModels.Count > 0)
                 throw new Exception($"Saga models {string.Join(", ", invalidModels.Distinct().ToArray())} not found");
 
-            foreach (var id in ids)
+            foreach (Guid id in ids)
             {
-                var saga = await sagaPersistance.Get(id);
+                ISaga saga = await sagaPersistance.Get(id);
 
-                var model = sagaRegistrator.FindModelByName(saga.Info.ModelName);
+                ISagaModel model = sagaRegistrator.FindModelByName(saga.Info.ModelName);
 
                 await ExecuteSaga(
                     new EmptyEvent(),
@@ -74,18 +74,18 @@ namespace TheSaga.Coordinators
 
         public async Task<ISaga> Publish(IEvent @event)
         {
-            var eventType = @event.GetType();
-            var sagaId = SagaID.From(@event.ID);
+            Type eventType = @event.GetType();
+            SagaID sagaId = SagaID.From(@event.ID);
 
-            var model = sagaRegistrator.FindModelForEventType(eventType);
+            ISagaModel model = sagaRegistrator.FindModelForEventType(eventType);
             if (model == null)
                 throw new SagaEventNotRegisteredException(eventType);
 
-            var newSaga = await CreateNewSagaIfRequired(model, sagaId, eventType);
+            ISaga newSaga = await CreateNewSagaIfRequired(model, sagaId, eventType);
 
             try
             {
-                var saga =
+                ISaga saga =
                     newSaga ??
                     await sagaPersistance.Get(sagaId);
 
@@ -112,7 +112,7 @@ namespace TheSaga.Coordinators
 
             try
             {
-                var stateChanged = false;
+                bool stateChanged = false;
 
                 internalMessageBus.Subscribe<StateChangedMessage>(this, mesage =>
                 {
@@ -123,7 +123,7 @@ namespace TheSaga.Coordinators
                     return Task.CompletedTask;
                 });
 
-                var saga = await sagaPersistance.Get(id);
+                ISaga saga = await sagaPersistance.Get(id);
 
                 if (saga == null)
                     throw new SagaInstanceNotFoundException(id);
@@ -131,7 +131,7 @@ namespace TheSaga.Coordinators
                 if (saga.State.CurrentState == new TState().GetStateName())
                     return;
 
-                var stopwatch = Stopwatch.StartNew();
+                Stopwatch stopwatch = Stopwatch.StartNew();
                 while (!stateChanged)
                 {
                     await Task.Delay(250);
@@ -158,7 +158,7 @@ namespace TheSaga.Coordinators
 
                 await sagaPersistance.Set(saga);
 
-                var handler = serviceProvider.GetRequiredService<ExecuteSagaCommandHandler>();
+                ExecuteSagaCommandHandler handler = serviceProvider.GetRequiredService<ExecuteSagaCommandHandler>();
 
                 return await handler.Handle(new ExecuteSagaCommand
                 {
@@ -183,7 +183,7 @@ namespace TheSaga.Coordinators
 
             if (eventType != null)
             {
-                var isStartEvent = model.IsStartEvent(eventType);
+                bool isStartEvent = model.IsStartEvent(eventType);
 
                 if (isStartEvent)
                     saga = await CreateNewSaga(model, id);
@@ -197,7 +197,7 @@ namespace TheSaga.Coordinators
             if (id == SagaID.Empty())
                 id = SagaID.New();
 
-            var data = (ISagaData) Activator.CreateInstance(model.SagaStateType);
+            ISagaData data = (ISagaData) Activator.CreateInstance(model.SagaStateType);
             data.ID = id;
 
             ISaga saga = new Saga

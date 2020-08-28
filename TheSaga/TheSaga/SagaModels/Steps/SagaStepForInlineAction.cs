@@ -28,7 +28,7 @@ namespace TheSaga.SagaModels.Steps
 
         public async Task Compensate(IExecutionContext context, IEvent @event)
         {
-            var contextForAction =
+            IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>) context;
 
             if (compensation != null)
@@ -37,7 +37,7 @@ namespace TheSaga.SagaModels.Steps
 
         public async Task Execute(IExecutionContext context, IEvent @event)
         {
-            var contextForAction =
+            IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>) context;
 
             if (action != null)

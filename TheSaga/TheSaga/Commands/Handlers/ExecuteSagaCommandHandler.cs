@@ -21,9 +21,9 @@ namespace TheSaga.Commands.Handlers
             if (command.Event == null)
                 command.Event = new EmptyEvent();
 
-            var executeActionHandler = ActivatorUtilities.CreateInstance<ExecuteActionCommandHandler>(serviceProvider);
+            ExecuteActionCommandHandler executeActionHandler = ActivatorUtilities.CreateInstance<ExecuteActionCommandHandler>(serviceProvider);
 
-            var stepExecutionResult = await executeActionHandler.Handle(
+            ExecuteActionResult stepExecutionResult = await executeActionHandler.Handle(
                 new ExecuteActionCommand
                 {
                     ID = command.ID,

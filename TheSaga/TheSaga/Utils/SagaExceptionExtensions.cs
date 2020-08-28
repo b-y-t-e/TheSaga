@@ -10,7 +10,7 @@ namespace TheSaga.Utils
             if (exception == null)
                 return null;
 
-            var exceptionType = exception.GetType();
+            Type exceptionType = exception.GetType();
             if (exceptionType.IsSerializable)
                 return exception;
             return new SagaStepException(

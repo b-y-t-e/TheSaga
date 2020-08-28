@@ -20,21 +20,21 @@ namespace TheSaga.Observables
 
         public void Subscribe()
         {
-            var internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
+            IMessageBus internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
 
             internalMessageBus.Subscribe<ExecutionStartMessage>(this, OnSagaProcessingStart);
         }
 
         public void Unsubscribe()
         {
-            var internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
+            IMessageBus internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
 
             internalMessageBus.Unsubscribe<ExecutionStartMessage>(this);
         }
 
         private async Task OnSagaProcessingStart(ExecutionStartMessage msg)
         {
-            var saga = msg.Saga;
+            ISaga saga = msg.Saga;
 
             if (!saga.IsIdle())
                 return;

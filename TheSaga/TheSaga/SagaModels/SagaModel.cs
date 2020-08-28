@@ -30,7 +30,7 @@ namespace TheSaga.SagaModels
 
         public ISagaAction FindActionForStateAndEvent(string state, Type eventType)
         {
-            var action = Actions.FindAction(state, eventType);
+            SagaAction<TSagaData> action = Actions.FindAction(state, eventType);
 
             if (action == null)
                 throw new Exception($"Could not find action for state {state} and event of type {eventType?.Name}");

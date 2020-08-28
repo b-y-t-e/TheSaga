@@ -7,6 +7,7 @@ using TheSaga.Exceptions;
 using TheSaga.Models;
 using TheSaga.SagaModels;
 using TheSaga.SagaModels.Actions;
+using TheSaga.SagaModels.History;
 using TheSaga.SagaModels.Steps;
 using TheSaga.SagaModels.Steps.Delegates;
 using TheSaga.States;
@@ -38,7 +39,7 @@ namespace TheSaga.Builders
             if (s.CurrentEvent == null)
                 throw new Exception($"{nameof(HandleBy)} must be defined after {nameof(When)} / {nameof(WhenAsync)}");
 
-            var action = s.Model.Actions.FindAction(s.CurrentState, s.CurrentEvent);
+            SagaAction<TSagaData> action = s.Model.Actions.FindAction(s.CurrentState, s.CurrentEvent);
             action.Steps.Clear();
             action.Steps.Add(new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
                 s.UniqueNameGenerator.Generate(s.CurrentState, nameof(HandleBy), s.CurrentEvent.GetType().Name,
@@ -476,7 +477,7 @@ namespace TheSaga.Builders
                     },
                     ctx =>
                     {
-                        var data = ctx.State.CurrentStepData();
+                        StepData data = ctx.State.CurrentStepData();
                         ctx.State.CurrentState = data.StateName;
                         return Task.CompletedTask;
                     },

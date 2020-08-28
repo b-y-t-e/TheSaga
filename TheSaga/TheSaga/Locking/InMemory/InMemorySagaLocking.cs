@@ -13,7 +13,7 @@ namespace TheSaga.Locking.InMemory
         {
             lock (locks)
             {
-                var hasAcquired = !locks.Contains(guid);
+                bool hasAcquired = !locks.Contains(guid);
                 if (hasAcquired) locks.Add(guid);
                 return Task.FromResult(hasAcquired);
             }
@@ -23,7 +23,7 @@ namespace TheSaga.Locking.InMemory
         {
             lock (locks)
             {
-                var hasBanished = locks.Contains(guid);
+                bool hasBanished = locks.Contains(guid);
                 if (hasBanished) locks.Remove(guid);
                 return Task.FromResult(hasBanished);
             }

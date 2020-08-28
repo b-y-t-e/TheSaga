@@ -11,6 +11,7 @@ using TheSaga.Persistance;
 using TheSaga.Providers;
 using TheSaga.SagaModels;
 using TheSaga.SagaModels.Actions;
+using TheSaga.SagaModels.History;
 using TheSaga.SagaModels.Steps;
 using TheSaga.Utils;
 using TheSaga.ValueObjects;
@@ -50,7 +51,7 @@ namespace TheSaga.Commands.Handlers
         {
             if (saga.State.IsCompensating)
             {
-                var latestToCompensate = saga.State.History.GetLatestToCompensate(saga.State.ExecutionID);
+                StepData latestToCompensate = saga.State.History.GetLatestToCompensate(saga.State.ExecutionID);
 
                 if (latestToCompensate != null)
                     return latestToCompensate.StepName;
@@ -68,29 +69,29 @@ namespace TheSaga.Commands.Handlers
 
         private async Task<ISaga> ExecuteStepSync(ExecuteStepCommand command)
         {
-            var saga = command.Saga;
-            var sagaStep = command.SagaStep;
-            var async = command.Async;
-            var sagaAction = command.SagaAction;
-            var @event = command.Event;
-            var model = command.Model;
+            ISaga saga = command.Saga;
+            ISagaStep sagaStep = command.SagaStep;
+            AsyncExecution async = command.Async;
+            ISagaAction sagaAction = command.SagaAction;
+            IEvent @event = command.Event;
+            ISagaModel model = command.Model;
 
-            var currentSagaState = saga.State.CurrentState;
-            var hasSagaCompleted = false;
+            string currentSagaState = saga.State.CurrentState;
+            bool hasSagaCompleted = false;
 
             saga.State.CurrentStep = sagaStep.StepName;
             saga.Info.Modified = dateTimeProvider.Now;
 
-            var executionData = saga.State.History.PrepareExecutionData(saga, async, dateTimeProvider);
+            StepData executionData = saga.State.History.PrepareExecutionData(saga, async, dateTimeProvider);
 
             await sagaPersistance.Set(saga);
 
             try
             {
-                var executionContextType =
+                Type executionContextType =
                     typeof(ExecutionContext<>).ConstructGenericType(saga.Data.GetType());
 
-                var context = (IExecutionContext) ActivatorUtilities.CreateInstance(serviceProvider,
+                IExecutionContext context = (IExecutionContext) ActivatorUtilities.CreateInstance(serviceProvider,
                     executionContextType, saga.Data, saga.Info, saga.State);
 
                 if (@event is EmptyEvent)
@@ -120,7 +121,7 @@ namespace TheSaga.Commands.Handlers
                 executionData.Ended(dateTimeProvider);
             }
 
-            var nextStepName = CalculateNextStep(saga, sagaAction, sagaStep);
+            string nextStepName = CalculateNextStep(saga, sagaAction, sagaStep);
 
             executionData.SetNextStepName(nextStepName);
 

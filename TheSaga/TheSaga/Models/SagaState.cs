@@ -22,7 +22,7 @@ namespace TheSaga.Models
 
         public string GetExecutionState()
         {
-            var item = History.FirstOrDefault(i => i.ExecutionID == ExecutionID);
+            StepData item = History.FirstOrDefault(i => i.ExecutionID == ExecutionID);
             return item?.StateName ?? CurrentState;
         }
 

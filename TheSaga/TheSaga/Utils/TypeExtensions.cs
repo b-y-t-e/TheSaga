@@ -6,16 +6,16 @@ namespace TheSaga.Utils
     {
         internal static string GetFriendlyName(this Type type)
         {
-            var friendlyName = type.Name;
+            string friendlyName = type.Name;
             if (type.IsGenericType)
             {
-                var iBacktick = friendlyName.IndexOf('`');
+                int iBacktick = friendlyName.IndexOf('`');
                 if (iBacktick > 0) friendlyName = friendlyName.Remove(iBacktick);
                 friendlyName += "<";
-                var typeParameters = type.GetGenericArguments();
-                for (var i = 0; i < typeParameters.Length; ++i)
+                Type[] typeParameters = type.GetGenericArguments();
+                for (int i = 0; i < typeParameters.Length; ++i)
                 {
-                    var typeParamName = GetFriendlyName(typeParameters[i]);
+                    string typeParamName = GetFriendlyName(typeParameters[i]);
                     friendlyName += i == 0 ? typeParamName : "," + typeParamName;
                 }
 
@@ -27,7 +27,7 @@ namespace TheSaga.Utils
 
         internal static Type ConstructGenericType(this Type generic, params Type[] typeArgs)
         {
-            var constructed = generic.MakeGenericType(typeArgs);
+            Type constructed = generic.MakeGenericType(typeArgs);
             return constructed;
         }
 
@@ -43,7 +43,7 @@ namespace TheSaga.Utils
 
         internal static Type GetInterfaceOf(this Type thisType, Type baseInterfaceType)
         {
-            foreach (var interfaceType in thisType.GetInterfaces())
+            foreach (Type interfaceType in thisType.GetInterfaces())
                 if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == baseInterfaceType)
                     return interfaceType;
                 else if (baseInterfaceType == interfaceType || baseInterfaceType.IsAssignableFrom(interfaceType))
@@ -53,7 +53,7 @@ namespace TheSaga.Utils
 
         internal static bool Is(this Type thisType, Type baseType)
         {
-            var result =
+            bool result =
                 baseType == thisType ||
                 baseType.IsAssignableFrom(thisType);
 
@@ -61,7 +61,7 @@ namespace TheSaga.Utils
             {
                 if (thisType.IsInterface && thisType.IsGenericType)
                 {
-                    var genericType = thisType.GetGenericTypeDefinition();
+                    Type genericType = thisType.GetGenericTypeDefinition();
 
                     if (genericType != null)
                         result =
@@ -70,7 +70,7 @@ namespace TheSaga.Utils
                 }
                 else
                 {
-                    foreach (var interfaceType in thisType.GetInterfaces())
+                    foreach (Type interfaceType in thisType.GetInterfaces())
                         if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == baseType)
                             return true;
                         else if (baseType == interfaceType || baseType.IsAssignableFrom(interfaceType))

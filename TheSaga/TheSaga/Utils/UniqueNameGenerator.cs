@@ -9,9 +9,9 @@ namespace TheSaga.Utils
 
         internal string Generate(params string[] names)
         {
-            var baseName = string.Join("_", names);
-            var index = 0;
-            var name = $"{baseName}_{index}";
+            string baseName = string.Join("_", names);
+            int index = 0;
+            string name = $"{baseName}_{index}";
             while (usedNames.Contains(name))
             {
                 index++;
