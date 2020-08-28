@@ -1,11 +1,15 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TheSaga.Events;
+using TheSaga.Exceptions;
 using TheSaga.Execution.Actions;
 using TheSaga.Execution.Context;
 using TheSaga.InternalMessages;
 using TheSaga.InternalMessages.MessageBus;
+using TheSaga.Models;
 using TheSaga.Persistance;
 using TheSaga.Providers;
 using TheSaga.SagaStates;
@@ -13,67 +17,53 @@ using TheSaga.SagaStates.Actions;
 using TheSaga.SagaStates.Steps;
 using TheSaga.Utils;
 
-namespace TheSaga.Execution.Steps
+namespace TheSaga.Execution.Commands
 {
-    internal class SagaStepExecutor<TSagaData>
+    internal class ExecuteStepCommandHandler<TSagaData>
         where TSagaData : ISagaData
     {
-        private ISaga saga;
-        private ISagaAction sagaAction;
-        private ISagaStep sagaStep;
-        private IEvent @event;
-        private IsExecutionAsync @async;
-        private IInternalMessageBus internalMessageBus;
         private ISagaPersistance sagaPersistance;
+        private IServiceProvider serviceProvider;
         private IDateTimeProvider dateTimeProvider;
+        private IInternalMessageBus internalMessageBus;
 
-        public SagaStepExecutor(
-            IsExecutionAsync async,
-            IEvent @event,
-            ISaga saga,
-            ISagaStep sagaStep,
-            ISagaAction sagaAction,
-            IInternalMessageBus internalMessageBus,
+        public ExecuteStepCommandHandler(
             ISagaPersistance sagaPersistance,
-            IDateTimeProvider dateTimeProvider)
+            IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider, IInternalMessageBus internalMessageBus)
         {
-            this.@async = async;
-            this.@event = @event;
-            this.internalMessageBus = internalMessageBus;
             this.sagaPersistance = sagaPersistance;
-            this.sagaStep = sagaStep;
-            this.sagaAction = sagaAction;
+            this.serviceProvider = serviceProvider;
             this.dateTimeProvider = dateTimeProvider;
-            this.saga = saga;
+            this.internalMessageBus = internalMessageBus;
         }
 
-        internal async Task ExecuteStep()
+        public async Task Handle(ExecuteStepCommand<TSagaData> command)
         {
-            if (@async)
+            if (command.async)
             {
-                ExecuteStepAsync();
+                ExecuteStepAsync(command);
             }
             else
             {
-                await ExecuteStepSync();
+                await ExecuteStepSync(command);
             }
         }
 
-        private void ExecuteStepAsync()
+        private void ExecuteStepAsync(ExecuteStepCommand<TSagaData> command)
         {
-            Task.Run(() => ExecuteStepSync());
+            Task.Run(() => ExecuteStepSync(command));
         }
 
-        private async Task ExecuteStepSync()
+        private async Task ExecuteStepSync(ExecuteStepCommand<TSagaData> command)
         {
+            var saga = command.saga;
+            var sagaStep = command.sagaStep;
+            var async = command.async;
+            var sagaAction = command.sagaAction;
+            var @event = command.@event;
+
             string currentSagaState = saga.State.CurrentState;
             bool hasSagaCompleted = false;
-
-            if (!saga.State.IsCompensating &&
-                sagaStep == sagaAction.Steps.First())
-            {
-                saga.State.CurrentError = null;
-            }
 
             saga.State.CurrentStep = sagaStep.StepName;
             saga.Info.Modified = dateTimeProvider.Now;
@@ -124,7 +114,7 @@ namespace TheSaga.Execution.Steps
                     Ended(dateTimeProvider);
             }
 
-            String nextStepName = CalculateNextStep();
+            String nextStepName = CalculateNextStep(saga, sagaAction, sagaStep);
 
             executionData.
                 SetNextStepName(nextStepName);
@@ -147,15 +137,13 @@ namespace TheSaga.Execution.Steps
             await sagaPersistance.
                 Set(saga);
 
-            SendInternalMessages(currentSagaState, hasSagaCompleted);
+            await SendInternalMessages(saga, currentSagaState, hasSagaCompleted, async);
 
-            ThrowErrorIfSagaCompletedForSyncCall();
+            ThrowErrorIfSagaCompletedForSyncCall(saga, async);
         }
 
-        private String CalculateNextStep()
+        private String CalculateNextStep(ISaga saga, ISagaAction sagaAction, ISagaStep sagaStep)
         {
-            String nextSagaStep = null;
-
             if (saga.State.IsCompensating)
             {
                 StepData latestToCompensate = saga.State.History.
@@ -168,44 +156,43 @@ namespace TheSaga.Execution.Steps
             }
             else
             {
-                nextSagaStep = sagaAction.
+                return sagaAction.
                     FindNextAfter(sagaStep)?.
                     StepName;
             }
-
-            return nextSagaStep;
         }
 
-        private void ThrowErrorIfSagaCompletedForSyncCall()
+        private void ThrowErrorIfSagaCompletedForSyncCall(ISaga saga, IsExecutionAsync async)
         {
-            if (!@async)
+            if (@async)
+                return;
+
+            if (saga.IsIdle() &&
+                saga.HasError())
             {
-                if (saga.IsProcessingCompleted() &&
-                    saga.State.CurrentError != null)
-                {
-                    throw saga.State.CurrentError;
-                }
+                throw saga.State.CurrentError;
             }
         }
 
-        private void SendInternalMessages(string currentState, bool hasSagaCompleted)
+        private async Task SendInternalMessages(
+            ISaga saga, string currentState, bool hasSagaCompleted, IsExecutionAsync async)
         {
             if (currentState != saga.State.CurrentState)
             {
-                internalMessageBus.Publish(
+                await internalMessageBus.Publish(
                     new SagaStateChangedMessage(typeof(TSagaData), SagaID.From(saga.Data.ID), saga.State.CurrentState, saga.State.CurrentStep, saga.State.IsCompensating));
             }
 
             if (hasSagaCompleted)
             {
-                internalMessageBus.Publish(
-                    new SagaProcessingCompletedMessage(typeof(TSagaData), SagaID.From(saga.Data.ID)));
+                await internalMessageBus.Publish(
+                    new SagaExecutionEndMessage(saga));
             }
             else
             {
                 if (@async)
                 {
-                    internalMessageBus.Publish(
+                    await internalMessageBus.Publish(
                         new SagaAsyncStepCompletedMessage(typeof(TSagaData), SagaID.From(saga.Data.ID), saga.State.CurrentState, saga.State.CurrentStep, saga.State.IsCompensating));
                 }
             }

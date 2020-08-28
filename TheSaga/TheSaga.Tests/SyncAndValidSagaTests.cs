@@ -45,8 +45,8 @@ namespace TheSaga.Tests
             persistedSaga.ShouldNotBeNull();
             persistedSaga.State.CurrentState.ShouldBe(nameof(StateCreated));
             persistedSaga.State.CurrentStep.ShouldBe(null);
-            persistedSaga.State.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && step.CompensationData == null && step.HasSucceeded());
-            persistedSaga.State.History.Count.ShouldBe(3);
+            persistedSaga.State.History.ShouldNotContain(step => step.StepName == "OrderCreatedEventStep1" && step.CompensationData == null && step.HasSucceeded());
+            persistedSaga.State.History.Count.ShouldBe(0);
         }
 
         [Fact]
@@ -72,13 +72,13 @@ namespace TheSaga.Tests
             persistedSaga.ShouldNotBeNull();
             persistedSaga.State.CurrentState.ShouldBe(nameof(StateCompleted));
             persistedSaga.State.CurrentStep.ShouldBe(null);
-            persistedSaga.State.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep0" && step.CompensationData == null && step.HasSucceeded());
-            persistedSaga.State.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && step.CompensationData == null && step.HasSucceeded());
+            persistedSaga.State.History.ShouldNotContain(step => step.StepName == "OrderCreatedEventStep0" && step.CompensationData == null && step.HasSucceeded());
+            persistedSaga.State.History.ShouldNotContain(step => step.StepName == "OrderCreatedEventStep1" && step.CompensationData == null && step.HasSucceeded());
             persistedSaga.State.History.ShouldContain(step => step.StepName == "OrderCompletedEventStep1" && step.CompensationData == null && step.HasSucceeded());
             persistedSaga.State.History.ShouldContain(step => step.StepName == "email" && step.CompensationData == null && step.HasSucceeded());
             persistedSaga.State.History.ShouldContain(step => step.StepName == "SendMessageToTheManagerEventStep" && step.CompensationData == null && step.HasSucceeded());
             persistedSaga.State.History.ShouldContain(step => step.StepName == "OrderCourierEventStep" && step.CompensationData == null && step.HasSucceeded());
-            persistedSaga.State.History.Count.ShouldBe(9);
+            persistedSaga.State.History.Count.ShouldBe(6);
         }
 
         [Fact]

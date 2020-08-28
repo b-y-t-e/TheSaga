@@ -32,8 +32,8 @@ namespace TheSaga.Tests
                 WaitForState<New>(saga.Data.ID);
 
             // then
-            SagaLocking.
-                IsAcquired(saga.Data.ID).
+            (await sagaLocking.
+                IsAcquired(saga.Data.ID)).
                 ShouldBeFalse();
         }
 
@@ -48,8 +48,8 @@ namespace TheSaga.Tests
                 Send(startEvent);
 
             // then
-            SagaLocking.
-                IsAcquired(saga.Data.ID).
+            (await sagaLocking.
+                IsAcquired(saga.Data.ID)).
                 ShouldBeTrue();
         }
 
@@ -80,6 +80,7 @@ namespace TheSaga.Tests
         private ISagaPersistance sagaPersistance;
         private ISagaRegistrator sagaRegistrator;
         private IServiceProvider serviceProvider;
+        ISagaLocking sagaLocking;
 
         public SagaLockingTests()
         {
@@ -104,6 +105,9 @@ namespace TheSaga.Tests
 
             sagaCoordinator = serviceProvider.
                 GetRequiredService<ISagaCoordinator>();
+
+            sagaLocking = serviceProvider.
+                GetRequiredService<ISagaLocking>();
 
             sagaRegistrator.Register(
                 new AsyncSagaDefinition().GetModel(serviceProvider));

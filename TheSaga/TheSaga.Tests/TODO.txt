@@ -1,6 +1,7 @@
 ﻿TODO:
  + skakanie w compenssatach do tylu po historii (ecexutionid?) 
- + 
+ + SagaExecutor -> ExecuteSagaCommand
+ + wolanie ExecuteStepCommand w publishasync?
 
 
  + Command & handler 

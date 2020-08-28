@@ -5,12 +5,13 @@ using TheSaga.Config;
 using TheSaga.Coordinators;
 using TheSaga.Execution;
 using TheSaga.Execution.Actions;
-using TheSaga.Execution.Steps;
+using TheSaga.Execution.Commands;
 using TheSaga.InternalMessages.MessageBus;
 using TheSaga.Persistance;
 using TheSaga.Persistance.InMemory;
 using TheSaga.Providers;
 using TheSaga.Registrator;
+using TheSaga.Utils;
 
 [assembly: InternalsVisibleTo("TheSaga.Tests")]
 
@@ -27,9 +28,11 @@ namespace TheSaga
             services.AddSingleton<ISagaRegistrator, SagaRegistrator>();
             services.AddSingleton<ISagaCoordinator, SagaCoordinator>();
             services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+            services.AddSingleton<ISagaLocking, InMemorySagaLocking>();
+            
             services.AddTransient(typeof(SagaExecutor<>), typeof(SagaExecutor<>));
-            services.AddTransient(typeof(SagaActionExecutor<>), typeof(SagaActionExecutor<>));
-            services.AddTransient(typeof(SagaStepExecutor<>), typeof(SagaStepExecutor<>));
+            services.AddTransient(typeof(ExecuteActionCommandHandler<>), typeof(ExecuteActionCommandHandler<>));
+            services.AddTransient(typeof(ExecuteStepCommandHandler<>), typeof(ExecuteStepCommandHandler<>));
 
             if (configAction != null)
             {

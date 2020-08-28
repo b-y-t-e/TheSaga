@@ -1,38 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace TheSaga.Utils
 {
-    internal static class SagaLocking
+    public class InMemorySagaLocking : ISagaLocking
     {
-        private static HashSet<Guid> locks =
+        private HashSet<Guid> locks =
             new HashSet<Guid>();
 
-        internal static bool Acquire(this Guid guid)
+        public Task<bool> Acquire(Guid guid)
         {
             lock (locks)
             {
                 bool hasAcquired = !locks.Contains(guid);
                 if (hasAcquired) locks.Add(guid);
-                return hasAcquired;
+                return Task.FromResult(hasAcquired);
             }
         }
 
-        internal static bool Banish(this Guid guid)
+        public Task<bool> Banish(Guid guid)
         {
             lock (locks)
             {
                 bool hasBanished = locks.Contains(guid);
                 if (hasBanished) locks.Remove(guid);
-                return hasBanished;
+                return Task.FromResult(hasBanished);
             }
         }
 
-        internal static bool IsAcquired(this Guid guid)
+        public Task<bool> IsAcquired(Guid guid)
         {
             lock (locks)
             {
-                return locks.Contains(guid);
+                return Task.FromResult(
+                    locks.Contains(guid));
             }
         }
     }
