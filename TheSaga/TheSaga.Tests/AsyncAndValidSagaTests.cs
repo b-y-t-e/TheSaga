@@ -26,7 +26,7 @@ namespace TheSaga.Tests
             IEvent startEvent = new CreatedEvent();
 
             ISaga saga = await sagaCoordinator.
-                Send(startEvent);
+                Publish(startEvent);
 
             // when
             await sagaCoordinator.
@@ -54,7 +54,7 @@ namespace TheSaga.Tests
 
             // when
             ISaga saga = await sagaCoordinator.
-                Send(startEvent);
+                Publish(startEvent);
 
             // then
             ISaga persistedSaga = await sagaPersistance.

@@ -24,11 +24,11 @@ namespace TheSaga.Tests
         {
             // given
             ISaga saga = await sagaCoordinator.
-                Send(new OrderCreatedEvent());
+                Publish(new OrderCreatedEvent());
 
             // when
             await sagaCoordinator.
-               Send(new ToAlternative1Event() { ID = saga.Data.ID });
+               Publish(new ToAlternative1Event() { ID = saga.Data.ID });
 
             // then
             ISaga persistedSaga = await sagaPersistance.
@@ -45,11 +45,11 @@ namespace TheSaga.Tests
         {
             // given
             ISaga saga = await sagaCoordinator.
-                Send(new OrderCreatedEvent());
+                Publish(new OrderCreatedEvent());
 
             // when
             await sagaCoordinator.
-               Send(new ToAlternative2Event() { ID = saga.Data.ID });
+               Publish(new ToAlternative2Event() { ID = saga.Data.ID });
 
             // then
             ISaga persistedSaga = await sagaPersistance.

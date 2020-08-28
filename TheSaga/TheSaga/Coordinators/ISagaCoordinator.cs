@@ -9,7 +9,7 @@ namespace TheSaga.Coordinators
 {
     public interface ISagaCoordinator
     {
-        Task<ISaga> Send(IEvent @event);
+        Task<ISaga> Publish(IEvent @event);
 
         Task ResumeAll();
 

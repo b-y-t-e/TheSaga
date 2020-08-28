@@ -24,11 +24,11 @@ namespace TheSaga.Tests
         {
             // given
             ISaga saga = await sagaCoordinator.
-                Send(new SendCreateEvent());
+                Publish(new SendCreateEvent());
 
             // when
             await sagaCoordinator.
-                Send(new TestSendActionEvent() { ID = saga.Data.ID });
+                Publish(new TestSendActionEvent() { ID = saga.Data.ID });
 
             // then
             ISaga orgSaga = await sagaPersistance.

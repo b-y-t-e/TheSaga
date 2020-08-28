@@ -24,7 +24,7 @@ namespace TheSaga.Tests
         {
             // given
             ISaga newSagaState = await sagaCoordinator.
-                Send(new OrderCreatedEvent());
+                Publish(new OrderCreatedEvent());
 
             IEvent invalidEvent = new OrderSendEvent()
             {
@@ -35,7 +35,7 @@ namespace TheSaga.Tests
             await Assert.ThrowsAsync<SagaInvalidEventForStateException>(() =>
                 // when
                 sagaCoordinator.
-                    Send(invalidEvent)
+                    Publish(invalidEvent)
             );
 
             // then
@@ -54,7 +54,7 @@ namespace TheSaga.Tests
         {
             // given
             ISaga newSagaState = await sagaCoordinator.
-            Send(new OrderCreatedEvent());
+            Publish(new OrderCreatedEvent());
 
             IEvent skompletowanoEvent = new OrderCompletedEvent()
             {
@@ -63,7 +63,7 @@ namespace TheSaga.Tests
 
             // then
             await sagaCoordinator.
-                Send(skompletowanoEvent);
+                Publish(skompletowanoEvent);
 
             // then
             ISaga persistedSaga = await sagaPersistance.
@@ -89,7 +89,7 @@ namespace TheSaga.Tests
 
             // when
             ISaga saga = await sagaCoordinator.
-                Send(startEvent);
+                Publish(startEvent);
 
             // then
             ISaga persistedSaga = await sagaPersistance.

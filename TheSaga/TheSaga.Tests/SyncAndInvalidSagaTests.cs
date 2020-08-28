@@ -24,12 +24,12 @@ namespace TheSaga.Tests
         {
             // given
             ISaga saga = await sagaCoordinator.
-                Send(new ValidCreatedEvent());
+                Publish(new ValidCreatedEvent());
 
             // when
             await Assert.ThrowsAsync<TestCompensationException>(async () =>
             {
-                await sagaCoordinator.Send(new InvalidCompensationEvent()
+                await sagaCoordinator.Publish(new InvalidCompensationEvent()
                 {
                     ID = saga.Data.ID
                 });
@@ -69,7 +69,7 @@ namespace TheSaga.Tests
             await Assert.ThrowsAsync<TestSagaException>(async () =>
             {
                 ISaga saga = await sagaCoordinator.
-                    Send(startEvent);
+                    Publish(startEvent);
             });
 
             // then
@@ -92,7 +92,7 @@ namespace TheSaga.Tests
             {
                 // when
                 ISaga saga = await sagaCoordinator.
-                    Send(startEvent);
+                    Publish(startEvent);
             });
         }
 
@@ -101,12 +101,12 @@ namespace TheSaga.Tests
         {
             // given
             ISaga saga = await sagaCoordinator.
-                Send(new ValidCreatedEvent());
+                Publish(new ValidCreatedEvent());
 
             // when
             await Assert.ThrowsAsync<TestSagaException>(async () =>
             {
-                await sagaCoordinator.Send(new InvalidUpdateEvent()
+                await sagaCoordinator.Publish(new InvalidUpdateEvent()
                 {
                     ID = saga.Data.ID
                 });
@@ -138,18 +138,18 @@ namespace TheSaga.Tests
         {
             // given
             ISaga saga = await sagaCoordinator.
-                Send(new ValidCreatedEvent());
+                Publish(new ValidCreatedEvent());
 
             await Assert.ThrowsAsync<TestCompensationException>(async () =>
             {
-                await sagaCoordinator.Send(new InvalidCompensationEvent()
+                await sagaCoordinator.Publish(new InvalidCompensationEvent()
                 {
                     ID = saga.Data.ID
                 });
             });
 
             // when
-            await sagaCoordinator.Send(new ValidUpdateEvent()
+            await sagaCoordinator.Publish(new ValidUpdateEvent()
             {
                 ID = saga.Data.ID
             });

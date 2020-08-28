@@ -26,7 +26,7 @@ namespace TheSaga.Tests
         {
             // given
             ISaga saga = await sagaCoordinator.
-                Send(new CreatedEvent());
+                Publish(new CreatedEvent());
 
             // when
             await sagaCoordinator.
@@ -46,7 +46,7 @@ namespace TheSaga.Tests
 
             // when
             ISaga saga = await sagaCoordinator.
-                Send(startEvent);
+                Publish(startEvent);
 
             // then
             (await sagaLocking.
@@ -59,19 +59,19 @@ namespace TheSaga.Tests
         {
             // given
             ISaga saga = await sagaCoordinator.
-                Send(new CreatedEvent());
+                Publish(new CreatedEvent());
             await sagaCoordinator.
                 WaitForState<New>(saga.Data.ID);
 
             // when
             await sagaCoordinator.
-                Send(new UpdatedEvent() { ID = saga.Data.ID });
+                Publish(new UpdatedEvent() { ID = saga.Data.ID });
 
             // then
             await Assert.ThrowsAsync<SagaIsBusyException>(async () =>
             {
                 await sagaCoordinator.
-                    Send(new UpdatedEvent() { ID = saga.Data.ID });
+                    Publish(new UpdatedEvent() { ID = saga.Data.ID });
             });
         }
 

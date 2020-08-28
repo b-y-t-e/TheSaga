@@ -24,10 +24,10 @@ namespace TheSaga.Tests
         {
             // given
             ResumeSagaSettings.StopSagaExecution = true;
-            ISaga saga = await sagaCoordinator.Send(new ResumeSagaCreateEvent());
+            ISaga saga = await sagaCoordinator.Publish(new ResumeSagaCreateEvent());
 
             // when
-            await sagaCoordinator.Send(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
+            await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
 
             // then
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
@@ -39,10 +39,10 @@ namespace TheSaga.Tests
         {
             // given
             ResumeSagaSettings.StopSagaExecution = true;
-            ISaga saga = await sagaCoordinator.Send(new ResumeSagaCreateEvent());
+            ISaga saga = await sagaCoordinator.Publish(new ResumeSagaCreateEvent());
 
             // when
-            await sagaCoordinator.Send(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
+            await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
 
             // then
             (await sagaLocking.IsAcquired(saga.Data.ID)).
@@ -54,8 +54,8 @@ namespace TheSaga.Tests
         {
             // given
             ResumeSagaSettings.StopSagaExecution = true;
-            ISaga saga = await sagaCoordinator.Send(new ResumeSagaCreateEvent());
-            await sagaCoordinator.Send(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
+            ISaga saga = await sagaCoordinator.Publish(new ResumeSagaCreateEvent());
+            await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
             ResumeSagaSettings.StopSagaExecution = false;
             await sagaLocking.Banish(saga.Data.ID);
 

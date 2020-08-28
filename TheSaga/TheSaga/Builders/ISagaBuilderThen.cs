@@ -17,17 +17,17 @@ namespace TheSaga.Builders
 
         ISagaBuilder<TSagaData> Finish();
 
-        ISagaBuilderThen<TSagaData> Send<TEvent>()
+        ISagaBuilderThen<TSagaData> Publish<TEvent>()
             where TEvent : IEvent, new();
 
-        ISagaBuilderThen<TSagaData> Send<TEvent>(SendActionDelegate<TSagaData, TEvent> action)
+        ISagaBuilderThen<TSagaData> Publish<TEvent>(SendActionDelegate<TSagaData, TEvent> action)
             where TEvent : IEvent, new();
 
-        ISagaBuilderThen<TSagaData> Send<TEvent, TCompensateEvent>()
+        ISagaBuilderThen<TSagaData> Publish<TEvent, TCompensateEvent>()
             where TEvent : IEvent, new()
             where TCompensateEvent : IEvent, new();
 
-        ISagaBuilderThen<TSagaData> Send<TEvent, TCompensateEvent>(SendActionDelegate<TSagaData, TEvent> action, SendActionDelegate<TSagaData, TCompensateEvent> compensation)
+        ISagaBuilderThen<TSagaData> Publish<TEvent, TCompensateEvent>(SendActionDelegate<TSagaData, TEvent> action, SendActionDelegate<TSagaData, TCompensateEvent> compensation)
             where TEvent : IEvent, new()
             where TCompensateEvent : IEvent, new();
 

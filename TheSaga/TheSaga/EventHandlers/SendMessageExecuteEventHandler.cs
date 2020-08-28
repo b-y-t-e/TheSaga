@@ -21,7 +21,7 @@ namespace TheSaga.Activities
 
         public async Task Execute(IExecutionContext<TSagaData> context, TEvent @event)
         {
-            await sagaCoordinator.Send(@event);
+            await sagaCoordinator.Publish(@event);
         }
 
         public async Task Compensate(IExecutionContext<TSagaData> context, TEvent @event)

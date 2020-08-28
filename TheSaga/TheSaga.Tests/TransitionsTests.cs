@@ -24,12 +24,12 @@ namespace TheSaga.Tests
         {
             // given
             ISaga saga = await sagaCoordinator.
-                Send(new CreateEvent());
+                Publish(new CreateEvent());
 
             // when
             await Assert.ThrowsAsync<Exception>(() =>
                sagaCoordinator.
-                   Send(new InvalidUpdateEvent() { ID = saga.Data.ID }));
+                   Publish(new InvalidUpdateEvent() { ID = saga.Data.ID }));
 
             // then
             ISaga persistedSaga = await sagaPersistance.

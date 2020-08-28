@@ -75,7 +75,7 @@ namespace TheSaga.Coordinators
             }
         }
 
-        public async Task<ISaga> Send(IEvent @event)
+        public async Task<ISaga> Publish(IEvent @event)
         {
             Type eventType = @event.GetType();
             SagaID sagaId = SagaID.From(@event.ID);
