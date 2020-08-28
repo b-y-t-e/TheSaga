@@ -1,7 +1,7 @@
 ﻿TODO:
+ + poprawienie sqlserver'a
  + IServiceScopeFactory->CreateScope dla celj sagi i ascynhandlerze
  + publishasync!
- + metoda Send
 
  + wolanie ExecuteStepCommand w publishasync?
  + Async message 
@@ -15,6 +15,7 @@
  + executors -> command / handlers
 
 DONE:
+ + metoda Send
  + wznawianie sag po restarcie
  + Command & handler 
  + SagaExecutor -> ExecuteSagaCommand

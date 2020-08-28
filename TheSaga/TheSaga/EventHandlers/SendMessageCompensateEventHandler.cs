@@ -1,12 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using TheSaga.Activities;
+﻿using System.Threading.Tasks;
 using TheSaga.Coordinators;
 using TheSaga.Events;
 using TheSaga.Models;
 using TheSaga.Models.Context;
 
-namespace TheSaga.Activities
+namespace TheSaga.EventHandlers
 {
     internal class SendMessageCompensateEventHandler<TSagaData, TEvent> : IEventHandler<TSagaData, TEvent>
         where TSagaData : ISagaData

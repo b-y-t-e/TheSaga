@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Activities;
+using TheSaga.EventHandlers;
 using TheSaga.Events;
 using TheSaga.Models.Context;
 
