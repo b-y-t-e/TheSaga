@@ -1,14 +1,17 @@
 ﻿using System;
+using System.Globalization;
 
 namespace TheSaga.ValueObjects
 {
     public readonly struct AsyncExecution : IEquatable<AsyncExecution>
     {
-        public Boolean Value { get; }
+        public bool Value { get; }
 
         ////////////////////////////////
-        internal AsyncExecution(Boolean value)
-            => Value = value;
+        internal AsyncExecution(bool value)
+        {
+            Value = value;
+        }
 
         ////////////////////////////////
 
@@ -21,6 +24,7 @@ namespace TheSaga.ValueObjects
         {
             return new AsyncExecution(true);
         }
+
         public static AsyncExecution From(bool val)
         {
             return new AsyncExecution(val);
@@ -28,27 +32,42 @@ namespace TheSaga.ValueObjects
 
         ////////////////////////////////
 
-        public static implicit operator Boolean(AsyncExecution self)
-            => self.Value;
+        public static implicit operator bool(AsyncExecution self)
+        {
+            return self.Value;
+        }
 
         ////////////////////////////////
 
         public static bool operator ==(AsyncExecution value1, AsyncExecution value2)
-            => value1.Value.Equals(value2.Value);
+        {
+            return value1.Value.Equals(value2.Value);
+        }
 
         public static bool operator !=(AsyncExecution value1, AsyncExecution value2)
-            => !value1.Value.Equals(value2.Value);
+        {
+            return !value1.Value.Equals(value2.Value);
+        }
 
         ////////////////////////////////
-        public bool Equals(AsyncExecution other) =>
-            Value.Equals(other.Value);
+        public bool Equals(AsyncExecution other)
+        {
+            return Value.Equals(other.Value);
+        }
 
-        public override bool Equals(object obj) =>
-            obj is AsyncExecution other && Equals(other);
+        public override bool Equals(object obj)
+        {
+            return obj is AsyncExecution other && Equals(other);
+        }
 
-        public override int GetHashCode() => Value.GetHashCode();
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
+        }
 
-        public override string ToString() =>
-            Convert.ToString(Value, System.Globalization.CultureInfo.InvariantCulture);
+        public override string ToString()
+        {
+            return Convert.ToString(Value, CultureInfo.InvariantCulture);
+        }
     }
 }

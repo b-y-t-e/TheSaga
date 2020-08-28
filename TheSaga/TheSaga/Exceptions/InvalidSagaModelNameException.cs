@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace TheSaga.Exceptions
 {
@@ -6,11 +7,14 @@ namespace TheSaga.Exceptions
     public class InvalidSagaModelNameException : Exception
     {
         public InvalidSagaModelNameException() :
-            base($"Saga model name cannot be empty!")
-        { }
+            base("Saga model name cannot be empty!")
+        {
+        }
 
         protected InvalidSagaModelNameException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+            SerializationInfo info,
+            StreamingContext context) : base(info, context)
+        {
+        }
     }
 }

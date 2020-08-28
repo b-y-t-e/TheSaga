@@ -6,14 +6,14 @@ namespace TheSaga.Locking.InMemory
 {
     public class InMemorySagaLocking : ISagaLocking
     {
-        private HashSet<Guid> locks =
+        private readonly HashSet<Guid> locks =
             new HashSet<Guid>();
 
         public Task<bool> Acquire(Guid guid)
         {
             lock (locks)
             {
-                bool hasAcquired = !locks.Contains(guid);
+                var hasAcquired = !locks.Contains(guid);
                 if (hasAcquired) locks.Add(guid);
                 return Task.FromResult(hasAcquired);
             }
@@ -23,7 +23,7 @@ namespace TheSaga.Locking.InMemory
         {
             lock (locks)
             {
-                bool hasBanished = locks.Contains(guid);
+                var hasBanished = locks.Contains(guid);
                 if (hasBanished) locks.Remove(guid);
                 return Task.FromResult(hasBanished);
             }

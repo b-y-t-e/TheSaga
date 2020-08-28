@@ -11,16 +11,30 @@ namespace TheSaga.Observables
     internal class ExecutionStartObservable : IObservable
 
     {
-        IServiceProvider serviceProvider;
+        private readonly IServiceProvider serviceProvider;
 
         public ExecutionStartObservable(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
 
-        async Task OnSagaProcessingStart(ExecutionStartMessage msg)
+        public void Subscribe()
         {
-            ISaga saga = msg.Saga;
+            var internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
+
+            internalMessageBus.Subscribe<ExecutionStartMessage>(this, OnSagaProcessingStart);
+        }
+
+        public void Unsubscribe()
+        {
+            var internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
+
+            internalMessageBus.Unsubscribe<ExecutionStartMessage>(this);
+        }
+
+        private async Task OnSagaProcessingStart(ExecutionStartMessage msg)
+        {
+            var saga = msg.Saga;
 
             if (!saga.IsIdle())
                 return;
@@ -28,24 +42,6 @@ namespace TheSaga.Observables
             saga.State.CurrentError = null;
             saga.State.ExecutionID = ExecutionID.New();
             saga.State.History.Clear();
-        }
-
-        public void Subscribe()
-        {
-            var internalMessageBus = serviceProvider.
-                GetRequiredService<IMessageBus>();
-
-            internalMessageBus.
-                Subscribe<ExecutionStartMessage>(this, OnSagaProcessingStart);
-        }
-
-        public void Unsubscribe()
-        {
-            var internalMessageBus = serviceProvider.
-                GetRequiredService<IMessageBus>();
-
-            internalMessageBus.
-                Unsubscribe<ExecutionStartMessage>(this);
         }
     }
 }

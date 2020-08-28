@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace TheSaga.ValueObjects
 {
@@ -8,7 +9,9 @@ namespace TheSaga.ValueObjects
 
         ////////////////////////////////
         internal SagaID(Guid value)
-            => Value = value;
+        {
+            Value = value;
+        }
 
         ////////////////////////////////
 
@@ -35,26 +38,41 @@ namespace TheSaga.ValueObjects
         ////////////////////////////////
 
         public static implicit operator Guid(SagaID self)
-            => self.Value;
+        {
+            return self.Value;
+        }
 
         ////////////////////////////////
 
         public static bool operator ==(SagaID value1, SagaID value2)
-            => value1.Value.Equals(value2.Value);
+        {
+            return value1.Value.Equals(value2.Value);
+        }
 
         public static bool operator !=(SagaID value1, SagaID value2)
-            => !value1.Value.Equals(value2.Value);
+        {
+            return !value1.Value.Equals(value2.Value);
+        }
 
         ////////////////////////////////
-        public bool Equals(SagaID other) =>
-            Value.Equals(other.Value);
+        public bool Equals(SagaID other)
+        {
+            return Value.Equals(other.Value);
+        }
 
-        public override bool Equals(object obj) =>
-            obj is SagaID other && Equals(other);
+        public override bool Equals(object obj)
+        {
+            return obj is SagaID other && Equals(other);
+        }
 
-        public override int GetHashCode() => Value.GetHashCode();
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
+        }
 
-        public override string ToString() =>
-            Convert.ToString(Value, System.Globalization.CultureInfo.InvariantCulture);
+        public override string ToString()
+        {
+            return Convert.ToString(Value, CultureInfo.InvariantCulture);
+        }
     }
 }

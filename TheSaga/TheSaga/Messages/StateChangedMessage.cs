@@ -14,9 +14,10 @@ namespace TheSaga.Messages
         }
 
         /// <summary>
-        /// Correlation ID
+        ///     Correlation ID
         /// </summary>
         public SagaID SagaID { get; }
+
         public string CurrentState { get; }
         public string CurrentStep { get; }
         public bool IsCompensating { get; }

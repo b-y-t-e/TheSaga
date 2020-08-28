@@ -15,13 +15,13 @@ namespace TheSaga.SagaModels.Actions
         }
 
         public Type Event { get; set; }
-        public String State { get; set; }
+        public string State { get; set; }
         public List<ISagaStep> Steps { get; set; }
 
         public ISagaStep FindNextAfter(ISagaStep step)
         {
-            bool stepFound = false;
-            foreach (ISagaStep curStep in this.Steps)
+            var stepFound = false;
+            foreach (var curStep in Steps)
             {
                 if (stepFound)
                     return curStep;
@@ -29,21 +29,21 @@ namespace TheSaga.SagaModels.Actions
                 if (curStep == step)
                     stepFound = true;
             }
+
             return null;
         }
 
         public ISagaStep FindPrevBefore(ISagaStep step)
         {
-            int stepIndex = this.Steps.IndexOf(step);
+            var stepIndex = Steps.IndexOf(step);
             if (stepIndex > 0)
-                return this.Steps[stepIndex - 1];
+                return Steps[stepIndex - 1];
             return null;
         }
 
         public ISagaStep FindStep(string stepName)
         {
-            ISagaStep step = Steps.
-                FirstOrDefault(s => s.StepName == stepName);
+            var step = Steps.FirstOrDefault(s => s.StepName == stepName);
 
             return step;
         }

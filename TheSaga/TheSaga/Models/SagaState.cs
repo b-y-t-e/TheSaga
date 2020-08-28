@@ -7,18 +7,18 @@ namespace TheSaga.Models
 {
     public class SagaState
     {
+        public SagaState()
+        {
+            History = new SagaHistory();
+            ExecutionID = ExecutionID.Empty();
+        }
+
         public Exception CurrentError { get; set; }
         public string CurrentState { get; set; }
         public string CurrentStep { get; set; }
         public bool IsCompensating { get; set; }
         public SagaHistory History { get; set; }
         public ExecutionID ExecutionID { get; set; }
-
-        public SagaState()
-        {
-            History = new SagaHistory();
-            ExecutionID = ExecutionID.Empty();
-        }
 
         public string GetExecutionState()
         {
@@ -28,8 +28,7 @@ namespace TheSaga.Models
 
         public StepData CurrentStepData()
         {
-            return History.
-                GetLatestByStepName(ExecutionID, CurrentStep);
+            return History.GetLatestByStepName(ExecutionID, CurrentStep);
         }
     }
 }

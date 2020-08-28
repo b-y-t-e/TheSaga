@@ -1,14 +1,18 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace TheSaga.Exceptions
 {
     internal class SagaStopException : Exception
     {
-        public SagaStopException() : base()
-        { }
+        public SagaStopException()
+        {
+        }
 
         protected SagaStopException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+            SerializationInfo info,
+            StreamingContext context) : base(info, context)
+        {
+        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
 using TheSaga.Models;
@@ -8,27 +7,29 @@ using TheSaga.SagaModels.Steps.Delegates;
 namespace TheSaga.SagaModels.Steps
 {
     internal class SagaStepForInlineAction<TSagaData> : ISagaStep
-            where TSagaData : ISagaData
+        where TSagaData : ISagaData
     {
-        private ThenActionDelegate<TSagaData> compensation;
+        private readonly ThenActionDelegate<TSagaData> compensation;
 
         public SagaStepForInlineAction(
-            String stepName, ThenActionDelegate<TSagaData> action, ThenActionDelegate<TSagaData> compensation, Boolean async)
+            string stepName, ThenActionDelegate<TSagaData> action, ThenActionDelegate<TSagaData> compensation,
+            bool async)
         {
-            this.StepName = stepName;
+            StepName = stepName;
             this.action = action;
             this.compensation = compensation;
             Async = async;
         }
 
-        public bool Async { get; }
-        public String StepName { get; }
         private ThenActionDelegate<TSagaData> action { get; }
+
+        public bool Async { get; }
+        public string StepName { get; }
 
         public async Task Compensate(IExecutionContext context, IEvent @event)
         {
-            IExecutionContext<TSagaData> contextForAction =
-                (IExecutionContext<TSagaData>)context;
+            var contextForAction =
+                (IExecutionContext<TSagaData>) context;
 
             if (compensation != null)
                 await compensation(contextForAction);
@@ -36,8 +37,8 @@ namespace TheSaga.SagaModels.Steps
 
         public async Task Execute(IExecutionContext context, IEvent @event)
         {
-            IExecutionContext<TSagaData> contextForAction =
-                (IExecutionContext<TSagaData>)context;
+            var contextForAction =
+                (IExecutionContext<TSagaData>) context;
 
             if (action != null)
                 await action(contextForAction);

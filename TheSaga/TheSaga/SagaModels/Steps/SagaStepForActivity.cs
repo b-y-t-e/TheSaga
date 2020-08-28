@@ -15,7 +15,7 @@ namespace TheSaga.SagaModels.Steps
         private readonly IServiceProvider serviceProvider;
 
         public SagaStepForActivity(
-            String StepName, IServiceProvider serviceProvider, Boolean async)
+            string StepName, IServiceProvider serviceProvider, bool async)
         {
             this.StepName = StepName;
             this.serviceProvider = serviceProvider;
@@ -23,15 +23,14 @@ namespace TheSaga.SagaModels.Steps
         }
 
         public bool Async { get; }
-        public String StepName { get; private set; }
+        public string StepName { get; }
 
         public async Task Compensate(IExecutionContext context, IEvent @event)
         {
-            IExecutionContext<TSagaData> contextForAction =
-                (IExecutionContext<TSagaData>)context;
+            var contextForAction =
+                (IExecutionContext<TSagaData>) context;
 
-            TSagaActivity activity = (TSagaActivity)ActivatorUtilities.
-                CreateInstance(serviceProvider, typeof(TSagaActivity));
+            var activity = (TSagaActivity) ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaActivity));
 
             if (activity != null)
                 await activity.Compensate(contextForAction);
@@ -39,11 +38,10 @@ namespace TheSaga.SagaModels.Steps
 
         public async Task Execute(IExecutionContext context, IEvent @event)
         {
-            IExecutionContext<TSagaData> contextForAction =
-                (IExecutionContext<TSagaData>)context;
+            var contextForAction =
+                (IExecutionContext<TSagaData>) context;
 
-            TSagaActivity activity = (TSagaActivity)ActivatorUtilities.
-                CreateInstance(serviceProvider, typeof(TSagaActivity));
+            var activity = (TSagaActivity) ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaActivity));
 
             if (activity != null)
                 await activity.Execute(contextForAction);

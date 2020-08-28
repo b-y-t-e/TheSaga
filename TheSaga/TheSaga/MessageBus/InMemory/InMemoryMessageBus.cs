@@ -8,7 +8,7 @@ namespace TheSaga.MessageBus.InMemory
 {
     public class InMemoryMessageBus : IMessageBus
     {
-        private Dictionary<Type, Dictionary<Object, InMemoryMessageBus.Subscriber>> typesAndSubscribers;
+        private readonly Dictionary<Type, Dictionary<object, Subscriber>> typesAndSubscribers;
 
         public InMemoryMessageBus()
         {
@@ -17,31 +17,37 @@ namespace TheSaga.MessageBus.InMemory
 
         public async Task Publish(IInternalMessage message)
         {
-            Type incomingMessageType = message.GetType();
+            var incomingMessageType = message.GetType();
 
             KeyValuePair<Type, Dictionary<object, Subscriber>>[] typesAndSubscribersArr = null;
 
             lock (typesAndSubscribers)
+            {
                 typesAndSubscribersArr = typesAndSubscribers.ToArray();
+            }
 
             foreach (var typesAndSubs in typesAndSubscribersArr)
             {
-                Type type = typesAndSubs.Key;
+                var type = typesAndSubs.Key;
                 if (incomingMessageType.Is(type))
                 {
                     KeyValuePair<object, Subscriber>[] subscribersArr = null;
 
                     lock (typesAndSubscribers)
+                    {
                         subscribersArr = typesAndSubs.Value.ToArray();
+                    }
 
-                    foreach (KeyValuePair<object, Subscriber> subscriber in subscribersArr)
+                    foreach (var subscriber in subscribersArr)
                     {
                         Func<IInternalMessage, Task>[] actionsArr = null;
 
                         lock (typesAndSubscribers)
+                        {
                             actionsArr = subscriber.Value.Actions.ToArray();
+                        }
 
-                        foreach (Func<IInternalMessage, Task> action in actionsArr)
+                        foreach (var action in actionsArr)
                             await action(message);
                     }
                 }
@@ -60,12 +66,12 @@ namespace TheSaga.MessageBus.InMemory
                 Subscriber subscriber = null;
                 dict.TryGetValue(listener, out subscriber);
                 if (subscriber == null)
-                    subscriber = dict[listener] = new Subscriber()
+                    subscriber = dict[listener] = new Subscriber
                     {
                         Sub = subscriber
                     };
 
-                Func<IInternalMessage, Task> func = (msg) => handler((T)msg);
+                Func<IInternalMessage, Task> func = msg => handler((T) msg);
                 subscriber.Actions.Add(func);
             }
         }
@@ -93,7 +99,7 @@ namespace TheSaga.MessageBus.InMemory
         internal class Subscriber
         {
             internal List<Func<IInternalMessage, Task>> Actions;
-            internal Object Sub;
+            internal object Sub;
 
             public Subscriber()
             {

@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Models;
@@ -16,12 +16,13 @@ namespace TheSaga.Commands.Handlers
 {
     internal class ExecuteActionCommandHandler
     {
-        private ISagaPersistance sagaPersistance;
+        private readonly ISagaPersistance sagaPersistance;
         private IServiceProvider serviceProvider;
-        IServiceScopeFactory serviceScopeFactory;
+        private readonly IServiceScopeFactory serviceScopeFactory;
+
         public ExecuteActionCommandHandler(
             ISagaPersistance sagaPersistance,
-            IServiceProvider serviceProvider, 
+            IServiceProvider serviceProvider,
             IServiceScopeFactory serviceScopeFactory)
         {
             this.sagaPersistance = sagaPersistance;
@@ -34,37 +35,34 @@ namespace TheSaga.Commands.Handlers
             if (command.Event == null)
                 command.Event = new EmptyEvent();
 
-            ISaga saga = await sagaPersistance.
-                Get(command.ID);
+            var saga = await sagaPersistance.Get(command.ID);
 
             if (saga == null)
                 throw new SagaInstanceNotFoundException(command.Model.SagaStateType, command.ID);
 
-            IList<ISagaAction> actions = command.Model.FindActionsForState(saga.State.GetExecutionState());
-            ISagaStep step = FindStep(saga, command.Event.GetType(), actions);
-            ISagaAction action = command.Model.FindActionForStep(step);
+            var actions = command.Model.FindActionsForState(saga.State.GetExecutionState());
+            var step = FindStep(saga, command.Event.GetType(), actions);
+            var action = command.Model.FindActionForStep(step);
 
-            AsyncExecution async = AsyncExecution.From(step.Async);
+            var async = AsyncExecution.From(step.Async);
             if (step.Async)
                 async = AsyncExecution.True();
 
             using (var scope = serviceScopeFactory.CreateScope())
             {
-                ExecuteStepCommandHandler stepExecutor = ActivatorUtilities.
-                   CreateInstance<ExecuteStepCommandHandler>(scope.ServiceProvider);
+                var stepExecutor = ActivatorUtilities.CreateInstance<ExecuteStepCommandHandler>(scope.ServiceProvider);
 
-                ISaga sagaFinalState = await stepExecutor.
-                    Handle(new ExecuteStepCommand()
-                    {
-                        Async = async,
-                        Event = command.Event,
-                        Saga = saga,
-                        SagaStep = step,
-                        SagaAction = action,
-                        Model = command.Model
-                    });
+                var sagaFinalState = await stepExecutor.Handle(new ExecuteStepCommand
+                {
+                    Async = async,
+                    Event = command.Event,
+                    Saga = saga,
+                    SagaStep = step,
+                    SagaAction = action,
+                    Model = command.Model
+                });
 
-                return new ExecuteActionResult()
+                return new ExecuteActionResult
                 {
                     Saga = sagaFinalState ?? saga,
                     IsSyncProcessingComplete = sagaFinalState == null || async || saga.IsIdle()
@@ -75,13 +73,8 @@ namespace TheSaga.Commands.Handlers
         private ISagaStep FindStep(ISaga saga, Type eventType, IList<ISagaAction> actions)
         {
             if (!eventType.Is<EmptyEvent>())
-            {
                 return FindStepForEventType(saga, eventType, actions);
-            }
-            else
-            {
-                return FindStepForCurrentState(saga, actions);
-            }
+            return FindStepForCurrentState(saga, actions);
         }
 
         private ISagaStep FindStepForCurrentState(ISaga saga, IList<ISagaAction> actions)
@@ -89,14 +82,12 @@ namespace TheSaga.Commands.Handlers
             if (saga.IsIdle())
                 throw new Exception("");
 
-            ISagaAction action = actions.
-                FirstOrDefault(a => a.FindStep(saga.State.CurrentStep) != null);
+            var action = actions.FirstOrDefault(a => a.FindStep(saga.State.CurrentStep) != null);
 
             if (action == null)
                 throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
 
-            ISagaStep step = action.
-                FindStep(saga.State.CurrentStep);
+            var step = action.FindStep(saga.State.CurrentStep);
 
             if (step == null)
                 throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
@@ -106,16 +97,16 @@ namespace TheSaga.Commands.Handlers
 
         private ISagaStep FindStepForEventType(ISaga saga, Type eventType, IList<ISagaAction> actions)
         {
-            ISagaAction action = actions.
-                FirstOrDefault(a => a.Event == eventType);
+            var action = actions.FirstOrDefault(a => a.Event == eventType);
 
             if (action == null)
                 throw new SagaInvalidEventForStateException(saga.State.GetExecutionState(), eventType);
 
             if (!saga.IsIdle())
-                throw new SagaIsBusyHandlingStepException(saga.Data.ID, saga.State.GetExecutionState(), saga.State.CurrentStep);
+                throw new SagaIsBusyHandlingStepException(saga.Data.ID, saga.State.GetExecutionState(),
+                    saga.State.CurrentStep);
 
-            ISagaStep step = action.Steps.FirstOrDefault();
+            var step = action.Steps.FirstOrDefault();
 
             if (step == null)
                 throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);

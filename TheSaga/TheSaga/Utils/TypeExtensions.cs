@@ -6,21 +6,19 @@ namespace TheSaga.Utils
     {
         internal static string GetFriendlyName(this Type type)
         {
-            string friendlyName = type.Name;
+            var friendlyName = type.Name;
             if (type.IsGenericType)
             {
-                int iBacktick = friendlyName.IndexOf('`');
-                if (iBacktick > 0)
-                {
-                    friendlyName = friendlyName.Remove(iBacktick);
-                }
+                var iBacktick = friendlyName.IndexOf('`');
+                if (iBacktick > 0) friendlyName = friendlyName.Remove(iBacktick);
                 friendlyName += "<";
-                Type[] typeParameters = type.GetGenericArguments();
-                for (int i = 0; i < typeParameters.Length; ++i)
+                var typeParameters = type.GetGenericArguments();
+                for (var i = 0; i < typeParameters.Length; ++i)
                 {
-                    string typeParamName = GetFriendlyName(typeParameters[i]);
-                    friendlyName += (i == 0 ? typeParamName : "," + typeParamName);
+                    var typeParamName = GetFriendlyName(typeParameters[i]);
+                    friendlyName += i == 0 ? typeParamName : "," + typeParamName;
                 }
+
                 friendlyName += ">";
             }
 
@@ -29,9 +27,10 @@ namespace TheSaga.Utils
 
         internal static Type ConstructGenericType(this Type generic, params Type[] typeArgs)
         {
-            Type constructed = generic.MakeGenericType(typeArgs);
+            var constructed = generic.MakeGenericType(typeArgs);
             return constructed;
         }
+
         internal static Type GetFirstGenericArgument(this Type generic)
         {
             return generic.GetGenericArguments()[0];
@@ -45,12 +44,10 @@ namespace TheSaga.Utils
         internal static Type GetInterfaceOf(this Type thisType, Type baseInterfaceType)
         {
             foreach (var interfaceType in thisType.GetInterfaces())
-            {
                 if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == baseInterfaceType)
                     return interfaceType;
                 else if (baseInterfaceType == interfaceType || baseInterfaceType.IsAssignableFrom(interfaceType))
                     return interfaceType;
-            }
             return null;
         }
 
@@ -64,15 +61,12 @@ namespace TheSaga.Utils
             {
                 if (thisType.IsInterface && thisType.IsGenericType)
                 {
-                    Type genericType = thisType.
-                        GetGenericTypeDefinition();
+                    var genericType = thisType.GetGenericTypeDefinition();
 
                     if (genericType != null)
-                    {
                         result =
                             baseType == genericType ||
                             baseType.IsAssignableFrom(genericType);
-                    }
                 }
                 else
                 {
@@ -82,6 +76,7 @@ namespace TheSaga.Utils
                         else if (baseType == interfaceType || baseType.IsAssignableFrom(interfaceType))
                             return true;
                 }
+
                 /*foreach( var iterface in thisType.GetInterfaces())
                 {
                     result =

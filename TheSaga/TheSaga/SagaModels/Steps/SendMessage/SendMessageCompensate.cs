@@ -10,7 +10,7 @@ namespace TheSaga.SagaModels.Steps.SendMessage
         where TSagaData : ISagaData
         where TEvent : IEvent
     {
-        ISagaCoordinator sagaCoordinator;
+        private readonly ISagaCoordinator sagaCoordinator;
 
         public SendMessageCompensate(ISagaCoordinator sagaCoordinator)
         {

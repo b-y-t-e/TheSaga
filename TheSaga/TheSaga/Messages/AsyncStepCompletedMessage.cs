@@ -6,7 +6,7 @@ namespace TheSaga.Messages
 {
     internal class AsyncStepCompletedMessage : IInternalMessage
     {
-        public AsyncStepCompletedMessage(SagaID sagaID, string currentState, 
+        public AsyncStepCompletedMessage(SagaID sagaID, string currentState,
             string currentStep, bool isCompensating, ISagaModel model)
         {
             SagaID = sagaID;
@@ -17,9 +17,10 @@ namespace TheSaga.Messages
         }
 
         /// <summary>
-        /// Correlation ID
+        ///     Correlation ID
         /// </summary>
         public SagaID SagaID { get; }
+
         public ISagaModel Model { get; }
         public string CurrentState { get; }
         public string CurrentStep { get; }

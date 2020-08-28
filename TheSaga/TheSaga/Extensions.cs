@@ -1,7 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Linq;
+﻿using System;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Builders;
 using TheSaga.Commands.Handlers;
 using TheSaga.Config;
@@ -16,7 +15,6 @@ using TheSaga.Persistance.InMemory;
 using TheSaga.Providers;
 using TheSaga.Registrator;
 using TheSaga.SagaModels;
-using TheSaga.Utils;
 
 [assembly: InternalsVisibleTo("TheSaga.Tests")]
 
@@ -45,12 +43,10 @@ namespace TheSaga
             services.AddSagaModelDefinitions();
 
             if (configAction != null)
-            {
-                configAction(new TheSagaConfig()
+                configAction(new TheSagaConfig
                 {
                     Services = services
                 });
-            }
 
             return services;
         }
@@ -77,8 +73,7 @@ namespace TheSaga
         public static IServiceProvider ResumeSagas(
             this IServiceProvider provider)
         {
-            ISagaCoordinator coordinator = provider.
-                GetRequiredService<ISagaCoordinator>();
+            var coordinator = provider.GetRequiredService<ISagaCoordinator>();
 
             coordinator.ResumeAll();
 

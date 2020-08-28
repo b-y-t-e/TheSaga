@@ -10,55 +10,47 @@ namespace TheSaga.Observables
 {
     internal class LockingObservable : IObservable
     {
-        private IServiceProvider serviceProvider;
+        private readonly IServiceProvider serviceProvider;
 
         public LockingObservable(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
 
-
-        async Task OnSagaProcessingStart(ExecutionStartMessage msg)
+        public void Subscribe()
         {
-            var sagaLocking = serviceProvider.
-                GetRequiredService<ISagaLocking>();
+            var internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
+
+            internalMessageBus.Subscribe<ExecutionStartMessage>(this, OnSagaProcessingStart);
+
+            internalMessageBus.Subscribe<ExecutionEndMessage>(this, OnSagaProcessingEnd);
+        }
+
+        public void Unsubscribe()
+        {
+            var internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
+
+            internalMessageBus.Unsubscribe<ExecutionStartMessage>(this);
+
+            internalMessageBus.Unsubscribe<ExecutionEndMessage>(this);
+        }
+
+
+        private async Task OnSagaProcessingStart(ExecutionStartMessage msg)
+        {
+            var sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
 
             if (msg.Saga?.Data?.ID != null)
                 if (!await sagaLocking.Acquire(msg.Saga.Data.ID))
                     throw new SagaIsBusyException(msg.Saga.Data.ID);
         }
 
-        async Task OnSagaProcessingEnd(ExecutionEndMessage msg)
+        private async Task OnSagaProcessingEnd(ExecutionEndMessage msg)
         {
-            var sagaLocking = serviceProvider.
-                GetRequiredService<ISagaLocking>();
+            var sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
 
             if (msg.Saga?.Data?.ID != null)
                 await sagaLocking.Banish(msg.Saga.Data.ID);
-        }
-
-        public void Subscribe()
-        {
-            var internalMessageBus = serviceProvider.
-                GetRequiredService<IMessageBus>();
-
-            internalMessageBus.
-                Subscribe<ExecutionStartMessage>(this, OnSagaProcessingStart);
-
-            internalMessageBus.
-                Subscribe<ExecutionEndMessage>(this, OnSagaProcessingEnd);
-        }
-
-        public void Unsubscribe()
-        {
-            var internalMessageBus = serviceProvider.
-                GetRequiredService<IMessageBus>();
-
-            internalMessageBus.
-                Unsubscribe<ExecutionStartMessage>(this);
-
-            internalMessageBus.
-                Unsubscribe<ExecutionEndMessage>(this);
         }
     }
 }

@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using TheSaga.Exceptions;
-using TheSaga.Locking;
-using TheSaga.Messages;
 
 namespace TheSaga.Observables.Registrator
 {
-    internal class ObservableRegistrator 
+    internal class ObservableRegistrator
     {
-        private IServiceProvider serviceProvider;
+        private readonly IServiceProvider serviceProvider;
 
         private bool wasInitialized;
 
@@ -24,17 +19,13 @@ namespace TheSaga.Observables.Registrator
             if (wasInitialized)
                 return;
 
-            new LockingObservable(serviceProvider).
-                Subscribe();
+            new LockingObservable(serviceProvider).Subscribe();
 
-            new ExecutionStartObservable(serviceProvider).
-                Subscribe();
+            new ExecutionStartObservable(serviceProvider).Subscribe();
 
-            new ExecutionEndObservable(serviceProvider).
-                Subscribe();
+            new ExecutionEndObservable(serviceProvider).Subscribe();
 
-            new AsyncStepCompletedObservable(serviceProvider).
-                Subscribe();
+            new AsyncStepCompletedObservable(serviceProvider).Subscribe();
 
             wasInitialized = true;
         }

@@ -2,14 +2,14 @@
 
 namespace TheSaga.SagaModels
 {
-    public interface ISagaModelBuilder<TSagaData> 
+    public interface ISagaModelBuilder<TSagaData>
         where TSagaData : ISagaData
     {
-         ISagaModel<TSagaData> Build();
+        ISagaModel<TSagaData> Build();
     }
 
-   /* public interface ISagaModelBuilder
-    {
-        ISagaModel Build();
-    }*/
+    /* public interface ISagaModelBuilder
+     {
+         ISagaModel Build();
+     }*/
 }

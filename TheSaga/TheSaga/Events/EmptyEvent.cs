@@ -5,11 +5,8 @@ namespace TheSaga.Events
     internal class EmptyEvent : IEvent
     {
         /// <summary>
-        /// Saga's correlation ID
+        ///     Saga's correlation ID
         /// </summary>
-        public Guid ID
-        {
-            get => Guid.Empty;
-        }
+        public Guid ID => Guid.Empty;
     }
 }

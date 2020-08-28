@@ -15,7 +15,7 @@ namespace TheSaga.SagaModels.Steps
         private readonly IServiceProvider serviceProvider;
 
         public SagaStepForEventHandler(
-            String StepName, IServiceProvider serviceProvider, Boolean async)
+            string StepName, IServiceProvider serviceProvider, bool async)
         {
             this.StepName = StepName;
             this.serviceProvider = serviceProvider;
@@ -23,31 +23,28 @@ namespace TheSaga.SagaModels.Steps
         }
 
         public bool Async { get; }
-        public String StepName { get; private set; }
+        public string StepName { get; }
 
         public async Task Compensate(IExecutionContext context, IEvent @event)
         {
-            IExecutionContext<TSagaData> contextForAction =
-                (IExecutionContext<TSagaData>)context;
+            var contextForAction =
+                (IExecutionContext<TSagaData>) context;
 
-            TEventHandler activity = (TEventHandler)ActivatorUtilities.
-                CreateInstance(serviceProvider, typeof(TEventHandler));
+            var activity = (TEventHandler) ActivatorUtilities.CreateInstance(serviceProvider, typeof(TEventHandler));
 
             if (activity != null)
-                await activity.Compensate(contextForAction, (TEvent)@event);
+                await activity.Compensate(contextForAction, (TEvent) @event);
         }
 
         public async Task Execute(IExecutionContext context, IEvent @event)
         {
-            IExecutionContext<TSagaData> contextForAction =
-                (IExecutionContext<TSagaData>)context;
+            var contextForAction =
+                (IExecutionContext<TSagaData>) context;
 
-            TEventHandler activity = (TEventHandler)ActivatorUtilities.
-                CreateInstance(serviceProvider, typeof(TEventHandler));
+            var activity = (TEventHandler) ActivatorUtilities.CreateInstance(serviceProvider, typeof(TEventHandler));
 
             if (activity != null)
-                await activity.Execute(contextForAction, (TEvent)@event);
+                await activity.Execute(contextForAction, (TEvent) @event);
         }
     }
-
 }

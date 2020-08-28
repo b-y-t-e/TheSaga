@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Events;
 using TheSaga.Models;
 
@@ -8,7 +8,7 @@ namespace TheSaga.Commands.Handlers
 {
     internal class ExecuteSagaCommandHandler
     {
-        private IServiceProvider serviceProvider;
+        private readonly IServiceProvider serviceProvider;
 
         public ExecuteSagaCommandHandler(
             IServiceProvider serviceProvider)
@@ -21,11 +21,10 @@ namespace TheSaga.Commands.Handlers
             if (command.Event == null)
                 command.Event = new EmptyEvent();
 
-            ExecuteActionCommandHandler executeActionHandler = ActivatorUtilities.
-               CreateInstance<ExecuteActionCommandHandler>(serviceProvider);
+            var executeActionHandler = ActivatorUtilities.CreateInstance<ExecuteActionCommandHandler>(serviceProvider);
 
-            ExecuteActionResult stepExecutionResult = await executeActionHandler.Handle(
-                new ExecuteActionCommand()
+            var stepExecutionResult = await executeActionHandler.Handle(
+                new ExecuteActionCommand
                 {
                     ID = command.ID,
                     Async = command.Async,
@@ -36,7 +35,7 @@ namespace TheSaga.Commands.Handlers
             if (stepExecutionResult.IsSyncProcessingComplete)
                 return stepExecutionResult.Saga;
 
-            return await Handle(new ExecuteSagaCommand()
+            return await Handle(new ExecuteSagaCommand
             {
                 Model = command.Model,
                 ID = command.ID,

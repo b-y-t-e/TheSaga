@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
 
@@ -8,14 +7,14 @@ namespace TheSaga.SagaModels.Steps
     internal class SagaEmptyStep : ISagaStep
     {
         public SagaEmptyStep(
-            String StepName)
+            string StepName)
         {
             this.StepName = StepName;
-            this.Async = false;
+            Async = false;
         }
 
         public bool Async { get; }
-        public String StepName { get; }
+        public string StepName { get; }
 
         public Task Compensate(IExecutionContext context, IEvent @event)
         {

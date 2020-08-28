@@ -10,7 +10,7 @@ namespace TheSaga.SagaModels.Steps.SendMessage
         where TSagaData : ISagaData
         where TEvent : IEvent
     {
-        ISagaCoordinator sagaCoordinator;
+        private readonly ISagaCoordinator sagaCoordinator;
 
         public SendMessageExecute(ISagaCoordinator sagaCoordinator)
         {
@@ -24,7 +24,6 @@ namespace TheSaga.SagaModels.Steps.SendMessage
 
         public async Task Compensate(IExecutionContext<TSagaData> context, TEvent @event)
         {
-
         }
     }
 }
