@@ -1,5 +1,8 @@
 ﻿TODO:
 
+ + retry (count) + retry (na message)
+     + retry (na message) - rejestracja eventu, w przypadku bledu przerwanie compensaty, w przypadku event'a proba powtorzenia execute (nie kompensaty)
+     + retry (count) - wykonanie kompensaty + zapisanie w StepData ilosci powtorzen, wykonywanie dopoki ilosc nie spadnie do zera
  + oblusga errorhandler?
  + transitionto w przypadku bledu w sadze
 

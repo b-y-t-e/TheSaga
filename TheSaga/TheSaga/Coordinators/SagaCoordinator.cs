@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Commands;
 using TheSaga.Commands.Handlers;
 using TheSaga.Events;
@@ -72,7 +72,8 @@ namespace TheSaga.Coordinators
             }
         }
 
-        public async Task<ISaga> Publish(IEvent @event)
+        public async Task<ISaga> Publish(
+            IEvent @event)
         {
             Type eventType = @event.GetType();
             SagaID sagaId = SagaID.From(@event.ID);
@@ -104,7 +105,8 @@ namespace TheSaga.Coordinators
             }
         }
 
-        public async Task WaitForIdle(Guid id, SagaWaitOptions waitOptions = null)
+        public async Task WaitForIdle(
+            Guid id, SagaWaitOptions waitOptions = null)
         {
             if (waitOptions == null)
                 waitOptions = new SagaWaitOptions();
@@ -144,20 +146,25 @@ namespace TheSaga.Coordinators
             }
         }
 
-        private async Task<ISaga> ExecuteSaga(IEvent @event, ISagaModel model, ISaga saga, SagaID id)
+        private async Task<ISaga> ExecuteSaga(
+            IEvent @event, ISagaModel model, ISaga saga, SagaID id)
         {
             try
             {
                 if (saga == null)
                     throw new SagaInstanceNotFoundException(id);
 
-                serviceProvider.GetRequiredService<ObservableRegistrator>().Initialize();
+                serviceProvider.
+                    GetRequiredService<ObservableRegistrator>().
+                    Initialize();
 
-                await messageBus.Publish(new ExecutionStartMessage(saga));
+                await messageBus.
+                    Publish(new ExecutionStartMessage(saga));
 
                 await sagaPersistance.Set(saga);
 
-                ExecuteActionCommandHandler handler = serviceProvider.GetRequiredService<ExecuteActionCommandHandler>();
+                ExecuteActionCommandHandler handler = serviceProvider.
+                    GetRequiredService<ExecuteActionCommandHandler>();
 
                 return await handler.Handle(new ExecuteActionCommand
                 {
@@ -196,7 +203,7 @@ namespace TheSaga.Coordinators
             if (id == SagaID.Empty())
                 id = SagaID.New();
 
-            ISagaData data = (ISagaData) Activator.CreateInstance(model.SagaStateType);
+            ISagaData data = (ISagaData)Activator.CreateInstance(model.SagaStateType);
             data.ID = id;
 
             ISaga saga = new Saga

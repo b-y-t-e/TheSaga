@@ -29,6 +29,7 @@ namespace TheSaga.Tests.SagaTests.Sagas.TransitionsSaga
                 When<InvalidUpdateEvent>().
                 TransitionTo<SecondState>().
                 Then(ctx => { throw new Exception(); }).
+                    RetryOn<InvalidUpdateEvent>().
                 Finish();
 
             return builder.
