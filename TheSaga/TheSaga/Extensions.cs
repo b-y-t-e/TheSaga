@@ -32,7 +32,7 @@ namespace TheSaga
             services.AddSingleton<ISagaPersistance, InMemorySagaPersistance>();
             services.AddSingleton<ISagaLocking, InMemorySagaLocking>();
             services.AddSingleton<IDateTimeProvider, LocalDateTimeProvider>();
-            services.AddSingleton<IErrorHandler, ErrorHandler>();
+            services.AddSingleton<IAsyncSagaErrorHandler, AsyncSagaErrorHandler>();
 
             services.AddTransient<ISagaRegistrator, SagaRegistrator>();
             services.AddTransient<ISagaCoordinator, SagaCoordinator>();

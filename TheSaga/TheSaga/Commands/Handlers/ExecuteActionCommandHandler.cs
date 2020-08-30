@@ -22,17 +22,17 @@ namespace TheSaga.Commands.Handlers
         private readonly ISagaPersistance sagaPersistance;
         private readonly IServiceScopeFactory serviceScopeFactory;
         private IMessageBus messageBus;
-        private IErrorHandler errorHandler;
+        private IAsyncSagaErrorHandler asyncErrorHandler;
 
         public ExecuteActionCommandHandler(
             ISagaPersistance sagaPersistance,
             IServiceScopeFactory serviceScopeFactory,
-            IMessageBus messageBus, IErrorHandler errorHandler)
+            IMessageBus messageBus, IAsyncSagaErrorHandler errorHandler)
         {
             this.sagaPersistance = sagaPersistance;
             this.serviceScopeFactory = serviceScopeFactory;
             this.messageBus = messageBus;
-            this.errorHandler = errorHandler;
+            this.asyncErrorHandler = errorHandler;
         }
 
         public async Task<ISaga> Handle(ExecuteActionCommand command)
@@ -40,10 +40,10 @@ namespace TheSaga.Commands.Handlers
             if (command.Event == null)
                 command.Event = new EmptyEvent();
 
-            ISaga saga = await sagaPersistance.Get(command.ID);
+            ISaga saga = command.Saga; // await sagaPersistance.Get(command.ID);
 
             if (saga == null)
-                throw new SagaInstanceNotFoundException(command.Model.SagaStateType, command.ID);
+                throw new SagaInstanceNotFoundException(command.Model.SagaStateType);
 
             IList<ISagaAction> actions = command.Model.
                 FindActionsForState(saga.State.GetExecutionState());
@@ -87,7 +87,7 @@ namespace TheSaga.Commands.Handlers
                 }
                 catch (Exception ex)
                 {
-                    await errorHandler.Handle(command.Saga, ex);
+                    await asyncErrorHandler.Handle(command.Saga, ex);
                 }
             });
         }
@@ -128,7 +128,8 @@ namespace TheSaga.Commands.Handlers
                         {
                             Async = AsyncExecution.False(),
                             Event = new EmptyEvent(),
-                            ID = SagaID.From(saga.Data.ID),
+                            Saga = saga,
+                            // ID = SagaID.From(saga.Data.ID),
                             Model = command.Model
                         });
                     }

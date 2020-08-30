@@ -11,6 +11,11 @@ namespace TheSaga.Exceptions
         {
         }
 
+        public SagaInstanceNotFoundException(Type sagaStateType) :
+            base($"Saga not found (state type {sagaStateType.Name})!")
+        {
+        }
+
         public SagaInstanceNotFoundException(Guid id) :
             base($"Saga with id {id} not found!")
         {

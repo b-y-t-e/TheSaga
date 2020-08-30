@@ -6,7 +6,7 @@ using TheSaga.Models;
 
 namespace TheSaga.Errors
 {
-    public class ErrorHandler : IErrorHandler
+    public class AsyncSagaErrorHandler : IAsyncSagaErrorHandler
     {
         public Task Handle(ISaga saga, Exception error)
         {

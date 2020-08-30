@@ -170,7 +170,8 @@ namespace TheSaga.Coordinators
                 {
                     Async = AsyncExecution.False(),
                     Event = @event,
-                    ID = SagaID.From(saga.Data.ID),
+                    Saga = saga, 
+                    // ID = SagaID.From(saga.Data.ID),
                     Model = model
                 });
             }
