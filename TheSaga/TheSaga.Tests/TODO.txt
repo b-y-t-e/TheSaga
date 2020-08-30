@@ -1,6 +1,9 @@
 ﻿TODO:
 
- +async and invalid
+ + oblusga errorhandler?
+ + transitionto w przypadku bledu w sadze
+
+ + async and invalid
  + poprawienie sqlserver'a
  + locki w bazie?
  + uzycie redis do lockow?
@@ -8,8 +11,6 @@
  + kasowanie lockow z bazy na starcie?
  + publishasync!
 
- + wolanie ExecuteStepCommand w publishasync?
- + Async message 
 
  + dodanie metody BusSend
  + podpiecie sie do masstransit
@@ -18,6 +19,7 @@
  + If else
 
 DONE:
+ + uproszczenie przetwarzania sagi
  + dodanie metody Publish
  + executors -> command / handlers
  + IServiceScopeFactory->CreateScope dla celj sagi i ascynhandlerze

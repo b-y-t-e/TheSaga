@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Activities;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
@@ -28,9 +28,9 @@ namespace TheSaga.SagaModels.Steps
         public async Task Compensate(IExecutionContext context, IEvent @event)
         {
             IExecutionContext<TSagaData> contextForAction =
-                (IExecutionContext<TSagaData>) context;
+                (IExecutionContext<TSagaData>)context;
 
-            TSagaActivity activity = (TSagaActivity) ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaActivity));
+            TSagaActivity activity = (TSagaActivity)ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaActivity));
 
             if (activity != null)
                 await activity.Compensate(contextForAction);
@@ -39,9 +39,9 @@ namespace TheSaga.SagaModels.Steps
         public async Task Execute(IExecutionContext context, IEvent @event)
         {
             IExecutionContext<TSagaData> contextForAction =
-                (IExecutionContext<TSagaData>) context;
+                (IExecutionContext<TSagaData>)context;
 
-            TSagaActivity activity = (TSagaActivity) ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaActivity));
+            TSagaActivity activity = (TSagaActivity)ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaActivity));
 
             if (activity != null)
                 await activity.Execute(contextForAction);
