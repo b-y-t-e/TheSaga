@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+using TheSaga.Errors;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.MessageBus;
 using TheSaga.Messages;
 using TheSaga.Models;
 using TheSaga.Persistance;
-using TheSaga.SagaModels;
 using TheSaga.SagaModels.Actions;
 using TheSaga.SagaModels.Steps;
 using TheSaga.Utils;
@@ -21,22 +21,21 @@ namespace TheSaga.Commands.Handlers
     {
         private readonly ISagaPersistance sagaPersistance;
         private readonly IServiceScopeFactory serviceScopeFactory;
-        private IServiceProvider serviceProvider;
         private IMessageBus messageBus;
+        private IErrorHandler errorHandler;
 
         public ExecuteActionCommandHandler(
             ISagaPersistance sagaPersistance,
-            IServiceProvider serviceProvider,
             IServiceScopeFactory serviceScopeFactory,
-            IMessageBus messageBus)
+            IMessageBus messageBus, IErrorHandler errorHandler)
         {
             this.sagaPersistance = sagaPersistance;
-            this.serviceProvider = serviceProvider;
             this.serviceScopeFactory = serviceScopeFactory;
             this.messageBus = messageBus;
+            this.errorHandler = errorHandler;
         }
 
-        public async Task<ExecuteActionResult> Handle(ExecuteActionCommand command)
+        public async Task<ISaga> Handle(ExecuteActionCommand command)
         {
             if (command.Event == null)
                 command.Event = new EmptyEvent();
@@ -46,16 +45,19 @@ namespace TheSaga.Commands.Handlers
             if (saga == null)
                 throw new SagaInstanceNotFoundException(command.Model.SagaStateType, command.ID);
 
-            IList<ISagaAction> actions = command.Model.FindActionsForState(saga.State.GetExecutionState());
+            IList<ISagaAction> actions = command.Model.
+                FindActionsForState(saga.State.GetExecutionState());
+
             ISagaStep step = FindStep(saga, command.Event.GetType(), actions);
-            ISagaAction action = command.Model.FindActionForStep(step);
+
+            ISagaAction action = command.Model.
+                FindActionForStep(step);
 
             if (step.Async)
                 saga.State.AsyncExecution = AsyncExecution.True();
 
             ExecuteStepCommand executeStepCommand = new ExecuteStepCommand
             {
-                AsyncExecution = saga.State.AsyncExecution,
                 Event = command.Event,
                 Saga = saga,
                 SagaStep = step,
@@ -65,112 +67,71 @@ namespace TheSaga.Commands.Handlers
 
             if (step.Async)
             {
-                Task.Run(async () =>
-                {
-                    try
-                    {
-                        await DispatchStepAsync(saga, executeStepCommand);
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-                });
-                return new ExecuteActionResult()
-                {
-                    IsSyncProcessingComplete = true,
-                    Saga = saga
-                };
+                DispatchStepAsync(executeStepCommand);
+                return saga;
             }
             else
             {
-                return await DispatchStepSync(saga, executeStepCommand);
+                return await DispatchStepSync(executeStepCommand);
             }
-
         }
 
-        async Task<ExecuteActionResult> DispatchStepSync(
-            ISaga saga, ExecuteStepCommand executeStepCommand)
+        private void DispatchStepAsync(
+            ExecuteStepCommand command)
+        {
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await DispatchStepSync(command);
+                }
+                catch (Exception ex)
+                {
+                    await errorHandler.Handle(command.Saga, ex);
+                }
+            });
+        }
+
+        private async Task<ISaga> DispatchStepSync(
+            ExecuteStepCommand command)
         {
             using (IServiceScope scope = serviceScopeFactory.CreateScope())
             {
                 ExecuteStepCommandHandler stepExecutor = ActivatorUtilities.
                     CreateInstance<ExecuteStepCommandHandler>(scope.ServiceProvider);
 
-                saga = await stepExecutor.
-                    Handle(executeStepCommand);
+                ISaga saga = await stepExecutor.
+                    Handle(command);
 
                 if (saga == null)
                 {
                     await messageBus.Publish(
                         new ExecutionEndMessage(saga));
 
-                    return new ExecuteActionResult()
-                    {
-                        Saga = null,
-                        IsSyncProcessingComplete = true
-                    };
+                    return null;
                 }
                 else
                 {
                     if (saga.IsIdle())
+                    {
                         await messageBus.Publish(
                             new ExecutionEndMessage(saga));
 
-                    if (saga.IsIdle() && saga.HasError())
-                        throw saga.State.CurrentError;
+                        if (saga.HasError())
+                            throw saga.State.CurrentError;
 
-                    return new ExecuteActionResult()
+                        return saga;
+                    }
+                    else
                     {
-                        Saga = saga,
-                        IsSyncProcessingComplete = saga.IsIdle()
-                    };
-                }
-            }
-        }
-
-        async Task<ExecuteActionResult> DispatchStepAsync(
-          ISaga saga, ExecuteStepCommand executeStepCommand)
-        {
-            using (IServiceScope scope = serviceScopeFactory.CreateScope())
-            {
-                ExecuteStepCommandHandler stepExecutor = ActivatorUtilities.
-                    CreateInstance<ExecuteStepCommandHandler>(scope.ServiceProvider);
-
-                saga = await stepExecutor.
-                    Handle(executeStepCommand);
-
-                if (saga == null)
-                {
-                    await messageBus.Publish(
-                        new ExecutionEndMessage(saga));
-
-                    return new ExecuteActionResult()
-                    {
-                        Saga = null,
-                        IsSyncProcessingComplete = true
-                    };
-                }
-                else
-                {
-                    if (saga.IsIdle())
-                        await messageBus.Publish(
-                            new ExecutionEndMessage(saga));
-
-                    // command handler?
-                    await messageBus.Publish(
-                        new AsyncStepCompletedMessage(
-                            SagaID.From(saga.Data.ID),
-                            saga.State.CurrentState,
-                            saga.State.CurrentStep,
-                            saga.State.IsCompensating,
-                            executeStepCommand.Model));
-
-                    return new ExecuteActionResult()
-                    {
-                        IsSyncProcessingComplete = true,
-                        Saga = saga
-                    };
+                        return await Handle(new ExecuteActionCommand()
+                        {
+                            Async = AsyncExecution.False(),
+                            Event = new EmptyEvent(),
+                            ID = SagaID.From(saga.Data.ID),
+                            Model = command.Model
+                        });
+                    }
                 }
             }
         }

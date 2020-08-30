@@ -36,40 +36,12 @@ namespace TheSaga.Commands.Handlers
             this.messageBus = messageBus;
         }
 
-       /* public async Task<ISaga> Handle(ExecuteStepCommand command)
-        {
-            if (command.SagaStep.Async)
-            {
-                ExecuteStepAsync(command);
-                return null;
-            }
-
-            return await ExecuteStepSync(command);
-        }*/
-
-        /*private void ExecuteStepAsync(ExecuteStepCommand command)
-        {
-            Task.Run(async () =>
-            {
-                try
-                {
-                    await ExecuteStepSync(command);
-                }
-                catch (Exception ex)
-                {
-
-                }
-            });
-        }*/
-
         public async Task<ISaga> Handle(ExecuteStepCommand command)
         {
             ISaga saga = command.Saga;
             ISagaStep sagaStep = command.SagaStep;
-            AsyncExecution asyncExecution = command.AsyncExecution;
             ISagaAction sagaAction = command.SagaAction;
             IEvent @event = command.Event;
-            ISagaModel model = command.Model;
 
             saga.State.CurrentStep = sagaStep.StepName;
             saga.Info.Modified = dateTimeProvider.Now;

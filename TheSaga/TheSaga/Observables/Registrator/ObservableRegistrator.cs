@@ -25,8 +25,6 @@ namespace TheSaga.Observables.Registrator
 
             new ExecutionEndObservable(serviceProvider).Subscribe();
 
-            new AsyncStepCompletedObservable(serviceProvider).Subscribe();
-
             wasInitialized = true;
         }
     }

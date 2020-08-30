@@ -5,6 +5,7 @@ using TheSaga.Builders;
 using TheSaga.Commands.Handlers;
 using TheSaga.Config;
 using TheSaga.Coordinators;
+using TheSaga.Errors;
 using TheSaga.Locking;
 using TheSaga.Locking.InMemory;
 using TheSaga.MessageBus;
@@ -31,12 +32,13 @@ namespace TheSaga
             services.AddSingleton<ISagaPersistance, InMemorySagaPersistance>();
             services.AddSingleton<ISagaLocking, InMemorySagaLocking>();
             services.AddSingleton<IDateTimeProvider, LocalDateTimeProvider>();
+            services.AddSingleton<IErrorHandler, ErrorHandler>();
 
             services.AddTransient<ISagaRegistrator, SagaRegistrator>();
             services.AddTransient<ISagaCoordinator, SagaCoordinator>();
 
             services.AddTransient(typeof(ISagaBuilder<>), typeof(SagaBuilder<>));
-            services.AddTransient<ExecuteSagaCommandHandler>();
+            //services.AddTransient<ExecuteSagaCommandHandler>();
             services.AddTransient<ExecuteActionCommandHandler>();
             services.AddTransient<ExecuteStepCommandHandler>();
 

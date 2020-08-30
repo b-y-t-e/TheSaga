@@ -10,7 +10,6 @@ namespace TheSaga.Commands
 {
     internal class ExecuteStepCommand 
     {
-        public AsyncExecution AsyncExecution;
         public IEvent Event;
         public ISagaModel Model;
         public ISaga Saga;

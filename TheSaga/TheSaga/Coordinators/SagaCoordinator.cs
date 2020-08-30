@@ -157,9 +157,9 @@ namespace TheSaga.Coordinators
 
                 await sagaPersistance.Set(saga);
 
-                ExecuteSagaCommandHandler handler = serviceProvider.GetRequiredService<ExecuteSagaCommandHandler>();
+                ExecuteActionCommandHandler handler = serviceProvider.GetRequiredService<ExecuteActionCommandHandler>();
 
-                return await handler.Handle(new ExecuteSagaCommand
+                return await handler.Handle(new ExecuteActionCommand
                 {
                     Async = AsyncExecution.False(),
                     Event = @event,
