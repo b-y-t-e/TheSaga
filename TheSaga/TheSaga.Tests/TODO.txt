@@ -1,6 +1,11 @@
 ﻿TODO:
 
+ +async and invalid
  + poprawienie sqlserver'a
+ + locki w bazie?
+ + uzycie redis do lockow?
+ + background worker do After?
+ + kasowanie lockow z bazy na starcie?
  + publishasync!
 
  + wolanie ExecuteStepCommand w publishasync?

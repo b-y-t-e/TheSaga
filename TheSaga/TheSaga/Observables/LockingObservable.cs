@@ -19,20 +19,20 @@ namespace TheSaga.Observables
 
         public void Subscribe()
         {
-            IMessageBus internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
+            IMessageBus messageBus = serviceProvider.GetRequiredService<IMessageBus>();
 
-            internalMessageBus.Subscribe<ExecutionStartMessage>(this, OnSagaProcessingStart);
+            messageBus.Subscribe<ExecutionStartMessage>(this, OnSagaProcessingStart);
 
-            internalMessageBus.Subscribe<ExecutionEndMessage>(this, OnSagaProcessingEnd);
+            messageBus.Subscribe<ExecutionEndMessage>(this, OnSagaProcessingEnd);
         }
 
         public void Unsubscribe()
         {
-            IMessageBus internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
+            IMessageBus messageBus = serviceProvider.GetRequiredService<IMessageBus>();
 
-            internalMessageBus.Unsubscribe<ExecutionStartMessage>(this);
+            messageBus.Unsubscribe<ExecutionStartMessage>(this);
 
-            internalMessageBus.Unsubscribe<ExecutionEndMessage>(this);
+            messageBus.Unsubscribe<ExecutionEndMessage>(this);
         }
 
 

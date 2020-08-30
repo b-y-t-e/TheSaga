@@ -17,16 +17,16 @@ namespace TheSaga.Observables
 
         public void Subscribe()
         {
-            IMessageBus internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
+            IMessageBus messageBus = serviceProvider.GetRequiredService<IMessageBus>();
 
-            internalMessageBus.Subscribe<ExecutionEndMessage>(this, OnSagaProcessingEnd);
+            messageBus.Subscribe<ExecutionEndMessage>(this, OnSagaProcessingEnd);
         }
 
         public void Unsubscribe()
         {
-            IMessageBus internalMessageBus = serviceProvider.GetRequiredService<IMessageBus>();
+            IMessageBus messageBus = serviceProvider.GetRequiredService<IMessageBus>();
 
-            internalMessageBus.Unsubscribe<ExecutionEndMessage>(this);
+            messageBus.Unsubscribe<ExecutionEndMessage>(this);
         }
 
         private async Task OnSagaProcessingEnd(ExecutionEndMessage msg)

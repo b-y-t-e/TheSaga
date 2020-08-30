@@ -19,6 +19,7 @@ namespace TheSaga.Models
         public bool IsCompensating { get; set; }
         public SagaHistory History { get; set; }
         public ExecutionID ExecutionID { get; set; }
+        public AsyncExecution AsyncExecution { get; set; }
 
         public string GetExecutionState()
         {

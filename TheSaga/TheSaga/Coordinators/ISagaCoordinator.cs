@@ -13,7 +13,6 @@ namespace TheSaga.Coordinators
 
         Task ResumeAll();
 
-        Task WaitForState<TState>(Guid id, SagaWaitOptions waitOptions = null)
-            where TState : IState, new();
+        Task WaitForIdle(Guid id, SagaWaitOptions waitOptions = null);
     }
 }

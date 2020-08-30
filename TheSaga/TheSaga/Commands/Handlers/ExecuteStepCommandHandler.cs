@@ -21,68 +21,61 @@ namespace TheSaga.Commands.Handlers
     internal class ExecuteStepCommandHandler
     {
         private readonly IDateTimeProvider dateTimeProvider;
-        private readonly IMessageBus internalMessageBus;
+        private readonly IMessageBus messageBus;
         private readonly ISagaPersistance sagaPersistance;
         private readonly IServiceProvider serviceProvider;
 
         public ExecuteStepCommandHandler(
             ISagaPersistance sagaPersistance,
             IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider,
-            IMessageBus internalMessageBus)
+            IMessageBus messageBus)
         {
             this.sagaPersistance = sagaPersistance;
             this.serviceProvider = serviceProvider;
             this.dateTimeProvider = dateTimeProvider;
-            this.internalMessageBus = internalMessageBus;
+            this.messageBus = messageBus;
         }
 
-        public async Task<ISaga> Handle(ExecuteStepCommand command)
+       /* public async Task<ISaga> Handle(ExecuteStepCommand command)
         {
-            if (command.Async)
+            if (command.SagaStep.Async)
             {
                 ExecuteStepAsync(command);
                 return null;
             }
 
             return await ExecuteStepSync(command);
-        }
+        }*/
 
-        private string CalculateNextStep(ISaga saga, ISagaAction sagaAction, ISagaStep sagaStep)
+        /*private void ExecuteStepAsync(ExecuteStepCommand command)
         {
-            if (saga.State.IsCompensating)
+            Task.Run(async () =>
             {
-                StepData latestToCompensate = saga.State.History.GetLatestToCompensate(saga.State.ExecutionID);
+                try
+                {
+                    await ExecuteStepSync(command);
+                }
+                catch (Exception ex)
+                {
 
-                if (latestToCompensate != null)
-                    return latestToCompensate.StepName;
+                }
+            });
+        }*/
 
-                return null;
-            }
-
-            return sagaAction.FindNextAfter(sagaStep)?.StepName;
-        }
-
-        private void ExecuteStepAsync(ExecuteStepCommand command)
-        {
-            Task.Run(() => ExecuteStepSync(command));
-        }
-
-        private async Task<ISaga> ExecuteStepSync(ExecuteStepCommand command)
+        public async Task<ISaga> Handle(ExecuteStepCommand command)
         {
             ISaga saga = command.Saga;
             ISagaStep sagaStep = command.SagaStep;
-            AsyncExecution async = command.Async;
+            AsyncExecution asyncExecution = command.AsyncExecution;
             ISagaAction sagaAction = command.SagaAction;
             IEvent @event = command.Event;
             ISagaModel model = command.Model;
 
-            string currentSagaState = saga.State.CurrentState;
-            bool hasSagaCompleted = false;
-
             saga.State.CurrentStep = sagaStep.StepName;
             saga.Info.Modified = dateTimeProvider.Now;
 
-            StepData executionData = saga.State.History.PrepareExecutionData(saga, async, dateTimeProvider);
+            StepData executionData = saga.State.History.
+                PrepareExecutionData(saga, sagaStep, dateTimeProvider);
 
             await sagaPersistance.Set(saga);
 
@@ -91,7 +84,7 @@ namespace TheSaga.Commands.Handlers
                 Type executionContextType =
                     typeof(ExecutionContext<>).ConstructGenericType(saga.Data.GetType());
 
-                IExecutionContext context = (IExecutionContext) ActivatorUtilities.CreateInstance(serviceProvider,
+                IExecutionContext context = (IExecutionContext)ActivatorUtilities.CreateInstance(serviceProvider,
                     executionContextType, saga.Data, saga.Info, saga.State);
 
                 if (@event is EmptyEvent)
@@ -133,7 +126,6 @@ namespace TheSaga.Commands.Handlers
             }
             else
             {
-                hasSagaCompleted = true;
                 saga.State.IsCompensating = false;
                 saga.State.CurrentStep = null;
             }
@@ -142,43 +134,23 @@ namespace TheSaga.Commands.Handlers
 
             await sagaPersistance.Set(saga);
 
-            await SendInternalMessages(saga, model, currentSagaState, hasSagaCompleted, async);
-
-            ThrowErrorIfSagaCompletedForSyncCall(saga, async);
-
             return saga;
         }
 
-        private async Task SendInternalMessages(
-            ISaga saga, ISagaModel model, string currentState, bool hasSagaCompleted, AsyncExecution async)
+        private string CalculateNextStep(ISaga saga, ISagaAction sagaAction, ISagaStep sagaStep)
         {
-            if (currentState != saga.State.CurrentState)
-                await internalMessageBus.Publish(
-                    new StateChangedMessage(SagaID.From(saga.Data.ID), saga.State.CurrentState, saga.State.CurrentStep,
-                        saga.State.IsCompensating));
+            if (saga.State.IsCompensating)
+            {
+                StepData latestToCompensate = saga.State.History.GetLatestToCompensate(saga.State.ExecutionID);
 
-            if (hasSagaCompleted)
-            {
-                await internalMessageBus.Publish(
-                    new ExecutionEndMessage(saga));
+                if (latestToCompensate != null)
+                    return latestToCompensate.StepName;
+
+                return null;
             }
-            else
-            {
-                if (async)
-                    await internalMessageBus.Publish(
-                        new AsyncStepCompletedMessage(SagaID.From(saga.Data.ID), saga.State.CurrentState,
-                            saga.State.CurrentStep, saga.State.IsCompensating, model));
-            }
+
+            return sagaAction.FindNextAfter(sagaStep)?.StepName;
         }
 
-        private void ThrowErrorIfSagaCompletedForSyncCall(ISaga saga, AsyncExecution async)
-        {
-            if (async)
-                return;
-
-            if (saga.IsIdle() &&
-                saga.HasError())
-                throw saga.State.CurrentError;
-        }
     }
 }

@@ -25,7 +25,7 @@ namespace TheSaga.Tests.SagaTests
 
             // when
             await sagaCoordinator.
-                WaitForState<New>(saga.Data.ID);
+                WaitForIdle(saga.Data.ID);
 
             // then
             (await sagaLocking.
@@ -56,7 +56,7 @@ namespace TheSaga.Tests.SagaTests
             ISaga saga = await sagaCoordinator.
                 Publish(new CreatedEvent());
             await sagaCoordinator.
-                WaitForState<New>(saga.Data.ID);
+                WaitForIdle(saga.Data.ID);
 
             // when
             await sagaCoordinator.

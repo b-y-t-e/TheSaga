@@ -1,4 +1,5 @@
 ﻿using TheSaga.Events;
+using TheSaga.MessageBus;
 using TheSaga.Models;
 using TheSaga.SagaModels;
 using TheSaga.SagaModels.Actions;
@@ -7,9 +8,9 @@ using TheSaga.ValueObjects;
 
 namespace TheSaga.Commands
 {
-    internal class ExecuteStepCommand
+    internal class ExecuteStepCommand 
     {
-        public AsyncExecution Async;
+        public AsyncExecution AsyncExecution;
         public IEvent Event;
         public ISagaModel Model;
         public ISaga Saga;

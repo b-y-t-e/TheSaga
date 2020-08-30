@@ -2,6 +2,7 @@
 using System.Linq;
 using TheSaga.Models;
 using TheSaga.Providers;
+using TheSaga.SagaModels.Steps;
 using TheSaga.ValueObjects;
 
 namespace TheSaga.SagaModels.History
@@ -43,7 +44,7 @@ namespace TheSaga.SagaModels.History
 
         public StepData PrepareExecutionData(
             ISaga saga,
-            AsyncExecution isExecutionAsync,
+            ISagaStep step,
             IDateTimeProvider dateTimeProvider)
         {
             StepData stepData = null;
@@ -60,7 +61,8 @@ namespace TheSaga.SagaModels.History
                 stepData = new StepData
                 {
                     ExecutionID = saga.State.ExecutionID,
-                    Async = isExecutionAsync,
+                    AsyncExecution = saga.State.AsyncExecution,
+                    AsyncStep = step.Async,
                     StateName = saga.State.CurrentState,
                     StepName = saga.State.CurrentStep,
                     ExecutionData = new StepExecutionData

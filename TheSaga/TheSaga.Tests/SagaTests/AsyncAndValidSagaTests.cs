@@ -25,7 +25,7 @@ namespace TheSaga.Tests.SagaTests
 
             // when
             await sagaCoordinator.
-                WaitForState<SagaFinishState>(saga.Data.ID);
+                WaitForIdle(saga.Data.ID);
 
             // then
             ISaga persistedSaga = await sagaPersistance.

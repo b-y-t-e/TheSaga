@@ -11,7 +11,8 @@ namespace TheSaga.SagaModels.History
         public string StateName { get; set; }
         public StepExecutionData ExecutionData { get; set; }
         public StepExecutionData CompensationData { get; set; }
-        public AsyncExecution Async { get; set; }
+        public bool AsyncExecution { get; set; }
+        public bool AsyncStep { get; set; }
 
         public void Started(IDateTimeProvider dateTimeProvider)
         {

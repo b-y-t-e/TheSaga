@@ -25,18 +25,18 @@ namespace TheSaga.Coordinators
     public class SagaCoordinator : ISagaCoordinator
     {
         private readonly IDateTimeProvider dateTimeProvider;
-        private readonly IMessageBus internalMessageBus;
+        private readonly IMessageBus messageBus;
         private readonly ISagaPersistance sagaPersistance;
         private readonly ISagaRegistrator sagaRegistrator;
         private readonly IServiceProvider serviceProvider;
 
         public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance,
-            IMessageBus internalMessageBus, IDateTimeProvider dateTimeProvider,
+            IMessageBus messageBus, IDateTimeProvider dateTimeProvider,
             IServiceProvider serviceProvider)
         {
             this.sagaRegistrator = sagaRegistrator;
             this.sagaPersistance = sagaPersistance;
-            this.internalMessageBus = internalMessageBus;
+            this.messageBus = messageBus;
             this.dateTimeProvider = dateTimeProvider;
             this.serviceProvider = serviceProvider;
         }
@@ -104,21 +104,20 @@ namespace TheSaga.Coordinators
             }
         }
 
-        public async Task WaitForState<TState>(Guid id, SagaWaitOptions waitOptions = null)
-            where TState : IState, new()
+        public async Task WaitForIdle(Guid id, SagaWaitOptions waitOptions = null)
         {
             if (waitOptions == null)
                 waitOptions = new SagaWaitOptions();
 
             try
             {
-                bool stateChanged = false;
+                bool isSagaInIdleState = false;
 
-                internalMessageBus.Subscribe<StateChangedMessage>(this, mesage =>
+                messageBus.Subscribe<ExecutionEndMessage>(this, mesage =>
                 {
-                    if (mesage.SagaID == id &&
-                        mesage.CurrentState == new TState().GetStateName())
-                        stateChanged = true;
+                    if (mesage.Saga.Data.ID == id &&
+                        mesage.Saga.IsIdle())
+                        isSagaInIdleState = true;
 
                     return Task.CompletedTask;
                 });
@@ -128,11 +127,11 @@ namespace TheSaga.Coordinators
                 if (saga == null)
                     throw new SagaInstanceNotFoundException(id);
 
-                if (saga.State.CurrentState == new TState().GetStateName())
+                if (saga.IsIdle())
                     return;
 
                 Stopwatch stopwatch = Stopwatch.StartNew();
-                while (!stateChanged)
+                while (!isSagaInIdleState)
                 {
                     await Task.Delay(250);
                     if (stopwatch.Elapsed >= waitOptions.Timeout)
@@ -141,7 +140,7 @@ namespace TheSaga.Coordinators
             }
             finally
             {
-                internalMessageBus.Unsubscribe<StateChangedMessage>(this);
+                messageBus.Unsubscribe<ExecutionEndMessage>(this);
             }
         }
 
@@ -154,7 +153,7 @@ namespace TheSaga.Coordinators
 
                 serviceProvider.GetRequiredService<ObservableRegistrator>().Initialize();
 
-                await internalMessageBus.Publish(new ExecutionStartMessage(saga));
+                await messageBus.Publish(new ExecutionStartMessage(saga));
 
                 await sagaPersistance.Set(saga);
 
@@ -170,7 +169,7 @@ namespace TheSaga.Coordinators
             }
             catch
             {
-                await internalMessageBus.Publish(
+                await messageBus.Publish(
                     new ExecutionEndMessage(saga));
 
                 throw;
