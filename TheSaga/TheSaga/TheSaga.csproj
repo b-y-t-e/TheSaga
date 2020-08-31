@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>.net saga / processmanager implementation
+
+https://github.com/b-y-t-e/TheSaga</Description>
+    <RepositoryUrl>https://github.com/b-y-t-e/TheSaga</RepositoryUrl>
+    <Version>0.7.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
