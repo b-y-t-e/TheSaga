@@ -18,6 +18,16 @@ namespace TheSaga.SagaModels.Actions
         public string State { get; set; }
         public List<ISagaStep> Steps { get; set; }
 
+        public void AddStep(ISagaStep step)
+        {
+            Steps.Add(step);
+        }
+
+        public ISagaStep FindFirstStep()
+        {
+            return Steps.FirstOrDefault();
+        }
+
         public ISagaStep FindNextAfter(ISagaStep step)
         {
             bool stepFound = false;

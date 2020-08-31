@@ -23,7 +23,7 @@ namespace TheSaga.SagaModels
 
         ISagaAction FindActionForStateAndEvent(string state, Type eventType);
 
-        IList<ISagaAction> FindActionsForState(string state);
+        ISagaStep FindStep(ISaga saga, Type eventType);
 
         bool IsStartEvent(Type type);
     }

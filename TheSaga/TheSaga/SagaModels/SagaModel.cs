@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TheSaga.Events;
+using TheSaga.Exceptions;
 using TheSaga.Models;
 using TheSaga.SagaModels.Actions;
 using TheSaga.SagaModels.Steps;
+using TheSaga.Utils;
 
 namespace TheSaga.SagaModels
 {
@@ -30,7 +33,7 @@ namespace TheSaga.SagaModels
 
         public ISagaAction FindActionForStateAndEvent(string state, Type eventType)
         {
-            SagaAction<TSagaData> action = Actions.FindAction(state, eventType);
+            SagaAction<TSagaData> action = Actions.FindActionByStateAndEventType(state, eventType);
 
             if (action == null)
                 throw new Exception($"Could not find action for state {state} and event of type {eventType?.Name}");
@@ -40,17 +43,66 @@ namespace TheSaga.SagaModels
 
         public ISagaAction FindActionForStep(ISagaStep sagaStep)
         {
-            return Actions.FindAction(sagaStep);
-        }
-
-        public IList<ISagaAction> FindActionsForState(string state)
-        {
-            return Actions.FindActions(state).Select(i => (ISagaAction) i).ToArray();
+            return Actions.FindActionByStep(sagaStep);
         }
 
         public bool IsStartEvent(Type type)
         {
             return Actions.StartEvents.Contains(type);
+        }
+
+        public ISagaStep FindStep(ISaga saga, Type eventType)
+        {
+            SagaActions<TSagaData> actions = this.
+                FindActionsForState(saga.State.GetExecutionState());
+
+            if (!eventType.Is<EmptyEvent>())
+                return FindStepForEventType(saga, eventType, actions);
+            return FindStepForCurrentState(saga, actions);
+        }
+
+        SagaActions<TSagaData> FindActionsForState(string state)
+        {
+            return Actions.FindActionsByState(state);
+        }
+
+        ISagaStep FindStepForCurrentState(ISaga saga, SagaActions<TSagaData> actions)
+        {
+            if (saga.IsIdle())
+                throw new Exception("");
+
+            ISagaAction action = actions.
+                FindActionByStep(saga.State.CurrentStep);
+
+            if (action == null)
+                throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
+
+            ISagaStep step = action.
+                FindStep(saga.State.CurrentStep);
+
+            if (step == null)
+                throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
+
+            return step;
+        }
+
+        ISagaStep FindStepForEventType(ISaga saga, Type eventType, SagaActions<TSagaData> actions)
+        {
+            ISagaAction action = actions.
+                FindActionByEventType(eventType);
+
+            if (action == null)
+                throw new SagaInvalidEventForStateException(saga.State.GetExecutionState(), eventType);
+
+            if (!saga.IsIdle())
+                throw new SagaIsBusyHandlingStepException(saga.Data.ID, saga.State.GetExecutionState(),
+                    saga.State.CurrentStep);
+
+            ISagaStep step = action.FindFirstStep();
+            if (step == null)
+                throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
+
+            return step;
         }
     }
 }

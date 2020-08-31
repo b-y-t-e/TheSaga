@@ -40,15 +40,12 @@ namespace TheSaga.Commands.Handlers
             if (command.Event == null)
                 command.Event = new EmptyEvent();
 
-            ISaga saga = command.Saga; // await sagaPersistance.Get(command.ID);
-
+            ISaga saga = command.Saga; 
             if (saga == null)
                 throw new SagaInstanceNotFoundException(command.Model.SagaStateType);
 
-            IList<ISagaAction> actions = command.Model.
-                FindActionsForState(saga.State.GetExecutionState());
-
-            ISagaStep step = FindStep(saga, command.Event.GetType(), actions);
+            ISagaStep step = command.Model.
+                FindStep(saga, command.Event.GetType());
 
             ISagaAction action = command.Model.
                 FindActionForStep(step);
@@ -129,7 +126,6 @@ namespace TheSaga.Commands.Handlers
                             Async = AsyncExecution.False(),
                             Event = new EmptyEvent(),
                             Saga = saga,
-                            // ID = SagaID.From(saga.Data.ID),
                             Model = command.Model
                         });
                     }
@@ -137,49 +133,5 @@ namespace TheSaga.Commands.Handlers
             }
         }
 
-        private ISagaStep FindStep(ISaga saga, Type eventType, IList<ISagaAction> actions)
-        {
-            if (!eventType.Is<EmptyEvent>())
-                return FindStepForEventType(saga, eventType, actions);
-            return FindStepForCurrentState(saga, actions);
-        }
-
-        private ISagaStep FindStepForCurrentState(ISaga saga, IList<ISagaAction> actions)
-        {
-            if (saga.IsIdle())
-                throw new Exception("");
-
-            ISagaAction action = actions.
-                FirstOrDefault(a => a.FindStep(saga.State.CurrentStep) != null);
-
-            if (action == null)
-                throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
-
-            ISagaStep step = action.FindStep(saga.State.CurrentStep);
-
-            if (step == null)
-                throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
-
-            return step;
-        }
-
-        private ISagaStep FindStepForEventType(ISaga saga, Type eventType, IList<ISagaAction> actions)
-        {
-            ISagaAction action = actions.FirstOrDefault(a => a.Event == eventType);
-
-            if (action == null)
-                throw new SagaInvalidEventForStateException(saga.State.GetExecutionState(), eventType);
-
-            if (!saga.IsIdle())
-                throw new SagaIsBusyHandlingStepException(saga.Data.ID, saga.State.GetExecutionState(),
-                    saga.State.CurrentStep);
-
-            ISagaStep step = action.Steps.FirstOrDefault();
-
-            if (step == null)
-                throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
-
-            return step;
-        }
     }
 }
