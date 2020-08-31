@@ -2,6 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Authors>Andrzej Ból</Authors>
+    <Company>Andrzej Ból</Company>
+    <Version>0.7.5</Version>
+    <Description>A module that allows you to save the state of the saga in sqlserver
+---------------------
+.net core Saga / ProcessManager implementation
+
+https://github.com/b-y-t-e/TheSaga</Description>
+    <PackageProjectUrl>https://github.com/b-y-t-e/TheSaga</PackageProjectUrl>
+    <Copyright>Andrzej Ból</Copyright>
+    <RepositoryUrl>https://github.com/b-y-t-e/TheSaga</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
