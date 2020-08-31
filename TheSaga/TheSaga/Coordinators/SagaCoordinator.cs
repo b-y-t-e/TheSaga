@@ -67,8 +67,7 @@ namespace TheSaga.Coordinators
                 await ExecuteSaga(
                     new EmptyEvent(),
                     model,
-                    saga,
-                    SagaID.From(id));
+                    saga);
             }
         }
 
@@ -93,8 +92,7 @@ namespace TheSaga.Coordinators
                 return await ExecuteSaga(
                     @event,
                     model,
-                    saga,
-                    SagaID.From(saga?.Data?.ID ?? sagaId));
+                    saga);
             }
             catch
             {
@@ -147,12 +145,12 @@ namespace TheSaga.Coordinators
         }
 
         private async Task<ISaga> ExecuteSaga(
-            IEvent @event, ISagaModel model, ISaga saga, SagaID id)
+            IEvent @event, ISagaModel model, ISaga saga)
         {
             try
             {
                 if (saga == null)
-                    throw new SagaInstanceNotFoundException(id);
+                    throw new SagaInstanceNotFoundException();
 
                 serviceProvider.
                     GetRequiredService<ObservableRegistrator>().
@@ -160,8 +158,6 @@ namespace TheSaga.Coordinators
 
                 await messageBus.
                     Publish(new ExecutionStartMessage(saga));
-
-                await sagaPersistance.Set(saga);
 
                 ExecuteActionCommandHandler handler = serviceProvider.
                     GetRequiredService<ExecuteActionCommandHandler>();

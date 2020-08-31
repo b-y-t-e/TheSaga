@@ -68,9 +68,6 @@ namespace TheSaga.SagaModels
 
         ISagaStep FindStepForCurrentState(ISaga saga, SagaActions<TSagaData> actions)
         {
-            if (saga.IsIdle())
-                throw new Exception("");
-
             ISagaAction action = actions.
                 FindActionByStep(saga.State.CurrentStep);
 
@@ -94,11 +91,9 @@ namespace TheSaga.SagaModels
             if (action == null)
                 throw new SagaInvalidEventForStateException(saga.State.GetExecutionState(), eventType);
 
-            if (!saga.IsIdle())
-                throw new SagaIsBusyHandlingStepException(saga.Data.ID, saga.State.GetExecutionState(),
-                    saga.State.CurrentStep);
+            ISagaStep step = action.
+                FindFirstStep();
 
-            ISagaStep step = action.FindFirstStep();
             if (step == null)
                 throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
 

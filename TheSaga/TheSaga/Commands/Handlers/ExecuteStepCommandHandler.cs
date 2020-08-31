@@ -21,19 +21,17 @@ namespace TheSaga.Commands.Handlers
     internal class ExecuteStepCommandHandler
     {
         private readonly IDateTimeProvider dateTimeProvider;
-        private readonly IMessageBus messageBus;
         private readonly ISagaPersistance sagaPersistance;
         private readonly IServiceProvider serviceProvider;
 
         public ExecuteStepCommandHandler(
             ISagaPersistance sagaPersistance,
-            IServiceProvider serviceProvider, IDateTimeProvider dateTimeProvider,
-            IMessageBus messageBus)
+            IServiceProvider serviceProvider, 
+            IDateTimeProvider dateTimeProvider)
         {
             this.sagaPersistance = sagaPersistance;
             this.serviceProvider = serviceProvider;
             this.dateTimeProvider = dateTimeProvider;
-            this.messageBus = messageBus;
         }
 
         public async Task<ISaga> Handle(ExecuteStepCommand command)

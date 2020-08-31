@@ -21,6 +21,11 @@ namespace TheSaga.Exceptions
         {
         }
 
+        public SagaInstanceNotFoundException() :
+            base($"Saga with specified id not found!")
+        {
+        }
+
         protected SagaInstanceNotFoundException(
             SerializationInfo info,
             StreamingContext context) : base(info, context)

@@ -40,7 +40,7 @@ namespace TheSaga.Commands.Handlers
             if (command.Event == null)
                 command.Event = new EmptyEvent();
 
-            ISaga saga = command.Saga; 
+            ISaga saga = command.Saga;
             if (saga == null)
                 throw new SagaInstanceNotFoundException(command.Model.SagaStateType);
 

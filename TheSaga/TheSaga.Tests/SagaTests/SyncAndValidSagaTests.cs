@@ -41,8 +41,9 @@ namespace TheSaga.Tests.SagaTests
             persistedSaga.ShouldNotBeNull();
             persistedSaga.State.CurrentState.ShouldBe(nameof(StateCreated));
             persistedSaga.State.CurrentStep.ShouldBe(null);
-            persistedSaga.State.History.ShouldNotContain(step => step.StepName == "OrderCreatedEventStep1" && step.CompensationData == null && step.HasSucceeded());
-            persistedSaga.State.History.Count.ShouldBe(0);
+            // blad nie powinien zmienic stanu sagi
+            persistedSaga.State.History.ShouldContain(step => step.StepName == "OrderCreatedEventStep1" && step.CompensationData == null && step.HasSucceeded());
+            persistedSaga.State.History.Count.ShouldBe(3);
         }
 
         [Fact]
