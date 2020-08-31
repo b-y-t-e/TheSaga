@@ -1,6 +1,5 @@
 ﻿namespace TheSaga.Models
 {
-
     public class Saga : ISaga
     {
         public Saga()

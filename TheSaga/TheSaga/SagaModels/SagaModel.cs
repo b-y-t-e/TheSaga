@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using TheSaga.Models;
-using TheSaga.Models.Actions;
-using TheSaga.Models.Steps;
+using TheSaga.SagaModels.Actions;
+using TheSaga.SagaModels.Steps;
 
 namespace TheSaga.SagaModels
 {
@@ -30,8 +30,7 @@ namespace TheSaga.SagaModels
 
         public ISagaAction FindActionForStateAndEvent(string state, Type eventType)
         {
-            SagaAction<TSagaData> action = this.Actions.
-                FindAction(state, eventType);
+            SagaAction<TSagaData> action = Actions.FindAction(state, eventType);
 
             if (action == null)
                 throw new Exception($"Could not find action for state {state} and event of type {eventType?.Name}");
@@ -41,16 +40,12 @@ namespace TheSaga.SagaModels
 
         public ISagaAction FindActionForStep(ISagaStep sagaStep)
         {
-            return this.Actions.
-                FindAction(sagaStep);
+            return Actions.FindAction(sagaStep);
         }
 
         public IList<ISagaAction> FindActionsForState(string state)
         {
-            return this.Actions.
-                 FindActions(state).
-                 Select(i => (ISagaAction)i).
-                 ToArray();
+            return Actions.FindActions(state).Select(i => (ISagaAction) i).ToArray();
         }
 
         public bool IsStartEvent(Type type)

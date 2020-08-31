@@ -1,0 +1,82 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using TheSaga.Models;
+using TheSaga.Providers;
+using TheSaga.SagaModels.Steps;
+using TheSaga.ValueObjects;
+
+namespace TheSaga.SagaModels.History
+{
+    public class SagaHistory : List<StepData>
+    {
+        public StepData GetLatestToCompensateByStepName(
+            ExecutionID executionID,
+            string stepName)
+        {
+            StepData executionData = this.LastOrDefault(s =>
+                s.ExecutionID == executionID &&
+                s.CompensationData == null &&
+                s.StepName == stepName);
+
+            return executionData;
+        }
+
+        public StepData GetLatestByStepName(
+            ExecutionID executionID,
+            string stepName)
+        {
+            StepData executionData = this.LastOrDefault(s =>
+                s.ExecutionID == executionID &&
+                s.StepName == stepName);
+
+            return executionData;
+        }
+
+        public StepData GetLatestToCompensate(
+            ExecutionID executionID)
+        {
+            StepData executionData = this.LastOrDefault(s =>
+                s.ExecutionID == executionID &&
+                s.CompensationData == null);
+
+            return executionData;
+        }
+
+        public StepData PrepareExecutionData(
+            ISaga saga,
+            ISagaStep step,
+            IDateTimeProvider dateTimeProvider)
+        {
+            StepData stepData = null;
+
+            if (saga.State.IsCompensating)
+            {
+                stepData = saga.State.History.GetLatestToCompensateByStepName(saga.State.ExecutionID,
+                    saga.State.CurrentStep);
+
+                stepData.CompensationData = new StepExecutionData();
+            }
+            else
+            {
+                stepData = new StepData
+                {
+                    ExecutionID = saga.State.ExecutionID,
+                    AsyncExecution = saga.State.AsyncExecution,
+                    AsyncStep = step.Async,
+                    StateName = saga.State.CurrentState,
+                    StepName = saga.State.CurrentStep,
+                    ExecutionData = new StepExecutionData
+                    {
+                        StartTime = dateTimeProvider.Now,
+                        EndStateName = saga.State.CurrentState
+                    }
+                };
+                saga.State.History.Add(stepData);
+            }
+
+            stepData.Started(dateTimeProvider);
+
+            return stepData;
+        }
+    }
+}

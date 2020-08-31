@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using TheSaga.Models;
-using TheSaga.Models.Actions;
-using TheSaga.Models.Steps;
+using TheSaga.SagaModels.Actions;
+using TheSaga.SagaModels.Steps;
 
 namespace TheSaga.SagaModels
 {
@@ -15,9 +15,9 @@ namespace TheSaga.SagaModels
     {
         Type SagaStateType { get; }
 
-        bool ContainsEvent(Type type);
-
         string Name { get; }
+
+        bool ContainsEvent(Type type);
 
         ISagaAction FindActionForStep(ISagaStep sagaStep);
 

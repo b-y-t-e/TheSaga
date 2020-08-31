@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Commands\Handlers\ExecuteActionResult.cs" />
     <Compile Remove="Execution\ISagaExecutor.cs" />
     <Compile Remove="Execution\SagaExecutor.cs" />
     <Compile Remove="ISagaRunningState.cs" />

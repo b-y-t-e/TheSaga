@@ -3,62 +3,54 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Exceptions;
 using TheSaga.Locking;
+using TheSaga.MessageBus;
 using TheSaga.Messages;
-using TheSaga.Messages.MessageBus;
 
 namespace TheSaga.Observables
 {
     internal class LockingObservable : IObservable
     {
-        private IServiceProvider serviceProvider;
+        private readonly IServiceProvider serviceProvider;
 
         public LockingObservable(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
 
-
-        async Task OnSagaProcessingStart(ExecutionStartMessage msg)
+        public void Subscribe()
         {
-            var sagaLocking = serviceProvider.
-                GetRequiredService<ISagaLocking>();
+            IMessageBus messageBus = serviceProvider.GetRequiredService<IMessageBus>();
+
+            messageBus.Subscribe<ExecutionStartMessage>(this, OnSagaProcessingStart);
+
+            messageBus.Subscribe<ExecutionEndMessage>(this, OnSagaProcessingEnd);
+        }
+
+        public void Unsubscribe()
+        {
+            IMessageBus messageBus = serviceProvider.GetRequiredService<IMessageBus>();
+
+            messageBus.Unsubscribe<ExecutionStartMessage>(this);
+
+            messageBus.Unsubscribe<ExecutionEndMessage>(this);
+        }
+
+
+        private async Task OnSagaProcessingStart(ExecutionStartMessage msg)
+        {
+            ISagaLocking sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
 
             if (msg.Saga?.Data?.ID != null)
                 if (!await sagaLocking.Acquire(msg.Saga.Data.ID))
                     throw new SagaIsBusyException(msg.Saga.Data.ID);
         }
 
-        async Task OnSagaProcessingEnd(ExecutionEndMessage msg)
+        private async Task OnSagaProcessingEnd(ExecutionEndMessage msg)
         {
-            var sagaLocking = serviceProvider.
-                GetRequiredService<ISagaLocking>();
+            ISagaLocking sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
 
             if (msg.Saga?.Data?.ID != null)
                 await sagaLocking.Banish(msg.Saga.Data.ID);
-        }
-
-        public void Subscribe()
-        {
-            var internalMessageBus = serviceProvider.
-                GetRequiredService<IMessageBus>();
-
-            internalMessageBus.
-                Subscribe<ExecutionStartMessage>(this, OnSagaProcessingStart);
-
-            internalMessageBus.
-                Subscribe<ExecutionEndMessage>(this, OnSagaProcessingEnd);
-        }
-
-        public void Unsubscribe()
-        {
-            var internalMessageBus = serviceProvider.
-                GetRequiredService<IMessageBus>();
-
-            internalMessageBus.
-                Unsubscribe<ExecutionStartMessage>(this);
-
-            internalMessageBus.
-                Unsubscribe<ExecutionEndMessage>(this);
         }
     }
 }

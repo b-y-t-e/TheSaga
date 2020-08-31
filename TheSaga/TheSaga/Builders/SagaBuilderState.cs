@@ -9,18 +9,19 @@ namespace TheSaga.Builders
         where TSagaData : ISagaData
     {
         public Type CurrentEvent;
-        public String CurrentState;
+        public string CurrentState;
         public SagaModel<TSagaData> Model;
         public IServiceProvider ServiceProvider;
         public UniqueNameGenerator UniqueNameGenerator;
 
-        public SagaBuilderState(Type currentEvent, string currentState, SagaModel<TSagaData> model, IServiceProvider serviceProvider, UniqueNameGenerator uniqueNameGenerator)
+        public SagaBuilderState(Type currentEvent, string currentState, SagaModel<TSagaData> model,
+            IServiceProvider serviceProvider, UniqueNameGenerator uniqueNameGenerator)
         {
-            this.CurrentEvent = currentEvent;
-            this.CurrentState = currentState;
-            this.Model = model;
-            this.ServiceProvider = serviceProvider;
-            this.UniqueNameGenerator = uniqueNameGenerator;
+            CurrentEvent = currentEvent;
+            CurrentState = currentState;
+            Model = model;
+            ServiceProvider = serviceProvider;
+            UniqueNameGenerator = uniqueNameGenerator;
         }
     }
 }

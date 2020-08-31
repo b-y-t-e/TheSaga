@@ -62,7 +62,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             else
                 sqlScript.Append(generateInsertScriptForObject(saga));
 
-            var dbobjectObject = prepareDbObject(saga);
+            Dictionary<string, object> dbobjectObject = prepareDbObject(saga);
 
             if (sqlScript.Length <= 0)
                 return;

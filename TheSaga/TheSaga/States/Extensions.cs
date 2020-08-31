@@ -8,7 +8,7 @@ namespace TheSaga.States
             where TState : IState
         {
             if (typeof(TState).Is<IStateWithCustomName>())
-                return ((IStateWithCustomName)state).Name;
+                return ((IStateWithCustomName) state).Name;
 
             return typeof(TState).Name;
         }

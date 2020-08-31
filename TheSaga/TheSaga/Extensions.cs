@@ -1,21 +1,21 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Linq;
+﻿using System;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Builders;
 using TheSaga.Commands.Handlers;
 using TheSaga.Config;
 using TheSaga.Coordinators;
+using TheSaga.Errors;
 using TheSaga.Locking;
 using TheSaga.Locking.InMemory;
-using TheSaga.Messages.MessageBus;
+using TheSaga.MessageBus;
+using TheSaga.MessageBus.InMemory;
 using TheSaga.Observables.Registrator;
 using TheSaga.Persistance;
 using TheSaga.Persistance.InMemory;
 using TheSaga.Providers;
 using TheSaga.Registrator;
 using TheSaga.SagaModels;
-using TheSaga.Utils;
 
 [assembly: InternalsVisibleTo("TheSaga.Tests")]
 
@@ -32,24 +32,23 @@ namespace TheSaga
             services.AddSingleton<ISagaPersistance, InMemorySagaPersistance>();
             services.AddSingleton<ISagaLocking, InMemorySagaLocking>();
             services.AddSingleton<IDateTimeProvider, LocalDateTimeProvider>();
+            services.AddSingleton<IAsyncSagaErrorHandler, AsyncSagaErrorHandler>();
 
             services.AddTransient<ISagaRegistrator, SagaRegistrator>();
             services.AddTransient<ISagaCoordinator, SagaCoordinator>();
 
             services.AddTransient(typeof(ISagaBuilder<>), typeof(SagaBuilder<>));
-            services.AddTransient<ExecuteSagaCommandHandler>();
+            //services.AddTransient<ExecuteSagaCommandHandler>();
             services.AddTransient<ExecuteActionCommandHandler>();
             services.AddTransient<ExecuteStepCommandHandler>();
 
             services.AddSagaModelDefinitions();
 
             if (configAction != null)
-            {
-                configAction(new TheSagaConfig()
+                configAction(new TheSagaConfig
                 {
                     Services = services
                 });
-            }
 
             return services;
         }
@@ -76,8 +75,7 @@ namespace TheSaga
         public static IServiceProvider ResumeSagas(
             this IServiceProvider provider)
         {
-            ISagaCoordinator coordinator = provider.
-                GetRequiredService<ISagaCoordinator>();
+            ISagaCoordinator coordinator = provider.GetRequiredService<ISagaCoordinator>();
 
             coordinator.ResumeAll();
 

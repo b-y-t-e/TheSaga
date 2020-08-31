@@ -1,44 +1,42 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using TheSaga.Commands;
+using TheSaga.Commands.Handlers;
 using TheSaga.Events;
 using TheSaga.Exceptions;
+using TheSaga.MessageBus;
+using TheSaga.Messages;
+using TheSaga.Models;
+using TheSaga.Observables.Registrator;
 using TheSaga.Options;
 using TheSaga.Persistance;
 using TheSaga.Providers;
 using TheSaga.Registrator;
-using TheSaga.States;
-using TheSaga.Utils;
-using Microsoft.Extensions.DependencyInjection;
-using TheSaga.Commands;
-using TheSaga.Commands.Handlers;
-using TheSaga.Locking;
-using TheSaga.Messages;
-using TheSaga.Messages.MessageBus;
-using TheSaga.Models;
 using TheSaga.SagaModels;
+using TheSaga.States;
 using TheSaga.ValueObjects;
-using TheSaga.Observables.Registrator;
 
 namespace TheSaga.Coordinators
 {
     public class SagaCoordinator : ISagaCoordinator
     {
-        private IMessageBus internalMessageBus;
-        private ISagaPersistance sagaPersistance;
-        private ISagaRegistrator sagaRegistrator;
-        private IDateTimeProvider dateTimeProvider;
-        private IServiceProvider serviceProvider;
+        private readonly IDateTimeProvider dateTimeProvider;
+        private readonly IMessageBus messageBus;
+        private readonly ISagaPersistance sagaPersistance;
+        private readonly ISagaRegistrator sagaRegistrator;
+        private readonly IServiceProvider serviceProvider;
 
         public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance,
-            IMessageBus internalMessageBus, IDateTimeProvider dateTimeProvider,
+            IMessageBus messageBus, IDateTimeProvider dateTimeProvider,
             IServiceProvider serviceProvider)
         {
             this.sagaRegistrator = sagaRegistrator;
             this.sagaPersistance = sagaPersistance;
-            this.internalMessageBus = internalMessageBus;
+            this.messageBus = messageBus;
             this.dateTimeProvider = dateTimeProvider;
             this.serviceProvider = serviceProvider;
         }
@@ -58,15 +56,13 @@ namespace TheSaga.Coordinators
             }
 
             if (invalidModels.Count > 0)
-                throw new Exception($"Saga models {String.Join(", ", invalidModels.Distinct().ToArray())} not found");
+                throw new Exception($"Saga models {string.Join(", ", invalidModels.Distinct().ToArray())} not found");
 
             foreach (Guid id in ids)
             {
-                ISaga saga = await sagaPersistance.
-                    Get(id);
+                ISaga saga = await sagaPersistance.Get(id);
 
-                ISagaModel model = sagaRegistrator.
-                    FindModelByName(saga.Info.ModelName);
+                ISagaModel model = sagaRegistrator.FindModelByName(saga.Info.ModelName);
 
                 await ExecuteSaga(
                     new EmptyEvent(),
@@ -76,7 +72,8 @@ namespace TheSaga.Coordinators
             }
         }
 
-        public async Task<ISaga> Publish(IEvent @event)
+        public async Task<ISaga> Publish(
+            IEvent @event)
         {
             Type eventType = @event.GetType();
             SagaID sagaId = SagaID.From(@event.ID);
@@ -94,9 +91,9 @@ namespace TheSaga.Coordinators
                     await sagaPersistance.Get(sagaId);
 
                 return await ExecuteSaga(
-                    @event, 
-                    model, 
-                    saga, 
+                    @event,
+                    model,
+                    saga,
                     SagaID.From(saga?.Data?.ID ?? sagaId));
             }
             catch
@@ -108,7 +105,49 @@ namespace TheSaga.Coordinators
             }
         }
 
-        private async Task<ISaga> ExecuteSaga(IEvent @event, ISagaModel model, ISaga saga, SagaID id)
+        public async Task WaitForIdle(
+            Guid id, SagaWaitOptions waitOptions = null)
+        {
+            if (waitOptions == null)
+                waitOptions = new SagaWaitOptions();
+
+            try
+            {
+                bool isSagaInIdleState = false;
+
+                messageBus.Subscribe<ExecutionEndMessage>(this, mesage =>
+                {
+                    if (mesage.Saga.Data.ID == id &&
+                        mesage.Saga.IsIdle())
+                        isSagaInIdleState = true;
+
+                    return Task.CompletedTask;
+                });
+
+                ISaga saga = await sagaPersistance.Get(id);
+
+                if (saga == null)
+                    throw new SagaInstanceNotFoundException(id);
+
+                if (saga.IsIdle())
+                    return;
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                while (!isSagaInIdleState)
+                {
+                    await Task.Delay(250);
+                    if (stopwatch.Elapsed >= waitOptions.Timeout)
+                        throw new TimeoutException();
+                }
+            }
+            finally
+            {
+                messageBus.Unsubscribe<ExecutionEndMessage>(this);
+            }
+        }
+
+        private async Task<ISaga> ExecuteSaga(
+            IEvent @event, ISagaModel model, ISaga saga, SagaID id)
         {
             try
             {
@@ -119,72 +158,29 @@ namespace TheSaga.Coordinators
                     GetRequiredService<ObservableRegistrator>().
                     Initialize();
 
-                await internalMessageBus.
+                await messageBus.
                     Publish(new ExecutionStartMessage(saga));
 
-                await sagaPersistance.
-                    Set(saga);
+                await sagaPersistance.Set(saga);
 
-                ExecuteSagaCommandHandler handler = serviceProvider.
-                    GetRequiredService<ExecuteSagaCommandHandler>();
+                ExecuteActionCommandHandler handler = serviceProvider.
+                    GetRequiredService<ExecuteActionCommandHandler>();
 
-                return await handler.Handle(new ExecuteSagaCommand()
+                return await handler.Handle(new ExecuteActionCommand
                 {
                     Async = AsyncExecution.False(),
                     Event = @event,
-                    ID = SagaID.From(saga.Data.ID),
+                    Saga = saga, 
+                    // ID = SagaID.From(saga.Data.ID),
                     Model = model
                 });
             }
             catch
             {
-                await internalMessageBus.Publish(
+                await messageBus.Publish(
                     new ExecutionEndMessage(saga));
 
                 throw;
-            }
-        }
-
-        public async Task WaitForState<TState>(Guid id, SagaWaitOptions waitOptions = null)
-            where TState : IState, new()
-        {
-            if (waitOptions == null)
-                waitOptions = new SagaWaitOptions();
-
-            try
-            {
-                bool stateChanged = false;
-
-                internalMessageBus.Subscribe<StateChangedMessage>(this, (mesage) =>
-                {
-                    if (mesage.SagaID == id &&
-                        mesage.CurrentState == new TState().GetStateName())
-                    {
-                        stateChanged = true;
-                    }
-
-                    return Task.CompletedTask;
-                });
-
-                ISaga saga = await sagaPersistance.Get(id);
-
-                if (saga == null)
-                    throw new SagaInstanceNotFoundException(id);
-
-                if (saga.State.CurrentState == new TState().GetStateName())
-                    return;
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                while (!stateChanged)
-                {
-                    await Task.Delay(250);
-                    if (stopwatch.Elapsed >= waitOptions.Timeout)
-                        throw new TimeoutException();
-                }
-            }
-            finally
-            {
-                internalMessageBus.Unsubscribe<StateChangedMessage>(this);
             }
         }
 
@@ -211,16 +207,16 @@ namespace TheSaga.Coordinators
             ISagaData data = (ISagaData)Activator.CreateInstance(model.SagaStateType);
             data.ID = id;
 
-            ISaga saga = new Saga()
+            ISaga saga = new Saga
             {
                 Data = data,
-                Info = new SagaInfo()
+                Info = new SagaInfo
                 {
                     ModelName = model.Name,
                     Created = dateTimeProvider.Now,
                     Modified = dateTimeProvider.Now
                 },
-                State = new SagaState()
+                State = new SagaState
                 {
                     CurrentState = new SagaStartState().GetStateName(),
                     CurrentStep = null

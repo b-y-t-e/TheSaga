@@ -6,7 +6,7 @@ namespace TheSaga.Locking.InMemory
 {
     public class InMemorySagaLocking : ISagaLocking
     {
-        private HashSet<Guid> locks =
+        private readonly HashSet<Guid> locks =
             new HashSet<Guid>();
 
         public Task<bool> Acquire(Guid guid)
