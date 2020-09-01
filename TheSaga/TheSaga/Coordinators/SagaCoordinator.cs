@@ -70,6 +70,24 @@ namespace TheSaga.Coordinators
                     saga);
             }
         }
+        public async Task Resume(Guid id)
+        {
+            List<string> invalidModels = new List<string>();
+
+            ISaga saga = await sagaPersistance.Get(id);
+            ISagaModel model = sagaRegistrator.FindModelByName(saga.Info.ModelName);
+
+            if (model == null)
+                invalidModels.Add(saga.Info.ModelName);
+
+            if (invalidModels.Count > 0)
+                throw new Exception($"Saga models {string.Join(", ", invalidModels.Distinct().ToArray())} not found");
+
+            await ExecuteSaga(
+                new EmptyEvent(),
+                model,
+                saga);
+        }
 
         public async Task<ISaga> Publish(
             IEvent @event)
@@ -166,7 +184,7 @@ namespace TheSaga.Coordinators
                 {
                     Async = AsyncExecution.False(),
                     Event = @event,
-                    Saga = saga, 
+                    Saga = saga,
                     Model = model
                 });
             }
@@ -220,5 +238,6 @@ namespace TheSaga.Coordinators
 
             return saga;
         }
+
     }
 }

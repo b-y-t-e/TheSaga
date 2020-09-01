@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheSaga", "TheSaga\TheSaga.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheSaga.Tests", "TheSaga.Tests\TheSaga.Tests.csproj", "{54F793E7-9C0D-4483-9674-756B331D831E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheSaga.Persistance.SqlServer", "TheSaga.Persistance.SqlServer\TheSaga.Persistance.SqlServer.csproj", "{334734F2-BA36-47AB-B7D3-A267495A3EEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheSaga.Persistance.SqlServer", "TheSaga.Persistance.SqlServer\TheSaga.Persistance.SqlServer.csproj", "{334734F2-BA36-47AB-B7D3-A267495A3EEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheSaga.Locking.DistributedLock", "TheSaga.Locking.DistributedLock\TheSaga.Locking.DistributedLock.csproj", "{279280D5-59C9-4EE3-8A18-BC2C316277D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{334734F2-BA36-47AB-B7D3-A267495A3EEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{334734F2-BA36-47AB-B7D3-A267495A3EEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{334734F2-BA36-47AB-B7D3-A267495A3EEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{279280D5-59C9-4EE3-8A18-BC2C316277D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{279280D5-59C9-4EE3-8A18-BC2C316277D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{279280D5-59C9-4EE3-8A18-BC2C316277D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{279280D5-59C9-4EE3-8A18-BC2C316277D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -20,7 +20,7 @@ namespace TheSaga.Tests.SagaTests.Sagas.AsyncAndInvalidSaga
         public ISagaModel<InvalidSagaData> Build()
         {
             builder.
-                Name(nameof(InvalidSagaData));
+                Name(nameof(InvalidSagaBuilder));
 
             builder.
                 Start<InvalidCreatedEvent, InvalidCreatedEventHandler>().

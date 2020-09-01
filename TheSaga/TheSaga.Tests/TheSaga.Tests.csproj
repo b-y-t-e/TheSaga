@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TheSaga.Locking.DistributedLock\TheSaga.Locking.DistributedLock.csproj" />
     <ProjectReference Include="..\TheSaga.Persistance.SqlServer\TheSaga.Persistance.SqlServer.csproj" />
     <ProjectReference Include="..\TheSaga\TheSaga.csproj" />
   </ItemGroup>

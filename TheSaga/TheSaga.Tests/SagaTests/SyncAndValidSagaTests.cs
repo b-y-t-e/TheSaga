@@ -1,12 +1,16 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using System;
+using System.Threading.Tasks;
 using TheSaga.Coordinators;
 using TheSaga.Events;
 using TheSaga.Exceptions;
+using TheSaga.Locking.DistributedLock;
+using TheSaga.Locking.DistributedLock.Options;
 using TheSaga.Models;
 using TheSaga.Persistance;
+using TheSaga.Persistance.SqlServer;
+using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Tests.SagaTests.Sagas.SyncAndValid.Events;
 using TheSaga.Tests.SagaTests.Sagas.SyncAndValid.States;
 using Xunit;
@@ -111,6 +115,10 @@ namespace TheSaga.Tests.SagaTests
             {
 #if SQL_SERVER
                 cfg.UseSqlServer(new SqlServerOptions()
+                {
+                    ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
+                });
+                cfg.UseDistributedLock(new SqlServerLockingOptions()
                 {
                     ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
                 });

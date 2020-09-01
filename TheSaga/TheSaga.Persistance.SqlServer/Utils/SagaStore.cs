@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,6 +58,99 @@ namespace TheSaga.Persistance.SqlServer.Utils
             if (saga == null)
                 return;
 
+            try
+            {
+                await saveStorageData(saga);
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 208)
+                    await createStorageTable();
+                await saveStorageData(saga);
+            }
+        }
+        private async Task createStorageTable()
+        {
+            _con.Connection().Execute(await generateTableScriptForType());
+        }
+
+
+        public async Task<ISaga> Get(Guid id)
+        {
+            try
+            {
+                return getStorageData(id);
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 208)
+                    await createStorageTable();
+                return getStorageData(id);
+            }
+        }
+
+        public async Task<IList<Guid>> GetUnfinished()
+        {
+            try
+            {
+                return getUnfinishedStorageData();
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 208)
+                    await createStorageTable();
+                return getUnfinishedStorageData();
+            }
+        }
+
+        private IList<Guid> getUnfinishedStorageData()
+        {
+            using var reader = _con.Connection().ExecuteReader(
+                $"select {idColumn} from {_sqlServerOptions.TableName} where step is not null ");
+
+            List<Guid> guids = new List<Guid>();
+            while (reader.Read())
+                guids.Add(reader.GetGuid(0));
+
+            return guids;
+        }
+
+        private ISaga getStorageData(Guid id)
+        {
+            string json = _con.Connection().ExecuteScalar<string>(
+                $"select {jsonColumn} from {_sqlServerOptions.TableName} where {idColumn} = @id",
+                new { id = id });
+
+            if (json == null)
+                return null;
+
+            object stateObject = JsonConvert.DeserializeObject(json, _serializerSettings);
+            return (ISaga)stateObject;
+        }
+
+        public async Task Remove(Guid id)
+        {
+            try
+            {
+                removeStorageData(id);
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 208)
+                    await createStorageTable();
+                removeStorageData(id);
+            }
+        }
+
+        private void removeStorageData(Guid id)
+        {
+            _con.Connection().Execute(
+                $"delete from {_sqlServerOptions.TableName} where {idColumn} = @id",
+                new { id = id });
+        }
+
+        private async Task saveStorageData(ISaga saga)
+        {
             StringBuilder sqlScript = new StringBuilder();
             if (await stateExists(saga.Data.ID))
                 sqlScript.Append(generateUpdateScriptForObject(saga));
@@ -67,39 +162,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             if (sqlScript.Length <= 0)
                 return;
 
-            try
-            {
-                _con.Connection().Execute(sqlScript.ToString(), dbobjectObject);
-            }
-            catch
-            {                 
-                _con.Connection().Execute(await generateTableScriptForType());
-                _con.Connection().Execute(sqlScript.ToString(), dbobjectObject);
-            }
-        }
-
-        public async Task<ISaga> Get(Guid id)
-        {
-            try
-            {
-                string json = _con.Connection().ExecuteScalar<string>(
-                    $"select {jsonColumn} from {_sqlServerOptions.TableName} where {idColumn} = @id",
-                    new { id = id });
-
-                object stateObject = JsonConvert.DeserializeObject(json, _serializerSettings);
-                return (ISaga)stateObject;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-
-        public async Task Remove(Guid id)
-        {
-            _con.Connection().Execute(
-                $"delete from {_sqlServerOptions.TableName} where {idColumn} = @id",
-                new { id = id });
+            _con.Connection().Execute(sqlScript.ToString(), dbobjectObject);
         }
 
         private Dictionary<string, object> prepareDbObject(ISaga saga)
@@ -174,6 +237,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
 
             if (!(await tableExists(_sqlServerOptions.TableName)))
                 script.
+                    Append($" if object_id('{_sqlServerOptions.TableName}') is null").
                     Append($" create table {_sqlServerOptions.TableName} (").
                     Append($"   {idColumn} uniqueidentifier not null primary key, ").
                     Append($"   {stateNameColumn} nvarchar(500) not null, ").

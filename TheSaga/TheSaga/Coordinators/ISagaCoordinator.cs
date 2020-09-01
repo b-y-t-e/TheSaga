@@ -10,9 +10,8 @@ namespace TheSaga.Coordinators
     public interface ISagaCoordinator
     {
         Task<ISaga> Publish(IEvent @event);
-
         Task ResumeAll();
-
+        Task Resume(Guid id);
         Task WaitForIdle(Guid id, SagaWaitOptions waitOptions = null);
     }
 }

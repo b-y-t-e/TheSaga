@@ -1,11 +1,15 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
+using System;
+using System.Threading.Tasks;
 using TheSaga.Coordinators;
 using TheSaga.Locking;
+using TheSaga.Locking.DistributedLock;
+using TheSaga.Locking.DistributedLock.Options;
 using TheSaga.Models;
 using TheSaga.Persistance;
+using TheSaga.Persistance.SqlServer;
+using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Tests.SagaTests.Sagas.ResumeSaga;
 using TheSaga.Tests.SagaTests.Sagas.ResumeSaga.Events;
 using Xunit;
@@ -56,7 +60,7 @@ namespace TheSaga.Tests.SagaTests
 
             // when
             await sagaCoordinator.
-                ResumeAll();
+                Resume(saga.Data.ID);
 
             // then
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
@@ -67,7 +71,7 @@ namespace TheSaga.Tests.SagaTests
 
         private ISagaCoordinator sagaCoordinator;
         private ISagaPersistance sagaPersistance;
-        ISagaLocking sagaLocking;
+        private ISagaLocking sagaLocking;
 
         public ResumeTests()
         {
@@ -76,6 +80,10 @@ namespace TheSaga.Tests.SagaTests
             {
 #if SQL_SERVER
                 cfg.UseSqlServer(new SqlServerOptions()
+                {
+                    ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
+                });
+                cfg.UseDistributedLock(new SqlServerLockingOptions()
                 {
                     ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
                 });

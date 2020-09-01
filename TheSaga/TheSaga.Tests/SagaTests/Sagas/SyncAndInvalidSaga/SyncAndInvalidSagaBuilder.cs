@@ -8,19 +8,19 @@ using TheSaga.Tests.SagaTests.Sagas.SyncAndInvalidSaga.States;
 
 namespace TheSaga.Tests.SagaTests.Sagas.SyncAndInvalidSaga
 {
-    public class InvalidSagaBuilder : ISagaModelBuilder<InvalidSagaData>
+    public class SyncAndInvalidSagaBuilder : ISagaModelBuilder<SyncAndInvalidSagaData>
     {
-        ISagaBuilder<InvalidSagaData> builder;
+        ISagaBuilder<SyncAndInvalidSagaData> builder;
 
-        public InvalidSagaBuilder(ISagaBuilder<InvalidSagaData> builder)
+        public SyncAndInvalidSagaBuilder(ISagaBuilder<SyncAndInvalidSagaData> builder)
         {
             this.builder = builder;
         }
 
-        public ISagaModel<InvalidSagaData> Build()
+        public ISagaModel<SyncAndInvalidSagaData> Build()
         {
             builder.
-                Name(nameof(InvalidSagaData));
+                Name(nameof(SyncAndInvalidSagaBuilder));
 
             builder.
                 Start<InvalidCreatedEvent, InvalidCreatedEventHandler>().

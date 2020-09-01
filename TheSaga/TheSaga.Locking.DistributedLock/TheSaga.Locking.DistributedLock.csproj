@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Version>0.7.5</Version>
+    <Authors>Andrzej Ból</Authors>
+    <Description>A module that allows you use distributed locking (using sql server, thanks to DistributedLock library)
+---------------------
+.net core Saga / ProcessManager implementation
+
+https://github.com/b-y-t-e/TheSaga</Description>
+    <Copyright>Andrzej Ból</Copyright>
+    <PackageProjectUrl>https://github.com/b-y-t-e/TheSaga</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/b-y-t-e/TheSaga</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DistributedLock" Version="1.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TheSaga\TheSaga.csproj" />
+  </ItemGroup>
+
+</Project>
