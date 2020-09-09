@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
@@ -29,12 +30,12 @@ namespace TheSaga.SagaModels.Steps
             this.ChildSteps = steps;
         }
 
-        public Task Compensate(IExecutionContext context, ISagaEvent @event)
+        public Task Compensate(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event)
         {
             return Task.CompletedTask;
         }
 
-        public Task Execute(IExecutionContext context, ISagaEvent @event)
+        public Task Execute(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event)
         {
             return Task.CompletedTask;
         }

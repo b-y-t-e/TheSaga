@@ -67,15 +67,15 @@ namespace TheSaga.Commands.Handlers
 
                 if (saga.State.IsResuming)
                 {
-                    await sagaStep.Compensate(context, @event);
+                    await sagaStep.Compensate(serviceProvider, context, @event);
                 }
                 else if (saga.State.IsCompensating)
                 {
-                    await sagaStep.Compensate(context, @event);
+                    await sagaStep.Compensate(serviceProvider, context, @event);
                 }
                 else
                 {
-                    await sagaStep.Execute(context, @event);
+                    await sagaStep.Execute(serviceProvider, context, @event);
                 }
 
                 executionData.

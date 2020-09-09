@@ -46,7 +46,6 @@ namespace TheSaga.Builders
             action.ChildSteps.AddStep(new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
                 builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(HandleBy), builderState.CurrentEvent.GetType().Name,
                     typeof(TEventHandler).Name),
-                builderState.ServiceProvider,
                 false,
                 builderState.ParentStep));
 
@@ -134,7 +133,6 @@ namespace TheSaga.Builders
                     new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
                         builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Start), typeof(TEvent).Name,
                             typeof(TEventHandler).Name),
-                        builderState.ServiceProvider,
                         false,
                         builderState.ParentStep)
                 )
@@ -181,7 +179,6 @@ namespace TheSaga.Builders
                 ChildSteps = new SagaSteps(
                     new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
                         stepName,
-                        builderState.ServiceProvider,
                         false,
                         builderState.ParentStep)
                 )
@@ -205,7 +202,6 @@ namespace TheSaga.Builders
                     new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
                         builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(StartAsync), typeof(TEvent).Name,
                             typeof(TEventHandler).Name),
-                        builderState.ServiceProvider,
                         true,
                         builderState.ParentStep)
                 )
@@ -230,7 +226,6 @@ namespace TheSaga.Builders
                 ChildSteps = new SagaSteps(
                     new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
                         stepName,
-                        builderState.ServiceProvider,
                         true,
                     builderState.ParentStep)
                 )
@@ -269,7 +264,6 @@ namespace TheSaga.Builders
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForActivity<TSagaData, TSagaActivity>(
                     builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Then), typeof(TSagaActivity).Name),
-                    builderState.ServiceProvider,
                     false,
                     builderState.ParentStep));
 
@@ -284,7 +278,6 @@ namespace TheSaga.Builders
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForActivity<TSagaData, TSagaActivity>(
                     stepName,
-                    builderState.ServiceProvider,
                     false,
                     builderState.ParentStep));
 
@@ -313,7 +306,6 @@ namespace TheSaga.Builders
                     null,
                     null,
                     builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEvent).Name),
-                    builderState.ServiceProvider,
                     false,
                     builderState.ParentStep));
 
@@ -330,7 +322,6 @@ namespace TheSaga.Builders
                     action,
                     compensation,
                     builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEvent).Name),
-                    builderState.ServiceProvider,
                     false,
                     builderState.ParentStep));
 
@@ -345,7 +336,6 @@ namespace TheSaga.Builders
                     null,
                     null,
                     builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEvent).Name),
-                    builderState.ServiceProvider,
                     false,
                     builderState.ParentStep));
 
@@ -360,7 +350,6 @@ namespace TheSaga.Builders
                     action,
                     null,
                     builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEvent).Name),
-                    builderState.ServiceProvider,
                     false,
                     builderState.ParentStep));
 
@@ -418,7 +407,6 @@ namespace TheSaga.Builders
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForActivity<TSagaData, TSagaActivity>(
                     builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(ThenAsync), typeof(TSagaActivity).Name),
-                    builderState.ServiceProvider,
                     true,
                     builderState.ParentStep));
 
@@ -433,7 +421,6 @@ namespace TheSaga.Builders
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForActivity<TSagaData, TSagaActivity>(
                     stepName,
-                    builderState.ServiceProvider,
                     true,
                     builderState.ParentStep));
 
@@ -550,7 +537,6 @@ namespace TheSaga.Builders
                     new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
                         builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(When), typeof(TEvent).Name,
                             typeof(TEventHandler).Name),
-                        builderState.ServiceProvider,
                         false,
                         builderState.ParentStep)
                 )
@@ -572,7 +558,6 @@ namespace TheSaga.Builders
                     new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
                         builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(WhenAsync), typeof(TEvent).Name,
                             typeof(TEventHandler).Name),
-                        builderState.ServiceProvider,
                         true,
                         builderState.ParentStep)
                 )

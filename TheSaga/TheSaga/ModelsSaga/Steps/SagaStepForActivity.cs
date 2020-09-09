@@ -14,15 +14,12 @@ namespace TheSaga.SagaModels.Steps
         where TSagaData : ISagaData
         where TSagaActivity : ISagaActivity<TSagaData>
     {
-        private readonly IServiceProvider serviceProvider;
-
         public ISagaStep ParentStep { get; }
         public SagaSteps ChildSteps { get; }
         public SagaStepForActivity(
-            string StepName, IServiceProvider serviceProvider, bool async, ISagaStep parentStep)
+            string StepName, bool async, ISagaStep parentStep)
         {
             this.StepName = StepName;
-            this.serviceProvider = serviceProvider;
             Async = async;
             ChildSteps = new SagaSteps();
             ParentStep = parentStep;
@@ -31,7 +28,7 @@ namespace TheSaga.SagaModels.Steps
         public bool Async { get; }
         public string StepName { get; }
 
-        public async Task Compensate(IExecutionContext context, ISagaEvent @event)
+        public async Task Compensate(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event)
         {
             IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>)context;
@@ -42,7 +39,7 @@ namespace TheSaga.SagaModels.Steps
                 await activity.Compensate(contextForAction);
         }
 
-        public async Task Execute(IExecutionContext context, ISagaEvent @event)
+        public async Task Execute(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event)
         {
             IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>)context;

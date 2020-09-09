@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Authors>Andrzej Ból</Authors>
     <Company>Andrzej Ból</Company>
-    <Version>0.7.7</Version>
+    <Version>0.7.8</Version>
     <Description>A module that allows you to save the state of the saga in sqlserver
 ---------------------
 .net core Saga / ProcessManager implementation

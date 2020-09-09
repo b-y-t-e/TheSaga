@@ -21,15 +21,13 @@ namespace TheSaga.SagaModels.Steps
         private readonly SendActionDelegate<TSagaData, TCompensateEvent> compensate;
         public SagaSteps ChildSteps { get; }
         public ISagaStep ParentStep { get; }
-        private readonly IServiceProvider serviceProvider;
 
         public SagaStepForSendActivity(
             SendActionDelegate<TSagaData, TExecuteEvent> action,
             SendActionDelegate<TSagaData, TCompensateEvent> compensate,
-            string StepName, IServiceProvider serviceProvider, bool async, ISagaStep parentStep)
+            string StepName, bool async, ISagaStep parentStep)
         {
             this.StepName = StepName;
-            this.serviceProvider = serviceProvider;
             Async = async;
             this.action = action;
             this.compensate = compensate;
@@ -40,7 +38,7 @@ namespace TheSaga.SagaModels.Steps
         public bool Async { get; }
         public string StepName { get; }
 
-        public async Task Compensate(IExecutionContext context, ISagaEvent @event)
+        public async Task Compensate(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event)
         {
             if (typeof(TCompensateEvent) == typeof(EmptyEvent))
                 return;
@@ -61,7 +59,7 @@ namespace TheSaga.SagaModels.Steps
                     eventToSend);
         }
 
-        public async Task Execute(IExecutionContext context, ISagaEvent @event)
+        public async Task Execute(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event)
         {
             if (typeof(TExecuteEvent) == typeof(EmptyEvent))
                 return;
