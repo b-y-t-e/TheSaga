@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TheSaga.Exceptions;
 using TheSaga.Models;
 using TheSaga.Providers;
 using TheSaga.SagaModels.Steps;
@@ -45,7 +46,8 @@ namespace TheSaga.SagaModels.History
 
         public StepData Create(
             ISaga saga,
-            ISagaStep step)
+            ISagaStep step,
+            ISagaModel model)
         {
             StepData currentExecutionData = saga.State.History.
                 LastOrDefault();
@@ -58,7 +60,18 @@ namespace TheSaga.SagaModels.History
                 currentExecutionData.StepName == saga.State.CurrentStep &&
                 currentExecutionData.ResumeData?.EndTime == null)
             {
-                saga.State.IsResuming = true;
+                if (model.ResumePolicy == ESagaResumePolicy.DoCurrentStepCompensation)
+                {
+                    saga.State.IsResuming = true;
+                }
+                else if (model.ResumePolicy == ESagaResumePolicy.DoFullCompensation)
+                {
+                    throw new SagaCompensateAllOnResumeException();
+                }
+                else
+                {
+                    saga.State.IsResuming = false;
+                }
             }
 
             StepData stepData = null;

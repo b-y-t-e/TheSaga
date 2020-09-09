@@ -41,13 +41,14 @@ namespace TheSaga.Commands.Handlers
             ISagaStep sagaStep = command.SagaStep;
             ISagaAction sagaAction = command.SagaAction;
             ISagaEvent @event = command.Event;
+            ISagaModel model = command.Model;
             Exception executionError = null;
 
             saga.State.CurrentStep = sagaStep.StepName;
             saga.Info.Modified = dateTimeProvider.Now;
 
             StepData executionData = saga.State.History.
-                Create(saga, sagaStep);
+                Create(saga, sagaStep, model);
 
             executionData.
                 MarkStarted(saga.State, dateTimeProvider);

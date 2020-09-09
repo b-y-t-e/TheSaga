@@ -1,4 +1,6 @@
-﻿using TheSaga.Events;
+﻿using System;
+using TheSaga.Builders.Saga;
+using TheSaga.Events;
 using TheSaga.Models;
 using TheSaga.SagaModels;
 using TheSaga.States;
@@ -12,7 +14,7 @@ namespace TheSaga.Builders
         ISagaBuilderWhen<TSagaData> During<TState>() where TState : ISagaState;
 
         ISagaBuilder<TSagaData> Name(string name);
-
+        ISagaBuilder<TSagaData> Settings(Action<ISagaSettingsBuilder> settingsBuilder);        
         ISagaBuilderThen<TSagaData> Start<TEvent>() where TEvent : ISagaEvent;
 
         ISagaBuilderThen<TSagaData> Start<TEvent, TEventHandler>() where TEvent : ISagaEvent

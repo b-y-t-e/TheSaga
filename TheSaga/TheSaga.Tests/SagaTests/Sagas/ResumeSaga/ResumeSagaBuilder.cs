@@ -18,17 +18,19 @@ namespace TheSaga.Tests.SagaTests.Sagas.ResumeSaga
         public ISagaModel Build()
         {
             builder.
-                Name(nameof(ResumeSagaBuilder));
+                Name(nameof(ResumeSagaBuilder)).
 
-            builder.
+                Settings(b => b.
+                    OnResumeDoCurrentStepCompensation().
+                    InHistoryStoreOnlyCurrentStep()).
+
                 Start<ResumeSagaCreateEvent>().
-                TransitionTo<Init>();
+                    TransitionTo<Init>().
 
-            builder.
                 During<Init>().
-                When<ResumeSagaUpdateEvent>().
-                Then(async ctx => { if (ResumeSagaSettings.StopSagaExecution) await ctx.Stop(); }).
-                TransitionTo<SecondState>();
+                    When<ResumeSagaUpdateEvent>().
+                    Then(async ctx => { if (ResumeSagaSettings.StopSagaExecution) await ctx.Stop(); }).
+                    TransitionTo<SecondState>();
 
             return builder.
                 Build();

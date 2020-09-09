@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TheSaga.MessageBus;
 using TheSaga.Messages;
 using TheSaga.Models;
+using TheSaga.SagaModels;
 using TheSaga.ValueObjects;
 
 namespace TheSaga.Observables
@@ -35,13 +36,16 @@ namespace TheSaga.Observables
         private async Task OnSagaProcessingStart(ExecutionStartMessage msg)
         {
             ISaga saga = msg.Saga;
+            SagaModels.ISagaModel model = msg.Model;
 
             if (!saga.IsIdle())
                 return;
 
             saga.State.CurrentError = null;
             saga.State.ExecutionID = ExecutionID.New();
-            saga.State.History.Clear();
+
+            if (model.HistoryPolicy == ESagaHistoryPolicy.StoreOnlyCurrentStep)
+                saga.State.History.Clear();
         }
     }
 }

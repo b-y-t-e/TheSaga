@@ -37,4 +37,8 @@ https://github.com/b-y-t-e/TheSaga</Description>
     <PackageReference Include="Scrutor" Version="3.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Builders\Saga\Options\" />
+  </ItemGroup>
+
 </Project>

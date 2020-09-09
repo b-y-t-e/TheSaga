@@ -177,7 +177,7 @@ namespace TheSaga.Coordinators
                     Initialize();
 
                 await messageBus.
-                    Publish(new ExecutionStartMessage(saga));
+                    Publish(new ExecutionStartMessage(saga, model));
 
                 ExecuteActionCommandHandler handler = serviceProvider.
                     GetRequiredService<ExecuteActionCommandHandler>();

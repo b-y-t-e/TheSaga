@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TheSaga.Activities;
+using TheSaga.Builders.Saga;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Models;
@@ -599,6 +600,13 @@ namespace TheSaga.Builders
             currentAction.
                 ChildSteps.AddStep(parentStep);
 
+            return new SagaBuilder<TSagaData>(builderState);
+        }
+
+        public ISagaBuilder<TSagaData> Settings(Action<ISagaSettingsBuilder> settingsBuilder)
+        {
+            ISagaSettingsBuilder sagaSettingsBuilder = new SagaSettingsBuilder(builderState.Model);
+            settingsBuilder(sagaSettingsBuilder);
             return new SagaBuilder<TSagaData>(builderState);
         }
     }

@@ -1,7 +1,6 @@
 ﻿TODO:
 
  + publish (fire&forget)
- + polityka resume - jako parametr (powtarzanie / kompensata calosci)
  + WhenTrue<Policy> dla TheHandlers
  + krok OnError
  + krok OnFinish
@@ -31,6 +30,7 @@
  + retry
 
 DONE:
+ + polityka resume - jako parametr (powtarzanie / kompensata calosci)
  + na resume wpierw kompensata a pozniej ponowienie kroku - ustawic jako parametr
  + SagaActionsContainer do SagaModel
  + poprawienie sqlserver'a
