@@ -592,8 +592,42 @@ namespace TheSaga.Builders
         {
             SagaAction currentAction = builderState.CurrentAction;
 
-            SagaIfStep<TSagaData, TSagaCondition> parentStep = new SagaIfStep<TSagaData, TSagaCondition>(
-                builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Do)),
+            SagaStepIf<TSagaData, TSagaCondition> parentStep = new SagaStepIf<TSagaData, TSagaCondition>(
+                builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(If)),
+                builderState.ParentStep);
+
+            SagaBuilderState childBuildState = new SagaBuilderState(
+                null, null, new SagaModel(typeof(TSagaData)),
+                builderState.ServiceProvider,
+                builderState.UniqueNameGenerator,
+                parentStep);
+
+            SagaBuilder<TSagaData> childBuilder = new SagaBuilder<TSagaData>(childBuildState);
+            childBuilder.Start<EmptyEvent>();
+
+            builderAction(childBuilder);
+
+            ISagaAction mainChildAction = childBuilder.
+                builderState.Model.Actions.
+                FindActionByStateAndEventType(new SagaStartState().GetStateName(), typeof(EmptyEvent));
+
+            mainChildAction.
+                ChildSteps.RemoveEmptyStepsAtBeginning();
+
+            parentStep.
+                SetChildSteps(mainChildAction.ChildSteps);
+
+            currentAction.
+                ChildSteps.AddStep(parentStep);
+
+            return new SagaBuilder<TSagaData>(builderState);
+        }
+        public ISagaBuilderThen<TSagaData> Else(Action<ISagaBuilderThen<TSagaData>> builderAction)
+        {
+            SagaAction currentAction = builderState.CurrentAction;
+
+            SagaStepElse<TSagaData> parentStep = new SagaStepElse<TSagaData>(
+                builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Else)),
                 builderState.ParentStep);
 
             SagaBuilderState childBuildState = new SagaBuilderState(

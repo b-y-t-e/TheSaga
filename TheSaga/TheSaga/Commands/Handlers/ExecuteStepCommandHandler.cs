@@ -109,7 +109,7 @@ namespace TheSaga.Commands.Handlers
             }
             else
             {
-                nextStepName = CalculateNextStep(saga, sagaAction, sagaStep);
+                nextStepName = CalculateNextStep(saga, sagaAction, sagaStep, stepData);
                 saga.State.IsResuming = false;
             }
 
@@ -137,13 +137,11 @@ namespace TheSaga.Commands.Handlers
             return saga;
         }
 
-        private string CalculateNextStep(ISaga saga, ISagaAction sagaAction, ISagaStep sagaStep)
+        private string CalculateNextStep(ISaga saga, ISagaAction sagaAction, ISagaStep sagaStep, IStepData stepData = null)
         {
             if (saga.State.IsResuming)
-            {
                 return sagaStep.StepName;
-            }
-
+            
             if (saga.State.IsCompensating)
             {
                 StepData latestToCompensate = saga.State.History.
@@ -156,7 +154,7 @@ namespace TheSaga.Commands.Handlers
             }
 
             return sagaAction.
-                GetNextStep(sagaStep)?.StepName;
+                GetNextStepToExecute(sagaStep, saga.State)?.StepName;
         }
 
     }

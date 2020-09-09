@@ -10,7 +10,7 @@ using TheSaga.SagaModels.History;
 
 namespace TheSaga.SagaModels.Steps
 {
-    internal class SagaIfStep<TSagaData, TSagaCondition> : ISagaStep
+    internal class SagaStepIf<TSagaData, TSagaCondition> : ISagaStep
         where TSagaData : ISagaData
         where TSagaCondition : ISagaCondition<TSagaData>
     {
@@ -18,7 +18,7 @@ namespace TheSaga.SagaModels.Steps
         public SagaSteps ChildSteps { get; private set; }
         public Type PolicyType { get; }
 
-        public SagaIfStep(string StepName, ISagaStep parentStep)
+        public SagaStepIf(string StepName, ISagaStep parentStep)
         {
             this.PolicyType = typeof(TSagaCondition);
             this.StepName = StepName;
@@ -56,7 +56,7 @@ namespace TheSaga.SagaModels.Steps
             if (activity != null)
             {
                 bool result = await activity.Execute(contextForAction);
-                stepData.ExecutionData.Result = result;
+                stepData.ExecutionData.ConditionResult = result;
             }
         }
     }
