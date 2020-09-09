@@ -2,5 +2,5 @@
 
 namespace TheSaga.Tests.SagaTests.Sagas.SyncAndValid.States
 {
-    internal class StateOrderSend : IState { }
+    internal class StateOrderSend : ISagaState { }
 }

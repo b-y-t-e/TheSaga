@@ -2,5 +2,5 @@
 
 namespace TheSaga.Tests.SagaTests.Sagas.SyncAndInvalidSaga.States
 {
-    internal class StateUpdated : IState { }
+    internal class StateUpdated : ISagaState { }
 }

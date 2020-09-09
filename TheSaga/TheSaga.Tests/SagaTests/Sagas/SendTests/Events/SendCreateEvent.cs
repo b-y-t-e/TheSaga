@@ -3,7 +3,7 @@ using TheSaga.Events;
 
 namespace TheSaga.Tests.SagaTests.Sagas.SendTests.Events
 {
-    public class SendCreateEvent : IEvent
+    public class SendCreateEvent : ISagaEvent
     {
         public Guid ID { get; set; }
     }

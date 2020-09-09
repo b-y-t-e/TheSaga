@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TheSaga.Coordinators;
 using TheSaga.Locking;
@@ -64,6 +65,28 @@ namespace TheSaga.Tests.SagaTests
 
             // then
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
+            persistedSaga.IsIdle().ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task WHEN_stoppedSagaIsResumed_THEN_sagaShouldCompensateAndExecuteLastStep()
+        {
+            // given
+            ResumeSagaSettings.StopSagaExecution = true;
+            ISaga saga = await sagaCoordinator.Publish(new ResumeSagaCreateEvent());
+            await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
+            ResumeSagaSettings.StopSagaExecution = false;
+            await sagaLocking.Banish(saga.Data.ID);
+
+            // when
+            await sagaCoordinator.
+                Resume(saga.Data.ID);
+
+            // then
+            ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
+            persistedSaga.State.History.Where(s => s.ResumeData != null).Count().ShouldBe(1);
+            persistedSaga.State.History.Where(s => s.CompensationData != null).Count().ShouldBe(0);
+            persistedSaga.State.History.Where(s => s.ExecutionData != null).Count().ShouldBe(4);
             persistedSaga.IsIdle().ShouldBeTrue();
         }
 

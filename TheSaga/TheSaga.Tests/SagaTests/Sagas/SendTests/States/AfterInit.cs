@@ -2,5 +2,5 @@
 
 namespace TheSaga.Tests.SagaTests.Sagas.SendTests.States
 {
-    public class AfterInit : IState { }
+    public class AfterInit : ISagaState { }
 }

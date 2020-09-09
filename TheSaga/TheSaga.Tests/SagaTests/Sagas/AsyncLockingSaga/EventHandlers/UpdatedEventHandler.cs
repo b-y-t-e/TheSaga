@@ -5,7 +5,7 @@ using TheSaga.Tests.SagaTests.Sagas.AsyncLockingSaga.Events;
 
 namespace TheSaga.Tests.SagaTests.Sagas.AsyncLockingSaga.EventHandlers
 {    
-    public class UpdatedEventHandler : IEventHandler<AsyncData, UpdatedEvent>
+    public class UpdatedEventHandler : ISagaEventHandler<AsyncData, UpdatedEvent>
     {
         public UpdatedEventHandler()
         {

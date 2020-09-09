@@ -15,7 +15,7 @@ namespace TheSaga.Tests.SagaTests.Sagas.TransitionsSaga
             this.builder = builder;
         }
 
-        public ISagaModel<TransitionsSagaData> Build()
+        public ISagaModel Build()
         {
             builder.
                 Name(nameof(TransitionsSagaBuilder));
@@ -29,7 +29,7 @@ namespace TheSaga.Tests.SagaTests.Sagas.TransitionsSaga
                 When<InvalidUpdateEvent>().
                 TransitionTo<SecondState>().
                 Then(ctx => { throw new Exception(); }).
-                    // RetryOn<InvalidUpdateEvent>().
+                    // RetryBy<InvalidUpdateEvent>().
                 Finish();
 
             return builder.

@@ -90,12 +90,14 @@ namespace TheSaga.Coordinators
         }
 
         public async Task<ISaga> Publish(
-            IEvent @event)
+            ISagaEvent @event)
         {
             Type eventType = @event.GetType();
             SagaID sagaId = SagaID.From(@event.ID);
 
-            ISagaModel model = sagaRegistrator.FindModelForEventType(eventType);
+            ISagaModel model = sagaRegistrator.
+                FindModelForEventType(eventType);
+
             if (model == null)
                 throw new SagaEventNotRegisteredException(eventType);
 
@@ -163,7 +165,7 @@ namespace TheSaga.Coordinators
         }
 
         private async Task<ISaga> ExecuteSaga(
-            IEvent @event, ISagaModel model, ISaga saga)
+            ISagaEvent @event, ISagaModel model, ISaga saga)
         {
             try
             {
@@ -203,7 +205,7 @@ namespace TheSaga.Coordinators
 
             if (eventType != null)
             {
-                bool isStartEvent = model.IsStartEvent(eventType);
+                bool isStartEvent = model.Actions.IsStartEvent(eventType);
 
                 if (isStartEvent)
                     saga = await CreateNewSaga(model, id);

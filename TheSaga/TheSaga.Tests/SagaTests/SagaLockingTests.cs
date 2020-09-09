@@ -40,7 +40,7 @@ namespace TheSaga.Tests.SagaTests
         public async Task WHEN_runSagaAsynchronous_THEN_sagaShouldBeLocked()
         {
             // given
-            IEvent startEvent = new CreatedEvent();
+            ISagaEvent startEvent = new CreatedEvent();
 
             // when
             ISaga saga = await sagaCoordinator.

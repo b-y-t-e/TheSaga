@@ -26,7 +26,7 @@ namespace TheSaga.Tests.SagaTests
             ISaga newSagaState = await sagaCoordinator.
                 Publish(new OrderCreatedEvent());
 
-            IEvent invalidEvent = new OrderSendEvent()
+            ISagaEvent invalidEvent = new OrderSendEvent()
             {
                 ID = newSagaState.Data.ID
             };
@@ -57,7 +57,7 @@ namespace TheSaga.Tests.SagaTests
             ISaga newSagaState = await sagaCoordinator.
             Publish(new OrderCreatedEvent());
 
-            IEvent skompletowanoEvent = new OrderCompletedEvent()
+            ISagaEvent skompletowanoEvent = new OrderCompletedEvent()
             {
                 ID = newSagaState.Data.ID
             };
@@ -86,7 +86,7 @@ namespace TheSaga.Tests.SagaTests
         public async Task WHEN_startEvent_THEN_sagaShouldBeCreated()
         {
             // given
-            IEvent startEvent = new OrderCreatedEvent();
+            ISagaEvent startEvent = new OrderCreatedEvent();
 
             // when
             ISaga saga = await sagaCoordinator.

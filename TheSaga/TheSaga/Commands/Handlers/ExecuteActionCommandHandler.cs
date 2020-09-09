@@ -10,6 +10,7 @@ using TheSaga.MessageBus;
 using TheSaga.Messages;
 using TheSaga.Models;
 using TheSaga.Persistance;
+using TheSaga.SagaModels;
 using TheSaga.SagaModels.Actions;
 using TheSaga.SagaModels.Steps;
 using TheSaga.Utils;
@@ -44,7 +45,7 @@ namespace TheSaga.Commands.Handlers
             if (saga == null)
                 throw new SagaInstanceNotFoundException(command.Model.SagaStateType);
 
-            ISagaStep step = command.Model.
+            ISagaStep step = command.Model.Actions.
                 FindStep(saga, command.Event.GetType());
 
             ISagaAction action = command.Model.

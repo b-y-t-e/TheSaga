@@ -17,6 +17,7 @@ namespace TheSaga.Models
         public string CurrentState { get; set; }
         public string CurrentStep { get; set; }
         public bool IsCompensating { get; set; }
+        public bool IsResuming { get; set; }
         public SagaHistory History { get; set; }
         public ExecutionID ExecutionID { get; set; }
         public AsyncExecution AsyncExecution { get; set; }

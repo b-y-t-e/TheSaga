@@ -18,4 +18,13 @@ namespace TheSaga.ExecutionContext
     public interface IExecutionContext
     {
     }
+    public interface IHandlersExecutionContext
+    {
+        SagaInfo Info { get; }
+
+        SagaState State { get; }
+
+        internal Task Stop();
+    }
+
 }

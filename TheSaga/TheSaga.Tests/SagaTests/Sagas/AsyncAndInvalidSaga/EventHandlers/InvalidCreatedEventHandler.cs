@@ -6,7 +6,7 @@ using TheSaga.Tests.SagaTests.Sagas.AsyncAndInvalidSaga.Events;
 
 namespace TheSaga.Tests.SagaTests.Sagas.AsyncAndInvalidSaga.EventHandlers
 {
-    public class InvalidCreatedEventHandler : IEventHandler<InvalidSagaData, InvalidCreatedEvent>
+    public class InvalidCreatedEventHandler : ISagaEventHandler<InvalidSagaData, InvalidCreatedEvent>
     {
         private readonly ISagaCoordinator sagaCoordinator;
 

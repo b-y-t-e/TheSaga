@@ -17,7 +17,7 @@ namespace TheSaga.Tests.SagaTests.Sagas.AsyncAndInvalidSaga
             this.builder = builder;
         }
 
-        public ISagaModel<InvalidSagaData> Build()
+        public ISagaModel Build()
         {
             builder.
                 Name(nameof(InvalidSagaBuilder));

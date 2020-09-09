@@ -6,7 +6,7 @@ using TheSaga.Tests.SagaTests.Sagas.AsyncLockingSaga.Events;
 
 namespace TheSaga.Tests.SagaTests.Sagas.AsyncLockingSaga.EventHandlers
 {
-    public class CreatedEventHandler : IEventHandler<AsyncData, CreatedEvent>
+    public class CreatedEventHandler : ISagaEventHandler<AsyncData, CreatedEvent>
     {
         private readonly ISagaCoordinator sagaCoordinator;
 
