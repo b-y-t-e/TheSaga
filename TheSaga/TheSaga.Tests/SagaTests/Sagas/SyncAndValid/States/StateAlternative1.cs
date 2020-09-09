@@ -2,5 +2,5 @@
 
 namespace TheSaga.Tests.SagaTests.Sagas.SyncAndValid.States
 {
-    public class StateAlternative1 : IState { }
+    public class StateAlternative1 : ISagaState { }
 }

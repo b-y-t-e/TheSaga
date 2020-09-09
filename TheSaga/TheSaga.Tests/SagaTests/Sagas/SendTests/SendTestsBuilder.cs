@@ -16,7 +16,7 @@ namespace TheSaga.Tests.SagaTests.Sagas.SendTests
             this.builder = builder;
         }
 
-        public ISagaModel<SendTestsData> Build()
+        public ISagaModel Build()
         {
             builder.
                 Name(nameof(SendTestsBuilder));

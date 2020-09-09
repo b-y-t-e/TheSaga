@@ -1,6 +1,18 @@
 ﻿TODO:
 
- + nuget
+ + publish (fire&forget)
+ + polityka resume - jako parametr (powtarzanie / kompensata calosci)
+ + WhenTrue<Policy> dla TheHandlers
+ + krok OnError
+ + krok OnFinish
+ + local transaction - one scope
+ + if / else
+ + TheHandlers -> powiazanie eventów i ich obsługi w systemie
+
+ + mozliwosc wysolania eventow i odbierania eventow
+ + metoda: Publish(IEvent @event)
+ + metoda: HandleBy dla start
+ + usuniecie task.delay z testow
  + retry (count) + retry (na message)
      + retry (na message) - rejestracja eventu, w przypadku bledu przerwanie compensaty, w przypadku event'a proba powtorzenia execute (nie kompensaty)
      + retry (count) - wykonanie kompensaty + zapisanie w StepData ilosci powtorzen, wykonywanie dopoki ilosc nie spadnie do zera
@@ -8,21 +20,22 @@
  + transitionto w przypadku bledu w sadze
 
  + async and invalid
- + poprawienie sqlserver'a
- + locki w bazie?
  + uzycie redis do lockow?
  + background worker do After?
  + kasowanie lockow z bazy na starcie?
  + publishasync!
 
-
  + dodanie metody BusSend
  + podpiecie sie do masstransit
  + after
  + retry
- + If else
 
 DONE:
+ + na resume wpierw kompensata a pozniej ponowienie kroku - ustawic jako parametr
+ + SagaActionsContainer do SagaModel
+ + poprawienie sqlserver'a
+ + locki w bazie?
+ + nuget
  + uproszczenie przetwarzania sagi
  + dodanie metody Publish
  + executors -> command / handlers

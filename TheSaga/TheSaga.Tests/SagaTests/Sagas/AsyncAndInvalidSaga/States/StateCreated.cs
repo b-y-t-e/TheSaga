@@ -2,5 +2,5 @@
 
 namespace TheSaga.Tests.SagaTests.Sagas.AsyncAndInvalidSaga.States
 {
-    internal class StateCreated : IState { }
+    internal class StateCreated : ISagaState { }
 }

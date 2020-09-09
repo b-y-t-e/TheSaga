@@ -17,7 +17,7 @@ namespace TheSaga.Tests.SagaTests.Sagas.AsyncLockingSaga
             this.builder = builder;
         }
 
-        public ISagaModel<AsyncData> Build()
+        public ISagaModel Build()
         {
             builder.
                 Start<CreatedEvent, CreatedEventHandler>().

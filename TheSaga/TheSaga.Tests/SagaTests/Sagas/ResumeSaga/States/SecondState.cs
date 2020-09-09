@@ -2,5 +2,5 @@
 
 namespace TheSaga.Tests.SagaTests.Sagas.ResumeSaga.States
 {
-    public class SecondState : IState { }
+    public class SecondState : ISagaState { }
 }

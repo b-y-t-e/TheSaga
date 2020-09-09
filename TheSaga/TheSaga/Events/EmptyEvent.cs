@@ -2,7 +2,7 @@
 
 namespace TheSaga.Events
 {
-    internal class EmptyEvent : IEvent
+    internal class EmptyEvent : ISagaEvent
     {
         /// <summary>
         ///     Saga's correlation ID

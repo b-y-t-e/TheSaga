@@ -15,7 +15,7 @@ namespace TheSaga.Tests.SagaTests.Sagas.ResumeSaga
             this.builder = builder;
         }
 
-        public ISagaModel<ResumeSagaData> Build()
+        public ISagaModel Build()
         {
             builder.
                 Name(nameof(ResumeSagaBuilder));

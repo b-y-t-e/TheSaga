@@ -22,7 +22,7 @@ namespace TheSaga.Tests.SagaTests
         public async Task WHEN_afterAsynchronousSagaRun_THEN_sagaShouldBeCompleted()
         {
             // given
-            IEvent startEvent = new CreatedEvent();
+            ISagaEvent startEvent = new CreatedEvent();
 
             ISaga saga = await sagaCoordinator.
                 Publish(startEvent);
@@ -49,7 +49,7 @@ namespace TheSaga.Tests.SagaTests
         public async Task WHEN_runSagaAsynchronous_THEN_sagaShouldBeInIntermediateState()
         {
             // given
-            IEvent startEvent = new CreatedEvent();
+            ISagaEvent startEvent = new CreatedEvent();
 
             // when
             ISaga saga = await sagaCoordinator.

@@ -2,5 +2,5 @@
 
 namespace TheSaga.Tests.SagaTests.Sagas.AsyncLockingSaga.States
 {
-    public class New : IState { }
+    public class New : ISagaState { }
 }

@@ -2,5 +2,5 @@
 
 namespace TheSaga.Tests.SagaTests.Sagas.TransitionsSaga.States
 {
-    public class SecondState : IState { }
+    public class SecondState : ISagaState { }
 }

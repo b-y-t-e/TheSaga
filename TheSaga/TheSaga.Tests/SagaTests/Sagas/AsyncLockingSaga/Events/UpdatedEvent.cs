@@ -3,7 +3,7 @@ using TheSaga.Events;
 
 namespace TheSaga.Tests.SagaTests.Sagas.AsyncLockingSaga.Events
 {
-    public class UpdatedEvent : IEvent
+    public class UpdatedEvent : ISagaEvent
     {
         public Guid ID { get; set; }
     }

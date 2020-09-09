@@ -34,12 +34,14 @@ namespace TheSaga.Registrator
 
         ISagaModel ISagaRegistrator.FindModelForEventType(Type eventType)
         {
-            return registeredModels.FirstOrDefault(v => v.ContainsEvent(eventType));
+            return registeredModels.
+                FirstOrDefault(model => model.Actions.IsEventSupported(eventType));
         }
 
         ISagaModel ISagaRegistrator.FindModelByName(string name)
         {
-            return registeredModels.FirstOrDefault(v => v.Name == name);
+            return registeredModels.
+                FirstOrDefault(model => model.Name == name);
         }
 
         private void RegisterAllModelWithBuilders()

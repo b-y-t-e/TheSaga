@@ -5,7 +5,7 @@ using TheSaga.Tests.SagaTests.Sagas.SyncAndValid.Events;
 
 namespace TheSaga.Tests.SagaTests.Sagas.SyncAndValid.EventHandlers
 {
-    public class OrderCreatedEventHandler : IEventHandler<OrderData, OrderCreatedEvent>
+    public class OrderCreatedEventHandler : ISagaEventHandler<OrderData, OrderCreatedEvent>
     {
         public OrderCreatedEventHandler()
         {

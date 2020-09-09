@@ -17,7 +17,7 @@ namespace TheSaga.Tests.SagaTests.Sagas.SyncAndValid
             this.builder = builder;
         }
 
-        public ISagaModel<OrderData> Build()
+        public ISagaModel Build()
         {
             builder.
                 Name(nameof(OrderSagaBuilder));

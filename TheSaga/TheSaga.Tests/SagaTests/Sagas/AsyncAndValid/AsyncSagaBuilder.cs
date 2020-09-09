@@ -16,7 +16,7 @@ namespace TheSaga.Tests.SagaTests.Sagas.AsyncAndValid
             this.builder = builder;
         }
 
-        public ISagaModel<AsyncData> Build()
+        public ISagaModel Build()
         {
             builder.
                 Start<CreatedEvent, CreatedEventHandler>(

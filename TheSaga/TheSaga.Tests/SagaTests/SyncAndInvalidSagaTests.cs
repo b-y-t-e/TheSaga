@@ -60,7 +60,7 @@ namespace TheSaga.Tests.SagaTests
         {
             // given
             Guid id = Guid.NewGuid();
-            IEvent startEvent = new InvalidCreatedEvent()
+            ISagaEvent startEvent = new InvalidCreatedEvent()
             {
                 ID = id
             };
@@ -82,7 +82,7 @@ namespace TheSaga.Tests.SagaTests
         {
             // given
             Guid id = Guid.NewGuid();
-            IEvent startEvent = new InvalidCreatedEvent()
+            ISagaEvent startEvent = new InvalidCreatedEvent()
             {
                 ID = id
             };

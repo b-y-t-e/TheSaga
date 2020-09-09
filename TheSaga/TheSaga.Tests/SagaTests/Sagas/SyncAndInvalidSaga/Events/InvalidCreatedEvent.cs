@@ -3,7 +3,7 @@ using TheSaga.Events;
 
 namespace TheSaga.Tests.SagaTests.Sagas.SyncAndInvalidSaga.Events
 {
-    public class InvalidCreatedEvent : IEvent
+    public class InvalidCreatedEvent : ISagaEvent
     {
         public Guid ID { get; set; }
     }

@@ -2,5 +2,5 @@
 
 namespace TheSaga.Tests.SagaTests.Sagas.SendTests.States
 {
-    public class AkternativeInit : IState { }
+    public class AkternativeInit : ISagaState { }
 }
