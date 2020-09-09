@@ -1,5 +1,6 @@
 ﻿using System;
 using TheSaga.Activities;
+using TheSaga.Conditions;
 using TheSaga.Events;
 using TheSaga.Models;
 using TheSaga.SagaModels;
@@ -36,6 +37,10 @@ namespace TheSaga.Builders
 
         ISagaBuilderThen<TSagaData> Do(Action<ISagaBuilderThen<TSagaData>> builder);
 
+        ISagaBuilderThen<TSagaData> If<TSagaCondition>(Action<ISagaBuilderThen<TSagaData>> builder)
+            where TSagaCondition : ISagaCondition<TSagaData>;
+
+        ISagaBuilderThen<TSagaData> Else(Action<ISagaBuilderThen<TSagaData>> builder);
         ISagaBuilderThen<TSagaData> Then(string stepName, ThenActionDelegate<TSagaData> action);
 
         ISagaBuilderThen<TSagaData> Then(ThenActionDelegate<TSagaData> action,

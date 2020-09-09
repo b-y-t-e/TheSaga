@@ -22,7 +22,7 @@ namespace TheSaga.Tests.SagaTests
         public async Task WHEN_sagaIsStopped_THEN_sagaShouldNotBeInIdleState()
         {
             // given
-            var @event = new ChildStepsSagaCreateEvent();
+            var @event = new SagaCreateWithDoStepEvent();
 
             // when
             ISaga saga = await sagaCoordinator.Publish(@event);

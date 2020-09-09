@@ -2,6 +2,7 @@
 using TheSaga.SagaModels;
 using TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga.Activities;
 using TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga.Events;
+using TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga.Conditions;
 using TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga.States;
 
 namespace TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga
@@ -22,13 +23,21 @@ namespace TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga
                 Name(nameof(ChildStepsSagaBuilder));
 
             builder.
-                Start<ChildStepsSagaCreateEvent>().
-                Do(b => b.
-                    Then<InnerActivity1>().
+                Start<SagaCreateWithDoStepEvent>().
                     Do(b => b.
-                        Then<InnerActivity2>()).
-                    Then<InnerActivity3>()).
-                TransitionTo<Init>();
+                        Then<InnerActivity1>().
+                        Do(b => b.
+                            Then<InnerActivity2>()).
+                        Then<InnerActivity3>()).
+                    TransitionTo<Init>();
+
+            builder.
+                Start<SagaCreateWithIfStepEvent>().
+                    Then<InnerActivity1>().
+                    If<Condition1>(b => b.
+                        Then<InnerActivity1>().
+                        Then<InnerActivity3>()).
+                    TransitionTo<Init>();
 
             return builder.
                 Build();

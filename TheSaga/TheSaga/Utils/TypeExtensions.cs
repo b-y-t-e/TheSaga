@@ -51,6 +51,13 @@ namespace TheSaga.Utils
             return null;
         }
 
+        internal static bool Is(this object obj, Type baseType)
+        {
+            if (obj == null)
+                return false;
+            return obj.GetType().Is(baseType);
+        }
+
         internal static bool Is(this Type thisType, Type baseType)
         {
             bool result =

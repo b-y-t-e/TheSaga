@@ -5,7 +5,7 @@ using TheSaga.ValueObjects;
 
 namespace TheSaga.SagaModels.History
 {
-    public class StepData
+    public class StepData : IStepData
     {
         public Guid ExecutionID { get; set; }
         public string StepName { get; set; }
