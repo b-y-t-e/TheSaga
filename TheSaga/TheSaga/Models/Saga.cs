@@ -5,13 +5,13 @@
         public Saga()
         {
             Info = new SagaInfo();
-            State = new SagaState();
+            State = new SagaExecutionState();
         }
 
         public ISagaData Data { get; set; }
 
         public SagaInfo Info { get; set; }
 
-        public SagaState State { get; set; }
+        public SagaExecutionState State { get; set; }
     }
 }

@@ -16,11 +16,9 @@ namespace TheSaga.SagaModels.Steps
     {
         public ISagaStep ParentStep { get; }
         public SagaSteps ChildSteps { get; private set; }
-        public Type PolicyType { get; }
 
         public SagaStepIf(string StepName, ISagaStep parentStep)
         {
-            this.PolicyType = typeof(TSagaCondition);
             this.StepName = StepName;
             this.Async = false;
             this.ChildSteps = new SagaSteps();

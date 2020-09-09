@@ -16,7 +16,7 @@ namespace TheSaga.SagaModels.History
         public bool AsyncExecution { get; set; }
         public bool AsyncStep { get; set; }
 
-        public void MarkStarted(SagaState state, IDateTimeProvider dateTimeProvider)
+        public void MarkStarted(SagaExecutionState state, IDateTimeProvider dateTimeProvider)
         {
             if (state.IsResuming)
                 ResumeData.StartTime = dateTimeProvider.Now;
@@ -26,7 +26,7 @@ namespace TheSaga.SagaModels.History
                 ExecutionData.StartTime = dateTimeProvider.Now;
         }
 
-        public void MarkEnded(SagaState state, IDateTimeProvider dateTimeProvider)
+        public void MarkEnded(SagaExecutionState state, IDateTimeProvider dateTimeProvider)
         {
             if (state.IsResuming)
                 ResumeData.EndTime = dateTimeProvider.Now;
@@ -36,7 +36,7 @@ namespace TheSaga.SagaModels.History
                 ExecutionData.EndTime = dateTimeProvider.Now;
         }
 
-        public void MarkSucceeded(SagaState state, IDateTimeProvider dateTimeProvider)
+        public void MarkSucceeded(SagaExecutionState state, IDateTimeProvider dateTimeProvider)
         {
             if (state.IsResuming)
                 ResumeData.SucceedTime = dateTimeProvider.Now;
@@ -46,7 +46,7 @@ namespace TheSaga.SagaModels.History
                 ExecutionData.SucceedTime = dateTimeProvider.Now;
         }
 
-        public void MarkFailed(SagaState state, IDateTimeProvider dateTimeProvider, Exception error)
+        public void MarkFailed(SagaExecutionState state, IDateTimeProvider dateTimeProvider, Exception error)
         {
             if (state.IsResuming)
             {

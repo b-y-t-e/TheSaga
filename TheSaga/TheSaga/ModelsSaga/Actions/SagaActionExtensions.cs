@@ -89,7 +89,7 @@ namespace TheSaga.SagaModels.Actions
             return step;
         }
         public static ISagaStep GetNextStepToExecute(
-            this ISagaAction sagaAction, ISagaStep currentStep, SagaState sagaState)
+            this ISagaAction sagaAction, ISagaStep currentStep, SagaExecutionState sagaState)
         {
             IStepData currentStepData = sagaState.History.
                 GetLatestByStepName(currentStep.StepName);

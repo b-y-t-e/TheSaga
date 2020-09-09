@@ -231,7 +231,7 @@ namespace TheSaga.Coordinators
                     Created = dateTimeProvider.Now,
                     Modified = dateTimeProvider.Now
                 },
-                State = new SagaState
+                State = new SagaExecutionState
                 {
                     CurrentState = new SagaStartState().GetStateName(),
                     CurrentStep = null

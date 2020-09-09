@@ -4,6 +4,6 @@
     {
         ISagaData Data { get; }
         SagaInfo Info { get; }
-        SagaState State { get; }
+        SagaExecutionState State { get; }
     }
 }
