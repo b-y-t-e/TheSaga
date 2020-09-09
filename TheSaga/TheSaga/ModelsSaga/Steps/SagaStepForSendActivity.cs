@@ -6,6 +6,7 @@ using TheSaga.Events;
 using TheSaga.ExecutionContext;
 using TheSaga.Models;
 using TheSaga.SagaModels.Actions;
+using TheSaga.SagaModels.History;
 using TheSaga.SagaModels.Steps.Delegates;
 using TheSaga.SagaModels.Steps.SendMessage;
 
@@ -38,7 +39,7 @@ namespace TheSaga.SagaModels.Steps
         public bool Async { get; }
         public string StepName { get; }
 
-        public async Task Compensate(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event)
+        public async Task Compensate(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event, IStepData stepData)
         {
             if (typeof(TCompensateEvent) == typeof(EmptyEvent))
                 return;
@@ -59,7 +60,7 @@ namespace TheSaga.SagaModels.Steps
                     eventToSend);
         }
 
-        public async Task Execute(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event)
+        public async Task Execute(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event, IStepData stepData)
         {
             if (typeof(TExecuteEvent) == typeof(EmptyEvent))
                 return;

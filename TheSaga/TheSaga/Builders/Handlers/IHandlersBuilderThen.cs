@@ -34,6 +34,8 @@ namespace TheSaga.Builders.Handlers
 
         IHandlersBuilderThen Do(Action<IHandlersBuilderThen> builder);
 
+        IHandlersBuilderThen If<TSagaCondition>(Action<IHandlersBuilderThen> builder);
+
         IHandlersBuilderThen Then(string stepName, HandlersThenActionDelegate action);
 
         IHandlersBuilderThen Then(HandlersThenActionDelegate action,

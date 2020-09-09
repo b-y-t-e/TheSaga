@@ -179,7 +179,6 @@ namespace TheSaga.Persistance.SqlServer.Utils
             dbobject[compensatingColumn] = saga.State.IsCompensating;
             dbobject[jsonColumn] = JsonConvert.SerializeObject(saga, _serializerSettings);
 
-
             return dbobject;
         }
 

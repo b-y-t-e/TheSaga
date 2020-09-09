@@ -11,5 +11,6 @@ namespace TheSaga.SagaModels.History
         public Exception Error { get; set; }
         public string EndStateName { get; set; }
         public string NextStepName { get; set; }
+        public object Result { get; set; }
     }
 }

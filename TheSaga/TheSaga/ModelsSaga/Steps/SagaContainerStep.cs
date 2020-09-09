@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
 using TheSaga.SagaModels.Actions;
+using TheSaga.SagaModels.History;
 using TheSaga.ValueObjects;
 
 namespace TheSaga.SagaModels.Steps
@@ -30,12 +31,12 @@ namespace TheSaga.SagaModels.Steps
             this.ChildSteps = steps;
         }
 
-        public Task Compensate(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event)
+        public Task Compensate(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event, IStepData stepData)
         {
             return Task.CompletedTask;
         }
 
-        public Task Execute(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event)
+        public Task Execute(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event, IStepData stepData)
         {
             return Task.CompletedTask;
         }

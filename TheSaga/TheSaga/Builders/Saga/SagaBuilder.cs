@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.Builders.Saga;
+using TheSaga.Conditions;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Models;
@@ -48,6 +49,25 @@ namespace TheSaga.Builders
                 builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(HandleBy), builderState.CurrentEvent.GetType().Name,
                     typeof(TEventHandler).Name),
                 false,
+                builderState.ParentStep));
+
+            return new SagaBuilder<TSagaData>(builderState);
+        }
+
+        public ISagaBuilderThen<TSagaData> HandleByAsync<TEventHandler>()
+            where TEventHandler : ISagaEventHandler<TSagaData, TEvent>
+        {
+            if (builderState.CurrentEvent == null)
+                throw new Exception($"{nameof(HandleBy)} must be defined after {nameof(When)} / {nameof(WhenAsync)}");
+
+            ISagaAction action = builderState.Model.
+                FindActionByStateAndEventType(builderState.CurrentState, builderState.CurrentEvent);
+
+            action.ChildSteps.RemoveEmptyStepsAtBeginning();
+            action.ChildSteps.AddStep(new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
+                builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(HandleByAsync), builderState.CurrentEvent.GetType().Name,
+                typeof(TEventHandler).Name),
+                true,
                 builderState.ParentStep));
 
             return new SagaBuilder<TSagaData>(builderState);
@@ -566,6 +586,41 @@ namespace TheSaga.Builders
             builderState.CurrentAction = action;
             builderState.Model.Actions.Add(action);
             return new SagaBuilder<TSagaData, TEvent>(builderState);
+        }
+        public ISagaBuilderThen<TSagaData> If<TSagaCondition>(Action<ISagaBuilderThen<TSagaData>> builderAction)
+            where TSagaCondition : ISagaCondition<TSagaData>
+        {
+            SagaAction currentAction = builderState.CurrentAction;
+
+            SagaIfStep<TSagaData, TSagaCondition> parentStep = new SagaIfStep<TSagaData, TSagaCondition>(
+                builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Do)),
+                builderState.ParentStep);
+
+            SagaBuilderState childBuildState = new SagaBuilderState(
+                null, null, new SagaModel(typeof(TSagaData)),
+                builderState.ServiceProvider,
+                builderState.UniqueNameGenerator,
+                parentStep);
+
+            SagaBuilder<TSagaData> childBuilder = new SagaBuilder<TSagaData>(childBuildState);
+            childBuilder.Start<EmptyEvent>();
+
+            builderAction(childBuilder);
+
+            ISagaAction mainChildAction = childBuilder.
+                builderState.Model.Actions.
+                FindActionByStateAndEventType(new SagaStartState().GetStateName(), typeof(EmptyEvent));
+
+            mainChildAction.
+                ChildSteps.RemoveEmptyStepsAtBeginning();
+
+            parentStep.
+                SetChildSteps(mainChildAction.ChildSteps);
+
+            currentAction.
+                ChildSteps.AddStep(parentStep);
+
+            return new SagaBuilder<TSagaData>(builderState);
         }
 
         public ISagaBuilderThen<TSagaData> Do(Action<ISagaBuilderThen<TSagaData>> builderAction)
