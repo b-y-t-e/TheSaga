@@ -41,14 +41,8 @@ namespace TheSaga.Commands.Handlers
             ISagaStep sagaStep = command.SagaStep;
             ISagaAction sagaAction = command.SagaAction;
             ISagaModel model = command.Model;
-            Exception executionError = null;
 
-            saga.ExecutionState.CurrentStep = sagaStep.StepName;
-            saga.ExecutionInfo.Modified = dateTimeProvider.Now;
-
-            StepData stepData = saga.ExecutionState.History.
-                Create(saga, sagaStep, model).
-                SetStarted(saga.ExecutionState, dateTimeProvider);
+            StepData stepData = GetOrCreateStepData(saga, sagaStep, model);
 
             await sagaPersistance.Set(saga);
 
@@ -56,26 +50,10 @@ namespace TheSaga.Commands.Handlers
             if (@event is EmptyEvent)
                 @event = null;
 
+            Exception executionError = null;
             try
             {
-                Type executionContextType =
-                    typeof(ExecutionContext<>).ConstructGenericType(saga.Data.GetType());
-
-                IExecutionContext context = (IExecutionContext)ActivatorUtilities.CreateInstance(serviceProvider,
-                    executionContextType, saga.Data, saga.ExecutionInfo, saga.ExecutionState, saga.ExecutionValues);
-
-                if (saga.ExecutionState.IsResuming)
-                {
-                    await sagaStep.Compensate(serviceProvider, context, @event, stepData);
-                }
-                else if (saga.ExecutionState.IsCompensating)
-                {
-                    await sagaStep.Compensate(serviceProvider, context, @event, stepData);
-                }
-                else
-                {
-                    await sagaStep.Execute(serviceProvider, context, @event, stepData);
-                }
+                await ExecuteStep(saga, sagaStep, stepData, @event);
 
                 stepData.
                     SetSucceeded(saga.ExecutionState, dateTimeProvider);
@@ -97,20 +75,18 @@ namespace TheSaga.Commands.Handlers
                     SetEnded(saga.ExecutionState, dateTimeProvider);
             }
 
-            string nextStepName = null;
-            if (executionError != null)
-            {
-                saga.ExecutionState.IsResuming = false;
-                saga.ExecutionState.IsCompensating = true;
-                saga.ExecutionState.CurrentError = executionError.ToSagaStepException();
-                nextStepName = CalculateNextCompensationStep(saga);
-            }
-            else
-            {
-                nextStepName = CalculateNextStep(saga, sagaAction, sagaStep, stepData);
-                saga.ExecutionState.IsResuming = false;
-            }
+            string nextStepName = CalculateNextStepName(
+                saga, sagaStep, sagaAction, stepData, executionError);
+            
+            SaveNextStep(saga, stepData, nextStepName);
 
+            await sagaPersistance.Set(saga);
+
+            return saga;
+        }
+
+        private void SaveNextStep(ISaga saga, StepData stepData, string nextStepName)
+        {
             stepData.
                 SetNextStepName(nextStepName).
                 SetEndStateName(saga.ExecutionState.CurrentState);
@@ -126,12 +102,61 @@ namespace TheSaga.Commands.Handlers
                 saga.ExecutionState.CurrentStep = nextStepName;
             }
 
-            saga.ExecutionState.CurrentEvent = new EmptyEvent();
+            saga.ExecutionInfo.Modified = dateTimeProvider.Now;
+        }
+
+        private string CalculateNextStepName(ISaga saga, ISagaStep sagaStep, ISagaAction sagaAction, StepData stepData, Exception executionError)
+        {
+            string nextStepName = null;
+            if (executionError != null)
+            {
+                saga.ExecutionState.IsResuming = false;
+                saga.ExecutionState.IsCompensating = true;
+                saga.ExecutionState.CurrentError = executionError.ToSagaStepException();
+                nextStepName = CalculateNextCompensationStep(saga);
+            }
+            else
+            {
+                nextStepName = CalculateNextStep(saga, sagaAction, sagaStep, stepData);
+                saga.ExecutionState.IsResuming = false;
+            }
+
+            return nextStepName;
+        }
+
+        private async Task ExecuteStep(ISaga saga, ISagaStep sagaStep, StepData stepData, ISagaEvent @event)
+        {
+            Type executionContextType =
+                                typeof(ExecutionContext<>).ConstructGenericType(saga.Data.GetType());
+
+            IExecutionContext context = (IExecutionContext)ActivatorUtilities.CreateInstance(serviceProvider,
+                executionContextType, saga.Data, saga.ExecutionInfo, saga.ExecutionState, saga.ExecutionValues);
+
+            if (saga.ExecutionState.IsResuming)
+            {
+                await sagaStep.Compensate(serviceProvider, context, @event, stepData);
+            }
+            else if (saga.ExecutionState.IsCompensating)
+            {
+                await sagaStep.Compensate(serviceProvider, context, @event, stepData);
+            }
+            else
+            {
+                await sagaStep.Execute(serviceProvider, context, @event, stepData);
+            }
+        }
+
+        private StepData GetOrCreateStepData(ISaga saga, ISagaStep sagaStep, ISagaModel model)
+        {
+            saga.ExecutionState.CurrentStep = sagaStep.StepName;
             saga.ExecutionInfo.Modified = dateTimeProvider.Now;
 
-            await sagaPersistance.Set(saga);
+            StepData stepData = saga.ExecutionState.History.
+                Create(saga, sagaStep, model).
+                SetStarted(saga.ExecutionState, dateTimeProvider);
 
-            return saga;
+            saga.ExecutionState.CurrentEvent = new EmptyEvent();
+            return stepData;
         }
 
         private string CalculateNextStep(ISaga saga, ISagaAction sagaAction, ISagaStep sagaStep, IStepData stepData = null)
