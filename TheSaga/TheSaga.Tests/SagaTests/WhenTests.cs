@@ -33,8 +33,8 @@ namespace TheSaga.Tests.SagaTests
                 Get(saga.Data.ID);
 
             persistedSaga.ShouldNotBeNull();
-            persistedSaga.State.CurrentStep.ShouldBe(null);
-            persistedSaga.State.CurrentState.ShouldBe(nameof(StateAlternative1));
+            persistedSaga.ExecutionState.CurrentStep.ShouldBe(null);
+            persistedSaga.ExecutionState.CurrentState.ShouldBe(nameof(StateAlternative1));
             persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
         }
 
@@ -54,8 +54,8 @@ namespace TheSaga.Tests.SagaTests
                 Get(saga.Data.ID);
 
             persistedSaga.ShouldNotBeNull();
-            persistedSaga.State.CurrentStep.ShouldBe(null);
-            persistedSaga.State.CurrentState.ShouldBe(nameof(StateAlternative2));
+            persistedSaga.ExecutionState.CurrentStep.ShouldBe(null);
+            persistedSaga.ExecutionState.CurrentState.ShouldBe(nameof(StateAlternative2));
             persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
         }
 

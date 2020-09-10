@@ -52,7 +52,7 @@ namespace TheSaga.Commands.Handlers
                 FindActionForStep(step);
 
             if (step.Async)
-                saga.State.AsyncExecution = AsyncExecution.True();
+                saga.ExecutionState.AsyncExecution = AsyncExecution.True();
 
             ExecuteStepCommand executeStepCommand = new ExecuteStepCommand
             {
@@ -116,7 +116,7 @@ namespace TheSaga.Commands.Handlers
                             new ExecutionEndMessage(saga));
 
                         if (saga.HasError())
-                            throw saga.State.CurrentError;
+                            throw saga.ExecutionState.CurrentError;
 
                         return saga;
                     }

@@ -41,11 +41,11 @@ namespace TheSaga.Observables
             if (!saga.IsIdle())
                 return;
 
-            saga.State.CurrentError = null;
-            saga.State.ExecutionID = ExecutionID.New();
+            saga.ExecutionState.CurrentError = null;
+            saga.ExecutionState.ExecutionID = ExecutionID.New();
 
             if (model.HistoryPolicy == ESagaHistoryPolicy.StoreOnlyCurrentStep)
-                saga.State.History.Clear();
+                saga.ExecutionState.History.Clear();
         }
     }
 }

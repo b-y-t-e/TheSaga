@@ -84,9 +84,9 @@ namespace TheSaga.Tests.SagaTests
 
             // then
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
-            persistedSaga.State.History.Where(s => s.ResumeData != null).Count().ShouldBe(1);
-            persistedSaga.State.History.Where(s => s.CompensationData != null).Count().ShouldBe(0);
-            persistedSaga.State.History.Where(s => s.ExecutionData != null).Count().ShouldBe(4);
+            persistedSaga.ExecutionState.History.Where(s => s.ResumeData != null).Count().ShouldBe(1);
+            persistedSaga.ExecutionState.History.Where(s => s.CompensationData != null).Count().ShouldBe(0);
+            persistedSaga.ExecutionState.History.Where(s => s.ExecutionData != null).Count().ShouldBe(4);
             persistedSaga.IsIdle().ShouldBeTrue();
         }
 

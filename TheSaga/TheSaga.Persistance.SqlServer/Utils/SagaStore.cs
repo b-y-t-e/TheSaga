@@ -172,11 +172,11 @@ namespace TheSaga.Persistance.SqlServer.Utils
             Dictionary<string, object> dbobject = new Dictionary<string, object>();
             dbobject[idColumn] = saga.Data.ID;
             dbobject[stateNameColumn] = sagaDataType.Name;
-            dbobject[createdColumn] = saga.Info.Created;
-            dbobject[modifiedColumn] = saga.Info.Modified;
-            dbobject[stateColumn] = saga.State.CurrentState;
-            dbobject[stepColumn] = saga.State.CurrentStep;
-            dbobject[compensatingColumn] = saga.State.IsCompensating;
+            dbobject[createdColumn] = saga.ExecutionInfo.Created;
+            dbobject[modifiedColumn] = saga.ExecutionInfo.Modified;
+            dbobject[stateColumn] = saga.ExecutionState.CurrentState;
+            dbobject[stepColumn] = saga.ExecutionState.CurrentStep;
+            dbobject[compensatingColumn] = saga.ExecutionState.IsCompensating;
             dbobject[jsonColumn] = JsonConvert.SerializeObject(saga, _serializerSettings);
 
             return dbobject;

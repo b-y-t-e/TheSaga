@@ -30,7 +30,7 @@ namespace TheSaga.Tests.SagaTests
             // then
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
             persistedSaga.IsIdle().ShouldBeTrue();
-            persistedSaga.State.History.Count.ShouldBe(7);
+            persistedSaga.ExecutionState.History.Count.ShouldBe(7);
         }
 
 

@@ -34,8 +34,8 @@ namespace TheSaga.Tests.SagaTests
                 Get(saga.Data.ID);
 
             persistedSaga.ShouldNotBeNull();
-            persistedSaga.State.CurrentStep.ShouldBe(null);
-            persistedSaga.State.CurrentState.ShouldBe(nameof(Init));
+            persistedSaga.ExecutionState.CurrentStep.ShouldBe(null);
+            persistedSaga.ExecutionState.CurrentState.ShouldBe(nameof(Init));
             persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
         }
 

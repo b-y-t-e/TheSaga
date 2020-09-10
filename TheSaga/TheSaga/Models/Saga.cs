@@ -12,7 +12,7 @@
 
         public ISagaData Data { get; set; }
 
-        public SagaExecutionInfo Info
+        public SagaExecutionInfo ExecutionInfo
         {
             get
             {
@@ -23,7 +23,7 @@
             set { info = value; }
         }
 
-        public SagaExecutionState State
+        public SagaExecutionState ExecutionState
         {
             get
             {
@@ -34,7 +34,7 @@
             set { state = value; }
         }
 
-        public SagaExecutionValues Values
+        public SagaExecutionValues ExecutionValues
         {
             get
             {

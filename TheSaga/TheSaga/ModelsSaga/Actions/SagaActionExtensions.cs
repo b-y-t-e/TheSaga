@@ -43,7 +43,7 @@ namespace TheSaga.SagaModels.Actions
 
         {
             ISagaActions foundActions = actions.
-                FindActionsByState(saga.State.GetExecutionState());
+                FindActionsByState(saga.ExecutionState.GetExecutionState());
 
             if (!eventType.Is<EmptyEvent>())
                 return FindStepForEventType(saga, eventType, foundActions);
@@ -56,16 +56,16 @@ namespace TheSaga.SagaModels.Actions
 
         {
             ISagaAction action = actions.
-                FindActionByStep(saga.State.CurrentStep);
+                FindActionByStep(saga.ExecutionState.CurrentStep);
 
             if (action == null)
-                throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
+                throw new SagaStepNotRegisteredException(saga.ExecutionState.GetExecutionState(), saga.ExecutionState.CurrentStep);
 
             ISagaStep step = action.
-                GetStep(saga.State.CurrentStep);
+                GetStep(saga.ExecutionState.CurrentStep);
 
             if (step == null)
-                throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
+                throw new SagaStepNotRegisteredException(saga.ExecutionState.GetExecutionState(), saga.ExecutionState.CurrentStep);
 
             return step;
         }
@@ -78,13 +78,13 @@ namespace TheSaga.SagaModels.Actions
                 FindActionByEventType(eventType);
 
             if (action == null)
-                throw new SagaInvalidEventForStateException(saga.State.GetExecutionState(), eventType);
+                throw new SagaInvalidEventForStateException(saga.ExecutionState.GetExecutionState(), eventType);
 
             ISagaStep step = action.
                 ChildSteps.GetFirstStep();
 
             if (step == null)
-                throw new SagaStepNotRegisteredException(saga.State.GetExecutionState(), saga.State.CurrentStep);
+                throw new SagaStepNotRegisteredException(saga.ExecutionState.GetExecutionState(), saga.ExecutionState.CurrentStep);
 
             return step;
         }

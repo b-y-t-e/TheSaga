@@ -39,12 +39,12 @@ namespace TheSaga.Tests.SagaTests
                 Get(data.CreatedSagaID);
 
             orgSaga.ShouldNotBeNull();
-            orgSaga.State.CurrentState.ShouldBe(nameof(AfterInit));
-            orgSaga.State.CurrentStep.ShouldBe(null);
+            orgSaga.ExecutionState.CurrentState.ShouldBe(nameof(AfterInit));
+            orgSaga.ExecutionState.CurrentStep.ShouldBe(null);
 
             createdSaga.ShouldNotBeNull();
-            createdSaga.State.CurrentState.ShouldBe(nameof(AkternativeInit));
-            createdSaga.State.CurrentStep.ShouldBe(null);
+            createdSaga.ExecutionState.CurrentState.ShouldBe(nameof(AkternativeInit));
+            createdSaga.ExecutionState.CurrentStep.ShouldBe(null);
         }
 
         #region Arrange

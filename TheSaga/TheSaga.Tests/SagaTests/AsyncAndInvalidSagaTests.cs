@@ -38,18 +38,18 @@ namespace TheSaga.Tests.SagaTests
                 Get(saga.Data.ID);
 
             persistedSaga.ShouldNotBeNull();
-            persistedSaga.State.CurrentStep.ShouldBe(null);
-            persistedSaga.State.CurrentState.ShouldBe(nameof(StateCreated));
-            persistedSaga.State.CurrentError.ShouldNotBeNull();
+            persistedSaga.ExecutionState.CurrentStep.ShouldBe(null);
+            persistedSaga.ExecutionState.CurrentState.ShouldBe(nameof(StateCreated));
+            persistedSaga.ExecutionState.CurrentError.ShouldNotBeNull();
             persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
 
-            persistedSaga.State.History.ShouldContain(item =>
+            persistedSaga.ExecutionState.History.ShouldContain(item =>
                 item.CompensationData != null && item.StepName == "InvalidUpdateEvent1");
 
-            persistedSaga.State.History.ShouldContain(item =>
+            persistedSaga.ExecutionState.History.ShouldContain(item =>
                 item.CompensationData != null && item.StepName == "InvalidUpdateEvent2");
 
-            persistedSaga.State.History.ShouldContain(item =>
+            persistedSaga.ExecutionState.History.ShouldContain(item =>
                 item.CompensationData != null && item.StepName == "InvalidUpdateEvent3");
         }
 
@@ -80,9 +80,9 @@ namespace TheSaga.Tests.SagaTests
                 Get(saga.Data.ID);
 
             persistedSaga.ShouldNotBeNull();
-            persistedSaga.State.CurrentStep.ShouldBe(null);
-            persistedSaga.State.CurrentState.ShouldBe(nameof(StateUpdated));
-            persistedSaga.State.CurrentError.ShouldBeNull();
+            persistedSaga.ExecutionState.CurrentStep.ShouldBe(null);
+            persistedSaga.ExecutionState.CurrentState.ShouldBe(nameof(StateUpdated));
+            persistedSaga.ExecutionState.CurrentError.ShouldBeNull();
             persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
         }
         */

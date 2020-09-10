@@ -58,20 +58,20 @@ namespace TheSaga.SagaModels.History
             ISagaStep step,
             ISagaModel model)
         {
-            StepData currentExecutionData = saga.State.History.
+            StepData currentExecutionData = saga.ExecutionState.History.
                 LastOrDefault();
 
-            if (!saga.State.IsCompensating &&
+            if (!saga.ExecutionState.IsCompensating &&
                 currentExecutionData != null &&
                 currentExecutionData.CompensationData == null &&
                 currentExecutionData.ExecutionData != null &&
-                currentExecutionData.ExecutionID == saga.State.ExecutionID &&
-                currentExecutionData.StepName == saga.State.CurrentStep &&
+                currentExecutionData.ExecutionID == saga.ExecutionState.ExecutionID &&
+                currentExecutionData.StepName == saga.ExecutionState.CurrentStep &&
                 currentExecutionData.ResumeData?.EndTime == null)
             {
                 if (model.ResumePolicy == ESagaResumePolicy.DoCurrentStepCompensation)
                 {
-                    saga.State.IsResuming = true;
+                    saga.ExecutionState.IsResuming = true;
                 }
                 else if (model.ResumePolicy == ESagaResumePolicy.DoFullCompensation)
                 {
@@ -79,27 +79,27 @@ namespace TheSaga.SagaModels.History
                 }
                 else
                 {
-                    saga.State.IsResuming = false;
+                    saga.ExecutionState.IsResuming = false;
                 }
             }
 
             StepData stepData = null;
-            if (saga.State.IsResuming)
+            if (saga.ExecutionState.IsResuming)
             {
                 stepData = currentExecutionData;
 
                 stepData.ResumeData = new StepExecutionData
                 {
-                    EndStateName = saga.State.CurrentState,
+                    EndStateName = saga.ExecutionState.CurrentState,
                     StepType = step.GetType()
                 };
             }
-            else if (saga.State.IsCompensating)
+            else if (saga.ExecutionState.IsCompensating)
             {
-                stepData = saga.State.History.
+                stepData = saga.ExecutionState.History.
                     GetLatestCompensationByStepName(
-                        saga.State.ExecutionID,
-                        saga.State.CurrentStep);
+                        saga.ExecutionState.ExecutionID,
+                        saga.ExecutionState.CurrentStep);
 
                 stepData.CompensationData = new StepExecutionData()
                 {
@@ -110,18 +110,18 @@ namespace TheSaga.SagaModels.History
             {
                 stepData = new StepData
                 {
-                    ExecutionID = saga.State.ExecutionID,
-                    AsyncExecution = saga.State.AsyncExecution,
+                    ExecutionID = saga.ExecutionState.ExecutionID,
+                    AsyncExecution = saga.ExecutionState.AsyncExecution,
                     AsyncStep = step.Async,
-                    StateName = saga.State.CurrentState,
-                    StepName = saga.State.CurrentStep,
+                    StateName = saga.ExecutionState.CurrentState,
+                    StepName = saga.ExecutionState.CurrentStep,
                     ExecutionData = new StepExecutionData
                     {
-                        EndStateName = saga.State.CurrentState,
+                        EndStateName = saga.ExecutionState.CurrentState,
                         StepType = step.GetType()
                     }
                 };
-                saga.State.History.Add(stepData);
+                saga.ExecutionState.History.Add(stepData);
             }
 
             return stepData;

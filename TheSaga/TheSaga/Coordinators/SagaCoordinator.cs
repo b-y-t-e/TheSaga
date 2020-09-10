@@ -49,10 +49,10 @@ namespace TheSaga.Coordinators
             foreach (Guid id in ids)
             {
                 ISaga saga = await sagaPersistance.Get(id);
-                ISagaModel model = sagaRegistrator.FindModelByName(saga.Info.ModelName);
+                ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
 
                 if (model == null)
-                    invalidModels.Add(saga.Info.ModelName);
+                    invalidModels.Add(saga.ExecutionInfo.ModelName);
             }
 
             if (invalidModels.Count > 0)
@@ -62,12 +62,13 @@ namespace TheSaga.Coordinators
             {
                 ISaga saga = await sagaPersistance.Get(id);
 
-                ISagaModel model = sagaRegistrator.FindModelByName(saga.Info.ModelName);
+                ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
 
                 await ExecuteSaga(
                     new EmptyEvent(),
                     model,
-                    saga);
+                    saga,
+                    null);
             }
         }
         public async Task Resume(Guid id)
@@ -75,10 +76,10 @@ namespace TheSaga.Coordinators
             List<string> invalidModels = new List<string>();
 
             ISaga saga = await sagaPersistance.Get(id);
-            ISagaModel model = sagaRegistrator.FindModelByName(saga.Info.ModelName);
+            ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
 
             if (model == null)
-                invalidModels.Add(saga.Info.ModelName);
+                invalidModels.Add(saga.ExecutionInfo.ModelName);
 
             if (invalidModels.Count > 0)
                 throw new Exception($"Saga models {string.Join(", ", invalidModels.Distinct().ToArray())} not found");
@@ -86,11 +87,17 @@ namespace TheSaga.Coordinators
             await ExecuteSaga(
                 new EmptyEvent(),
                 model,
-                saga);
+                saga,
+                null);
         }
 
-        public async Task<ISaga> Publish(
+        public Task<ISaga> Publish(
             ISagaEvent @event)
+        {
+            return Publish(@event, null);
+        }
+
+        public async Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues)
         {
             Type eventType = @event.GetType();
             SagaID sagaId = SagaID.From(@event.ID);
@@ -112,7 +119,8 @@ namespace TheSaga.Coordinators
                 return await ExecuteSaga(
                     @event,
                     model,
-                    saga);
+                    saga,
+                    executionValues);
             }
             catch
             {
@@ -165,7 +173,7 @@ namespace TheSaga.Coordinators
         }
 
         private async Task<ISaga> ExecuteSaga(
-            ISagaEvent @event, ISagaModel model, ISaga saga)
+            ISagaEvent @event, ISagaModel model, ISaga saga, IDictionary<string, object> executionValues)
         {
             try
             {
@@ -181,6 +189,8 @@ namespace TheSaga.Coordinators
 
                 ExecuteActionCommandHandler handler = serviceProvider.
                     GetRequiredService<ExecuteActionCommandHandler>();
+
+                saga.ExecutionValues.Set(executionValues);
 
                 return await handler.Handle(new ExecuteActionCommand
                 {
@@ -225,13 +235,13 @@ namespace TheSaga.Coordinators
             ISaga saga = new Saga
             {
                 Data = data,
-                Info = new SagaExecutionInfo
+                ExecutionInfo = new SagaExecutionInfo
                 {
                     ModelName = model.Name,
                     Created = dateTimeProvider.Now,
                     Modified = dateTimeProvider.Now
                 },
-                State = new SagaExecutionState
+                ExecutionState = new SagaExecutionState
                 {
                     CurrentState = new SagaStartState().GetStateName(),
                     CurrentStep = null

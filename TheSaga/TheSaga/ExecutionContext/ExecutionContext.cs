@@ -7,18 +7,21 @@ namespace TheSaga.ExecutionContext
     public class ExecutionContext<TSagaData> : IExecutionContext<TSagaData>
         where TSagaData : ISagaData
     {
-        public ExecutionContext(TSagaData data, SagaExecutionInfo info, SagaExecutionState state)
+        public ExecutionContext(TSagaData data, SagaExecutionInfo info, SagaExecutionState state, SagaExecutionValues executionValues)
         {
             Data = data;
-            Info = info;
-            State = state;
+            ExecutionInfo = info;
+            ExecutionState = state;
+            ExecutionValues = executionValues;
         }
 
         public TSagaData Data { get; set; }
 
-        public SagaExecutionInfo Info { get; set; }
+        public SagaExecutionInfo ExecutionInfo { get; set; }
 
-        public SagaExecutionState State { get; set; }
+        public SagaExecutionState ExecutionState { get; set; }
+
+        public SagaExecutionValues ExecutionValues { get; set; }
 
         Task IExecutionContext<TSagaData>.Stop()
         {
