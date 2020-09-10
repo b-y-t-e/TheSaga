@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>0.7.15</Version>
+    <Version>0.7.16</Version>
     <Authors>Andrzej Ból</Authors>
     <Description>A module that allows you use distributed locking (using sql server, thanks to DistributedLock library)
 ---------------------

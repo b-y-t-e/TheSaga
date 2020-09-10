@@ -19,8 +19,8 @@ namespace TheSaga.Tests.SagaTests.Sagas.AsyncAndValid
         public ISagaModel Build()
         {
             builder.
-                Start<CreatedEvent, CreatedEventHandler>(
-                    "CreatedEventStep0").
+                Start<CreatedEvent>().
+                    HandleBy<CreatedEventHandler>("CreatedEventStep0").
                 ThenAsync(
                     "CreatedEventStep1",
                     ctx => Task.Delay(TimeSpan.FromSeconds(1))).

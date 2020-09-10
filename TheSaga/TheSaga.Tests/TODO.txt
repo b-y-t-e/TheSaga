@@ -1,8 +1,7 @@
 ﻿TODO:
 
- + dodanie testow if / else
+ + dodanie elseif
  + publish (fire&forget)
- + WhenTrue<Policy> dla TheHandlers
  + krok OnError
  + krok OnFinish
  + local transaction - one scope
@@ -10,7 +9,6 @@
 
  + mozliwosc wysolania eventow i odbierania eventow
  + metoda: Publish(IEvent @event)
- + metoda: HandleBy dla start
  + usuniecie task.delay z testow
  + retry (count) + retry (na message)
      + retry (na message) - rejestracja eventu, w przypadku bledu przerwanie compensaty, w przypadku event'a proba powtorzenia execute (nie kompensaty)
@@ -30,6 +28,8 @@
  + retry
 
 DONE:
+ + metoda: HandleBy dla start
+ + dodanie testow if / else
  + if / else
  + persystencja event'a
  + zmiana nazwy SagaState (myli sie z iSagaState)

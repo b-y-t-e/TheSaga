@@ -27,14 +27,14 @@ namespace TheSaga.Tests.SagaTests.Sagas.IfElseSaga
                     When<Test1Event>().
                         HandleBy<Test1EventHandler>().
                     If(async c => c.Data.Condition, b => b.
-                        Then(async c => c.Data.Value1 = new Test1Event())).
+                        Then(async c => c.Data.Value1 = new TrueValue())).
                     TransitionTo<SecondState>().
 
                 During<Init>().
                     When<Test2Event>().
                         HandleBy<Test2EventHandler>().
                     If(async c => c.Data.Condition, b => b.
-                        Then(async c => c.Data.Value1 = new Test2Event())).
+                        Then(async c => c.Data.Value1 = new TrueValue())).
                     TransitionTo<SecondState>().
 
                 During<Init>().

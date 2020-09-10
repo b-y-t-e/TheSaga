@@ -35,6 +35,46 @@ namespace TheSaga.Builders
         {
         }
 
+        public ISagaBuilderThen<TSagaData> HandleBy<TEventHandler>(string stepName)
+            where TEventHandler : ISagaEventHandler<TSagaData, TEvent>
+        {
+            builderState.UniqueNameGenerator.ThrowIfNotUnique(stepName);
+
+            if (builderState.CurrentEvent == null)
+                throw new Exception($"{nameof(HandleBy)} must be defined after {nameof(When)} / {nameof(WhenAsync)}");
+
+            ISagaAction action = builderState.Model.
+                FindActionByStateAndEventType(builderState.CurrentState, builderState.CurrentEvent);
+
+            action.ChildSteps.RemoveEmptyStepsAtBeginning();
+            action.ChildSteps.AddStep(new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
+                stepName,
+                false,
+                builderState.ParentStep));
+
+            return new SagaBuilder<TSagaData>(builderState);
+        }
+
+        public ISagaBuilderThen<TSagaData> HandleByAsync<TEventHandler>(string stepName)
+            where TEventHandler : ISagaEventHandler<TSagaData, TEvent>
+        {
+            builderState.UniqueNameGenerator.ThrowIfNotUnique(stepName);
+
+            if (builderState.CurrentEvent == null)
+                throw new Exception($"{nameof(HandleBy)} must be defined after {nameof(When)} / {nameof(WhenAsync)}");
+
+            ISagaAction action = builderState.Model.
+                FindActionByStateAndEventType(builderState.CurrentState, builderState.CurrentEvent);
+
+            action.ChildSteps.RemoveEmptyStepsAtBeginning();
+            action.ChildSteps.AddStep(new SagaStepForEventHandler<TSagaData, TEventHandler, TEvent>(
+                stepName,
+                true,
+                builderState.ParentStep));
+
+            return new SagaBuilder<TSagaData>(builderState);
+        }
+
         public ISagaBuilderThen<TSagaData> HandleBy<TEventHandler>()
             where TEventHandler : ISagaEventHandler<TSagaData, TEvent>
         {
@@ -120,7 +160,7 @@ namespace TheSaga.Builders
             return new SagaBuilder<TSagaData>(builderState);
         }
 
-        public ISagaBuilderThen<TSagaData> Start<TEvent>()
+        public ISagaBuilderHandle<TSagaData, TEvent> Start<TEvent>()
             where TEvent : ISagaEvent
         {
             builderState.CurrentState = new SagaStartState().GetStateName();
@@ -137,7 +177,7 @@ namespace TheSaga.Builders
             };
             builderState.CurrentAction = action;
             builderState.Model.Actions.Add(action);
-            return new SagaBuilder<TSagaData>(builderState);
+            return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
 
         public ISagaBuilderThen<TSagaData> Start<TEvent, TEventHandler>()
@@ -163,7 +203,7 @@ namespace TheSaga.Builders
             return new SagaBuilder<TSagaData>(builderState);
         }
 
-        public ISagaBuilderThen<TSagaData> Start<TEvent>(string stepName)
+        public ISagaBuilderHandle<TSagaData, TEvent> Start<TEvent>(string stepName)
             where TEvent : ISagaEvent
         {
             builderState.UniqueNameGenerator.ThrowIfNotUnique(stepName);
@@ -182,7 +222,7 @@ namespace TheSaga.Builders
             };
             builderState.CurrentAction = action;
             builderState.Model.Actions.Add(action);
-            return new SagaBuilder<TSagaData>(builderState);
+            return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
 
         public ISagaBuilderThen<TSagaData> Start<TEvent, TEventHandler>(string stepName)

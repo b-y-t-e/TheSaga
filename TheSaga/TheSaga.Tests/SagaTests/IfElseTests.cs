@@ -32,7 +32,7 @@ namespace TheSaga.Tests.SagaTests
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
             IfElseSagaData data = persistedSaga.Data as IfElseSagaData;
             data.Condition.ShouldBeTrue();
-            data.Value1.ShouldBeOfType<Test1Event>();
+            data.Value1.ShouldBeOfType<TrueValue>();
         }
 
         [Fact]
@@ -48,11 +48,11 @@ namespace TheSaga.Tests.SagaTests
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
             IfElseSagaData data = persistedSaga.Data as IfElseSagaData;
             data.Condition.ShouldBeFalse();
-            data.Value1.ShouldNotBeOfType<Test2Event>();
+            data.Value1.ShouldNotBeOfType<TrueValue>();
         }
 
         [Fact]
-        public async Task WHEN_conditionIsMet_THEN_shouldOmitElse()
+        public async Task WHEN_conditionIsMet_THEN_shouldDoIfAndOmitElse()
         {
             // given
             ISaga saga = await sagaCoordinator.Publish(new CreateIfElseSagaEvent());
@@ -67,7 +67,7 @@ namespace TheSaga.Tests.SagaTests
         }
 
         [Fact]
-        public async Task WHEN_conditionIsNotMet_THEN_shouldDoElse()
+        public async Task WHEN_conditionIsNotMet_THEN_shouldOmitIfAndDoElse()
         {
             // given
             ISaga saga = await sagaCoordinator.Publish(new CreateIfElseSagaEvent());

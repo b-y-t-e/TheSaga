@@ -14,13 +14,15 @@ namespace TheSaga.Builders
         ISagaBuilderWhen<TSagaData> During<TState>() where TState : ISagaState;
 
         ISagaBuilder<TSagaData> Name(string name);
-        ISagaBuilder<TSagaData> Settings(Action<ISagaSettingsBuilder> settingsBuilder);        
-        ISagaBuilderThen<TSagaData> Start<TEvent>() where TEvent : ISagaEvent;
+        ISagaBuilder<TSagaData> Settings(Action<ISagaSettingsBuilder> settingsBuilder);
+        ISagaBuilderHandle<TSagaData, TEvent> Start<TEvent>() 
+            where TEvent : ISagaEvent;
 
         ISagaBuilderThen<TSagaData> Start<TEvent, TEventHandler>() where TEvent : ISagaEvent
             where TEventHandler : ISagaEventHandler<TSagaData, TEvent>;
 
-        ISagaBuilderThen<TSagaData> Start<TEvent>(string stepName) where TEvent : ISagaEvent;
+        ISagaBuilderHandle<TSagaData, TEvent> Start<TEvent>(string stepName) 
+            where TEvent : ISagaEvent;
 
         ISagaBuilderThen<TSagaData> Start<TEvent, TEventHandler>(string stepName)
             where TEvent : ISagaEvent
