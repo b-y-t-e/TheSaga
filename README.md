@@ -36,8 +36,7 @@
                         Then<NotifyErp>().
                         Finish();
                         
-            return builder.
-                Build();
+            return builder.Build();
         }
     }
 ```
