@@ -10,7 +10,7 @@ using TheSaga.SagaModels.History;
 
 namespace TheSaga.SagaModels.Steps
 {
-    internal class SagaStepElse<TSagaData> : ISagaStep
+    internal class SagaStepElse<TSagaData> : ISagaStep, ISagaStepElse
         where TSagaData : ISagaData
     {
         public ISagaStep ParentStep { get; }
@@ -41,5 +41,9 @@ namespace TheSaga.SagaModels.Steps
         {
             
         }
+    }
+
+    internal interface ISagaStepElse
+    {
     }
 }

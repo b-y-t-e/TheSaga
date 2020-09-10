@@ -1,35 +1,30 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TheSaga.Activities;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
 using TheSaga.Models;
 using TheSaga.SagaModels.Actions;
 using TheSaga.SagaModels.History;
-using TheSaga.SagaModels.Steps.Delegates;
 
 namespace TheSaga.SagaModels.Steps
 {
-    internal class SagaStepForInlineAction<TSagaData> : ISagaStep
+    internal class SagaStepForThen<TSagaData, TSagaActivity> : ISagaStep
         where TSagaData : ISagaData
+        where TSagaActivity : ISagaActivity<TSagaData>
     {
         public ISagaStep ParentStep { get; }
         public SagaSteps ChildSteps { get; }
-        private readonly ThenActionDelegate<TSagaData> compensation;
-
-        public SagaStepForInlineAction(
-            string stepName, ThenActionDelegate<TSagaData> action, ThenActionDelegate<TSagaData> compensation,
-            bool async, ISagaStep parentStep)
+        public SagaStepForThen(
+            string StepName, bool async, ISagaStep parentStep)
         {
-            StepName = stepName;
-            this.action = action;
-            this.compensation = compensation;
+            this.StepName = StepName;
             Async = async;
             ChildSteps = new SagaSteps();
             ParentStep = parentStep;
         }
-
-        private ThenActionDelegate<TSagaData> action { get; }
 
         public bool Async { get; }
         public string StepName { get; }
@@ -37,19 +32,23 @@ namespace TheSaga.SagaModels.Steps
         public async Task Compensate(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event, IStepData stepData)
         {
             IExecutionContext<TSagaData> contextForAction =
-                (IExecutionContext<TSagaData>) context;
+                (IExecutionContext<TSagaData>)context;
 
-            if (compensation != null)
-                await compensation(contextForAction);
+            TSagaActivity activity = (TSagaActivity)ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaActivity));
+
+            if (activity != null)
+                await activity.Compensate(contextForAction);
         }
 
         public async Task Execute(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event, IStepData stepData)
         {
             IExecutionContext<TSagaData> contextForAction =
-                (IExecutionContext<TSagaData>) context;
+                (IExecutionContext<TSagaData>)context;
 
-            if (action != null)
-                await action(contextForAction);
+            TSagaActivity activity = (TSagaActivity)ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaActivity));
+
+            if (activity != null)
+                await activity.Execute(contextForAction);
         }
     }
 }

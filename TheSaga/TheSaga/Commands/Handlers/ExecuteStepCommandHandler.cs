@@ -64,7 +64,6 @@ namespace TheSaga.Commands.Handlers
                 IExecutionContext context = (IExecutionContext)ActivatorUtilities.CreateInstance(serviceProvider,
                     executionContextType, saga.Data, saga.ExecutionInfo, saga.ExecutionState, saga.ExecutionValues);
 
-
                 if (saga.ExecutionState.IsResuming)
                 {
                     await sagaStep.Compensate(serviceProvider, context, @event, stepData);

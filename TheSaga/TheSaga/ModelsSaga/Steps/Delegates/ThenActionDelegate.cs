@@ -8,5 +8,8 @@ namespace TheSaga.SagaModels.Steps.Delegates
     public delegate Task ThenActionDelegate<TSagaData>(IExecutionContext<TSagaData> context)
         where TSagaData : ISagaData;
 
-    public delegate Task HandlersThenActionDelegate (IExecutionContext<HandlersData> context);
+    public delegate Task HandlersThenActionDelegate(IExecutionContext<HandlersData> context);
+
+    public delegate Task<bool> IfFuncDelegate<TSagaData>(IExecutionContext<TSagaData> context)
+        where TSagaData : ISagaData;
 }

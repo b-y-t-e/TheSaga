@@ -6,7 +6,6 @@
  + krok OnError
  + krok OnFinish
  + local transaction - one scope
- + if / else
  + TheHandlers -> powiazanie eventów i ich obsługi w systemie
 
  + mozliwosc wysolania eventow i odbierania eventow
@@ -31,6 +30,7 @@
  + retry
 
 DONE:
+ + if / else
  + persystencja event'a
  + zmiana nazwy SagaState (myli sie z iSagaState)
  + polityka resume - jako parametr (powtarzanie / kompensata calosci)

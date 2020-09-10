@@ -7,19 +7,25 @@ using TheSaga.ExecutionContext;
 using TheSaga.Models;
 using TheSaga.SagaModels.Actions;
 using TheSaga.SagaModels.History;
+using TheSaga.SagaModels.Steps.Delegates;
 
 namespace TheSaga.SagaModels.Steps
 {
-    internal class SagaStepIf<TSagaData, TSagaCondition> : ISagaStep
+    internal class SagaStepForIfInline<TSagaData> : ISagaStep, ISagaStepForIf
         where TSagaData : ISagaData
-        where TSagaCondition : ISagaCondition<TSagaData>
     {
         public ISagaStep ParentStep { get; }
         public SagaSteps ChildSteps { get; private set; }
 
-        public SagaStepIf(string StepName, ISagaStep parentStep)
+        public SagaStepForIfInline(
+            string StepName,
+            IfFuncDelegate<TSagaData> action,
+            ThenActionDelegate<TSagaData> compensation,
+            ISagaStep parentStep)
         {
             this.StepName = StepName;
+            this.action = action;
+            this.compensation = compensation;
             this.Async = false;
             this.ChildSteps = new SagaSteps();
             this.ParentStep = parentStep;
@@ -27,6 +33,8 @@ namespace TheSaga.SagaModels.Steps
 
         public bool Async { get; }
         public string StepName { get; }
+        private IfFuncDelegate<TSagaData> action { get; }
+        private ThenActionDelegate<TSagaData> compensation { get; }
 
         public void SetChildSteps(SagaSteps steps)
         {
@@ -38,10 +46,8 @@ namespace TheSaga.SagaModels.Steps
             IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>)context;
 
-            TSagaCondition activity = (TSagaCondition)ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaCondition));
-
-            if (activity != null)
-                await activity.Compensate(contextForAction);
+            if (compensation != null)
+                await compensation(contextForAction);
         }
 
         public async Task Execute(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event, IStepData stepData)
@@ -49,12 +55,14 @@ namespace TheSaga.SagaModels.Steps
             IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>)context;
 
-            TSagaCondition activity = (TSagaCondition)ActivatorUtilities.CreateInstance(serviceProvider, typeof(TSagaCondition));
-
-            if (activity != null)
+            if (action != null)
             {
-                bool result = await activity.Execute(contextForAction);
+                bool result = await action(contextForAction);
                 stepData.ExecutionData.ConditionResult = result;
+            }
+            else
+            {
+                stepData.ExecutionData.ConditionResult = false;
             }
         }
     }

@@ -36,11 +36,6 @@ namespace TheSaga.Utils
             return generic.GetGenericArguments()[0];
         }
 
-        internal static bool Is<T>(this Type thisType)
-        {
-            return Is(thisType, typeof(T));
-        }
-
         internal static Type GetInterfaceOf(this Type thisType, Type baseInterfaceType)
         {
             foreach (Type interfaceType in thisType.GetInterfaces())
@@ -49,6 +44,18 @@ namespace TheSaga.Utils
                 else if (baseInterfaceType == interfaceType || baseInterfaceType.IsAssignableFrom(interfaceType))
                     return interfaceType;
             return null;
+        }
+
+        internal static bool Is<T>(this object obj)
+        {
+            if (obj == null)
+                return false;
+            return obj.GetType().Is(typeof(T));
+        }
+
+        internal static bool Is<T>(this Type thisType)
+        {
+            return Is(thisType, typeof(T));
         }
 
         internal static bool Is(this object obj, Type baseType)

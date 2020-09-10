@@ -94,7 +94,7 @@ namespace TheSaga.SagaModels.Actions
             IStepData currentStepData = sagaState.History.
                 GetLatestByStepName(currentStep.StepName);
 
-            if (currentStepData?.ExecutionData?.StepType?.Is(typeof(SagaStepIf<,>)) == true)
+            if (currentStepData?.ExecutionData?.StepType?.Is<ISagaStepForIf>() == true)
             {
                 if (currentStepData.ExecutionData.ConditionResult == true)
                 {
@@ -111,17 +111,21 @@ namespace TheSaga.SagaModels.Actions
 
             ISagaStep nextStep = GetNextStep(sagaAction.ChildSteps, currentStep.ParentStep, currentStep);
 
-            if (nextStep.Is(typeof(SagaStepElse<>))/* &&
+            if (nextStep.Is<ISagaStepElse>()/* &&
                 nextStep.ParentStep != currentStep.ParentStep*/)
             {
-                ISagaStep prevStepIf = GetPrevStepSameLevel(sagaAction.ChildSteps, currentStep.ParentStep, currentStep);
-                if (prevStepIf.Is(typeof(SagaStepIf<,>)))
+                ISagaStep prevStepIf = GetPrevStepSameLevel(sagaAction.ChildSteps, nextStep.ParentStep, nextStep);
+                if (prevStepIf.Is<ISagaStepForIf>())
                 {
                     IStepData stepDataIf = sagaState.History.
                         GetLatestByStepName(prevStepIf.StepName);
 
                     if (stepDataIf?.ExecutionData?.ConditionResult == true)
-                        nextStep = GetNextStep(sagaAction.ChildSteps, prevStepIf.ParentStep, prevStepIf);
+                        nextStep = GetNextStep(sagaAction.ChildSteps, nextStep.ParentStep, nextStep);
+                }
+                else
+                {
+                    throw new NotSupportedException($"'Else' must be after 'If'");
                 }
             }
 
