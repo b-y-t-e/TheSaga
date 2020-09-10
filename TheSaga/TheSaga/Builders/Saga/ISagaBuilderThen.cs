@@ -42,6 +42,8 @@ namespace TheSaga.Builders
 
         ISagaBuilderThen<TSagaData> If(IfFuncDelegate<TSagaData> action, Action<ISagaBuilderThen<TSagaData>> builder);
 
+        ISagaBuilderThen<TSagaData> ElseIf(IfFuncDelegate<TSagaData> action, Action<ISagaBuilderThen<TSagaData>> builder);
+
         ISagaBuilderThen<TSagaData> Else(Action<ISagaBuilderThen<TSagaData>> builder);
         ISagaBuilderThen<TSagaData> Then(string stepName, ThenActionDelegate<TSagaData> action);
 

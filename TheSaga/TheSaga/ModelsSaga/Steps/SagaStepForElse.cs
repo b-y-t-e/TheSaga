@@ -10,13 +10,13 @@ using TheSaga.SagaModels.History;
 
 namespace TheSaga.SagaModels.Steps
 {
-    internal class SagaStepElse<TSagaData> : ISagaStep, ISagaStepElse
+    internal class SagaStepForElse<TSagaData> : ISagaStep, ISagaStepElse
         where TSagaData : ISagaData
     {
         public ISagaStep ParentStep { get; }
         public SagaSteps ChildSteps { get; private set; }
         
-        public SagaStepElse(string StepName, ISagaStep parentStep)
+        public SagaStepForElse(string StepName, ISagaStep parentStep)
         {
             this.StepName = StepName;
             this.Async = false;

@@ -9,7 +9,7 @@ namespace TheSaga.Tests.SagaTests.Sagas.IfElseSaga.Events
     public class Test1Event : ISagaEvent
     {
         public Guid ID { get; set; }
-        public Boolean Condition { get; set; }
+        public int Condition { get; set; }
     }
 
     public class Test1EventHandler : ISagaEventHandler<IfElseSagaData, Test1Event>

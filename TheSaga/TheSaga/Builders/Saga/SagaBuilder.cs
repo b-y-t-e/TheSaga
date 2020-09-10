@@ -698,11 +698,47 @@ namespace TheSaga.Builders
 
             return new SagaBuilder<TSagaData>(builderState);
         }
+        public ISagaBuilderThen<TSagaData> ElseIf(IfFuncDelegate<TSagaData> condition, Action<ISagaBuilderThen<TSagaData>> builderAction)
+        {
+            SagaAction currentAction = builderState.CurrentAction;
+
+            SagaStepForElseIfInline<TSagaData> parentStep = new SagaStepForElseIfInline<TSagaData>(
+                builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(If)),
+                condition,
+                null,
+                builderState.ParentStep);
+
+            SagaBuilderState childBuildState = new SagaBuilderState(
+                null, null, new SagaModel(typeof(TSagaData)),
+                builderState.ServiceProvider,
+                builderState.UniqueNameGenerator,
+                parentStep);
+
+            SagaBuilder<TSagaData> childBuilder = new SagaBuilder<TSagaData>(childBuildState);
+            childBuilder.Start<EmptyEvent>();
+
+            builderAction(childBuilder);
+
+            ISagaAction mainChildAction = childBuilder.
+                builderState.Model.Actions.
+                FindActionByStateAndEventType(new SagaStartState().GetStateName(), typeof(EmptyEvent));
+
+            mainChildAction.
+                ChildSteps.RemoveEmptyStepsAtBeginning();
+
+            parentStep.
+                SetChildSteps(mainChildAction.ChildSteps);
+
+            currentAction.
+                ChildSteps.AddStep(parentStep);
+
+            return new SagaBuilder<TSagaData>(builderState);
+        }
         public ISagaBuilderThen<TSagaData> Else(Action<ISagaBuilderThen<TSagaData>> builderAction)
         {
             SagaAction currentAction = builderState.CurrentAction;
 
-            SagaStepElse<TSagaData> parentStep = new SagaStepElse<TSagaData>(
+            SagaStepForElse<TSagaData> parentStep = new SagaStepForElse<TSagaData>(
                 builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Else)),
                 builderState.ParentStep);
 
