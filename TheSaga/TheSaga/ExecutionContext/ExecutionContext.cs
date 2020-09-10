@@ -7,7 +7,7 @@ namespace TheSaga.ExecutionContext
     public class ExecutionContext<TSagaData> : IExecutionContext<TSagaData>
         where TSagaData : ISagaData
     {
-        public ExecutionContext(TSagaData data, SagaInfo info, SagaExecutionState state)
+        public ExecutionContext(TSagaData data, SagaExecutionInfo info, SagaExecutionState state)
         {
             Data = data;
             Info = info;
@@ -16,7 +16,7 @@ namespace TheSaga.ExecutionContext
 
         public TSagaData Data { get; set; }
 
-        public SagaInfo Info { get; set; }
+        public SagaExecutionInfo Info { get; set; }
 
         public SagaExecutionState State { get; set; }
 

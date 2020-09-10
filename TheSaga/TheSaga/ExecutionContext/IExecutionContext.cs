@@ -8,7 +8,7 @@ namespace TheSaga.ExecutionContext
     {
         TSagaData Data { get; }
 
-        SagaInfo Info { get; }
+        SagaExecutionInfo Info { get; }
 
         SagaExecutionState State { get; }
 
@@ -20,7 +20,7 @@ namespace TheSaga.ExecutionContext
     }
     public interface IHandlersExecutionContext
     {
-        SagaInfo Info { get; }
+        SagaExecutionInfo Info { get; }
 
         SagaExecutionState State { get; }
 

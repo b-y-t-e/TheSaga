@@ -3,7 +3,8 @@
     public interface ISaga
     {
         ISagaData Data { get; }
-        SagaInfo Info { get; }
+        SagaExecutionInfo Info { get; }
         SagaExecutionState State { get; }
+        SagaExecutionValues Values { get; }
     }
 }

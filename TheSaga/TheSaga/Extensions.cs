@@ -75,7 +75,8 @@ namespace TheSaga
         public static IServiceProvider ResumeSagas(
             this IServiceProvider provider)
         {
-            ISagaCoordinator coordinator = provider.GetRequiredService<ISagaCoordinator>();
+            ISagaCoordinator coordinator = provider.
+                GetRequiredService<ISagaCoordinator>();
 
             coordinator.ResumeAll();
 

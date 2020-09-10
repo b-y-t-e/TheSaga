@@ -225,7 +225,7 @@ namespace TheSaga.Coordinators
             ISaga saga = new Saga
             {
                 Data = data,
-                Info = new SagaInfo
+                Info = new SagaExecutionInfo
                 {
                     ModelName = model.Name,
                     Created = dateTimeProvider.Now,
