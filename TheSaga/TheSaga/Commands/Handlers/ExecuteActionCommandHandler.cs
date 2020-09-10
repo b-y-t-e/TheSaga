@@ -38,15 +38,12 @@ namespace TheSaga.Commands.Handlers
 
         public async Task<ISaga> Handle(ExecuteActionCommand command)
         {
-            if (command.Event == null)
-                command.Event = new EmptyEvent();
-
             ISaga saga = command.Saga;
             if (saga == null)
                 throw new SagaInstanceNotFoundException(command.Model.SagaStateType);
 
             ISagaStep step = command.Model.Actions.
-                FindStep(saga, command.Event.GetType());
+                FindStep(saga, saga.ExecutionState.CurrentEvent.GetType());
 
             ISagaAction action = command.Model.
                 FindActionForStep(step);
@@ -56,7 +53,6 @@ namespace TheSaga.Commands.Handlers
 
             ExecuteStepCommand executeStepCommand = new ExecuteStepCommand
             {
-                Event = command.Event,
                 Saga = saga,
                 SagaStep = step,
                 SagaAction = action,
@@ -125,7 +121,6 @@ namespace TheSaga.Commands.Handlers
                         return await Handle(new ExecuteActionCommand()
                         {
                             Async = AsyncExecution.False(),
-                            Event = new EmptyEvent(),
                             Saga = saga,
                             Model = command.Model
                         });

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using TheSaga.Events;
 using TheSaga.SagaModels.History;
 using TheSaga.ValueObjects;
 
@@ -13,6 +14,7 @@ namespace TheSaga.Models
             ExecutionID = ExecutionID.Empty();
         }
 
+        public ISagaEvent CurrentEvent { get; set; }
         public Exception CurrentError { get; set; }
         public string CurrentState { get; set; }
         public string CurrentStep { get; set; }
@@ -21,13 +23,11 @@ namespace TheSaga.Models
         public SagaHistory History { get; set; }
         public ExecutionID ExecutionID { get; set; }
         public AsyncExecution AsyncExecution { get; set; }
-
         public string GetExecutionState()
         {
             StepData item = History.FirstOrDefault(i => i.ExecutionID == ExecutionID);
             return item?.StateName ?? CurrentState;
         }
-
         public StepData CurrentStepData()
         {
             return History.GetLatestByStepName(ExecutionID, CurrentStep);

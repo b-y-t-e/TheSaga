@@ -1,4 +1,5 @@
 ﻿using System;
+using TheSaga.Events;
 
 namespace TheSaga.SagaModels.History
 {

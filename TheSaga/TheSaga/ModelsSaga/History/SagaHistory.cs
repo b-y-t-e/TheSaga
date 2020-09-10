@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Models;
 using TheSaga.Providers;
@@ -115,6 +116,7 @@ namespace TheSaga.SagaModels.History
                     AsyncStep = step.Async,
                     StateName = saga.ExecutionState.CurrentState,
                     StepName = saga.ExecutionState.CurrentStep,
+                    Event = saga.ExecutionState.CurrentEvent,
                     ExecutionData = new StepExecutionData
                     {
                         EndStateName = saga.ExecutionState.CurrentState,

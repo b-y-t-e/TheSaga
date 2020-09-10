@@ -40,7 +40,6 @@ namespace TheSaga.Commands.Handlers
             ISaga saga = command.Saga;
             ISagaStep sagaStep = command.SagaStep;
             ISagaAction sagaAction = command.SagaAction;
-            ISagaEvent @event = command.Event;
             ISagaModel model = command.Model;
             Exception executionError = null;
 
@@ -48,12 +47,14 @@ namespace TheSaga.Commands.Handlers
             saga.ExecutionInfo.Modified = dateTimeProvider.Now;
 
             StepData stepData = saga.ExecutionState.History.
-                Create(saga, sagaStep, model);
-
-            stepData.
-                MarkStarted(saga.ExecutionState, dateTimeProvider);
+                Create(saga, sagaStep, model).
+                SetStarted(saga.ExecutionState, dateTimeProvider);
 
             await sagaPersistance.Set(saga);
+
+            ISagaEvent @event = stepData.Event;
+            if (@event is EmptyEvent)
+                @event = null;
 
             try
             {
@@ -63,8 +64,6 @@ namespace TheSaga.Commands.Handlers
                 IExecutionContext context = (IExecutionContext)ActivatorUtilities.CreateInstance(serviceProvider,
                     executionContextType, saga.Data, saga.ExecutionInfo, saga.ExecutionState, saga.ExecutionValues);
 
-                if (@event is EmptyEvent)
-                    @event = null;
 
                 if (saga.ExecutionState.IsResuming)
                 {
@@ -80,7 +79,7 @@ namespace TheSaga.Commands.Handlers
                 }
 
                 stepData.
-                    MarkSucceeded(saga.ExecutionState, dateTimeProvider);
+                    SetSucceeded(saga.ExecutionState, dateTimeProvider);
             }
             catch (SagaStopException)
             {
@@ -91,12 +90,12 @@ namespace TheSaga.Commands.Handlers
                 executionError = ex;
 
                 stepData.
-                    MarkFailed(saga.ExecutionState, dateTimeProvider, executionError.ToSagaStepException());
+                    SetFailed(saga.ExecutionState, dateTimeProvider, executionError.ToSagaStepException());
             }
             finally
             {
                 stepData.
-                    MarkEnded(saga.ExecutionState, dateTimeProvider);
+                    SetEnded(saga.ExecutionState, dateTimeProvider);
             }
 
             string nextStepName = null;
@@ -105,7 +104,7 @@ namespace TheSaga.Commands.Handlers
                 saga.ExecutionState.IsResuming = false;
                 saga.ExecutionState.IsCompensating = true;
                 saga.ExecutionState.CurrentError = executionError.ToSagaStepException();
-                nextStepName = CalculateNextStep(saga, sagaAction, sagaStep);
+                nextStepName = CalculateNextCompensationStep(saga);
             }
             else
             {
@@ -114,9 +113,7 @@ namespace TheSaga.Commands.Handlers
             }
 
             stepData.
-                SetNextStepName(nextStepName);
-
-            stepData.
+                SetNextStepName(nextStepName).
                 SetEndStateName(saga.ExecutionState.CurrentState);
 
             // czy ostatni krok
@@ -130,6 +127,7 @@ namespace TheSaga.Commands.Handlers
                 saga.ExecutionState.CurrentStep = nextStepName;
             }
 
+            saga.ExecutionState.CurrentEvent = new EmptyEvent();
             saga.ExecutionInfo.Modified = dateTimeProvider.Now;
 
             await sagaPersistance.Set(saga);
@@ -142,6 +140,15 @@ namespace TheSaga.Commands.Handlers
             if (saga.ExecutionState.IsResuming)
                 return sagaStep.StepName;
             
+            if (saga.ExecutionState.IsCompensating)            
+                return CalculateNextCompensationStep(saga);            
+
+            return sagaAction.
+                GetNextStepToExecute(sagaStep, saga.ExecutionState)?.StepName;
+        }
+
+        private string CalculateNextCompensationStep(ISaga saga)
+        {
             if (saga.ExecutionState.IsCompensating)
             {
                 StepData latestToCompensate = saga.ExecutionState.History.
@@ -152,10 +159,10 @@ namespace TheSaga.Commands.Handlers
 
                 return null;
             }
-
-            return sagaAction.
-                GetNextStepToExecute(sagaStep, saga.ExecutionState)?.StepName;
+            else
+            {
+                throw new NotSupportedException();
+            }
         }
-
     }
 }

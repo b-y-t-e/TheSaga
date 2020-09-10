@@ -8,10 +8,7 @@ namespace TheSaga.Commands
     internal class ExecuteActionCommand
     {
         public AsyncExecution Async;
-        public ISagaEvent Event;
-        // public SagaID ID;
         public ISagaModel Model;
-
         public ISaga Saga { get; internal set; }
     }
 }

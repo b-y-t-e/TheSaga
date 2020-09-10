@@ -1,6 +1,5 @@
 ﻿TODO:
 
- + zmiana nazwy SagaState (myli sie z iSagaState)
  + dodanie testow if / else
  + publish (fire&forget)
  + WhenTrue<Policy> dla TheHandlers
@@ -32,6 +31,8 @@
  + retry
 
 DONE:
+ + persystencja event'a
+ + zmiana nazwy SagaState (myli sie z iSagaState)
  + polityka resume - jako parametr (powtarzanie / kompensata calosci)
  + na resume wpierw kompensata a pozniej ponowienie kroku - ustawic jako parametr
  + SagaActionsContainer do SagaModel
@@ -64,6 +65,4 @@ DONE:
  + serializacja błędów
  + co w przypadku bledow podczas kompensacji?
  + obsluga bledow
-
-INNE:
  + podpiecie sie do convey-api

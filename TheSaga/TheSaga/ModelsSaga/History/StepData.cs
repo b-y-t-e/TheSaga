@@ -1,4 +1,5 @@
 ﻿using System;
+using TheSaga.Events;
 using TheSaga.Models;
 using TheSaga.Providers;
 using TheSaga.ValueObjects;
@@ -15,8 +16,9 @@ namespace TheSaga.SagaModels.History
         public StepExecutionData ResumeData { get; set; }
         public bool AsyncExecution { get; set; }
         public bool AsyncStep { get; set; }
+        public ISagaEvent Event { get; set; }
 
-        public void MarkStarted(SagaExecutionState state, IDateTimeProvider dateTimeProvider)
+        public StepData SetStarted(SagaExecutionState state, IDateTimeProvider dateTimeProvider)
         {
             if (state.IsResuming)
                 ResumeData.StartTime = dateTimeProvider.Now;
@@ -24,9 +26,10 @@ namespace TheSaga.SagaModels.History
                 CompensationData.StartTime = dateTimeProvider.Now;
             else
                 ExecutionData.StartTime = dateTimeProvider.Now;
+            return this;
         }
 
-        public void MarkEnded(SagaExecutionState state, IDateTimeProvider dateTimeProvider)
+        public StepData SetEnded(SagaExecutionState state, IDateTimeProvider dateTimeProvider)
         {
             if (state.IsResuming)
                 ResumeData.EndTime = dateTimeProvider.Now;
@@ -34,9 +37,10 @@ namespace TheSaga.SagaModels.History
                 CompensationData.EndTime = dateTimeProvider.Now;
             else
                 ExecutionData.EndTime = dateTimeProvider.Now;
+            return this;
         }
 
-        public void MarkSucceeded(SagaExecutionState state, IDateTimeProvider dateTimeProvider)
+        public StepData SetSucceeded(SagaExecutionState state, IDateTimeProvider dateTimeProvider)
         {
             if (state.IsResuming)
                 ResumeData.SucceedTime = dateTimeProvider.Now;
@@ -44,9 +48,10 @@ namespace TheSaga.SagaModels.History
                 CompensationData.SucceedTime = dateTimeProvider.Now;
             else
                 ExecutionData.SucceedTime = dateTimeProvider.Now;
+            return this;
         }
 
-        public void MarkFailed(SagaExecutionState state, IDateTimeProvider dateTimeProvider, Exception error)
+        public StepData SetFailed(SagaExecutionState state, IDateTimeProvider dateTimeProvider, Exception error)
         {
             if (state.IsResuming)
             {
@@ -63,22 +68,25 @@ namespace TheSaga.SagaModels.History
                 ExecutionData.Error = error;
                 ExecutionData.FailTime = dateTimeProvider.Now;
             }
+            return this;
         }
 
-        internal void SetNextStepName(string stepName)
+        internal StepData SetNextStepName(string stepName)
         {
             if (CompensationData != null)
                 CompensationData.NextStepName = stepName;
             else
                 ExecutionData.NextStepName = stepName;
+            return this;
         }
 
-        internal void SetEndStateName(string currentState)
+        internal StepData SetEndStateName(string currentState)
         {
             if (CompensationData != null)
                 CompensationData.EndStateName = currentState;
             else
                 ExecutionData.EndStateName = currentState;
+            return this;
         }
 
         internal bool HasSucceeded()

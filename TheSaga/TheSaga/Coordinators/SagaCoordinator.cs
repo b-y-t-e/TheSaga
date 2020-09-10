@@ -191,11 +191,11 @@ namespace TheSaga.Coordinators
                     GetRequiredService<ExecuteActionCommandHandler>();
 
                 saga.ExecutionValues.Set(executionValues);
+                saga.ExecutionState.CurrentEvent = @event ?? new EmptyEvent();
 
                 return await handler.Handle(new ExecuteActionCommand
                 {
                     Async = AsyncExecution.False(),
-                    Event = @event,
                     Saga = saga,
                     Model = model
                 });
