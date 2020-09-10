@@ -5,9 +5,9 @@ using TheSaga.ValueObjects;
 
 namespace TheSaga.Models
 {
-    public class SagaState
+    public class SagaExecutionState
     {
-        public SagaState()
+        public SagaExecutionState()
         {
             History = new SagaHistory();
             ExecutionID = ExecutionID.Empty();

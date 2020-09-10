@@ -10,7 +10,7 @@ namespace TheSaga.ExecutionContext
 
         SagaInfo Info { get; }
 
-        SagaState State { get; }
+        SagaExecutionState State { get; }
 
         internal Task Stop();
     }
@@ -22,7 +22,7 @@ namespace TheSaga.ExecutionContext
     {
         SagaInfo Info { get; }
 
-        SagaState State { get; }
+        SagaExecutionState State { get; }
 
         internal Task Stop();
     }

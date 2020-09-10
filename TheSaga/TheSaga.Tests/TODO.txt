@@ -1,5 +1,7 @@
 ﻿TODO:
 
+ + zmiana nazwy SagaState (myli sie z iSagaState)
+ + dodanie testow if / else
  + publish (fire&forget)
  + WhenTrue<Policy> dla TheHandlers
  + krok OnError

@@ -5,7 +5,9 @@ using System.Linq;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Models;
+using TheSaga.SagaModels.History;
 using TheSaga.SagaModels.Steps;
+using TheSaga.States;
 using TheSaga.Utils;
 
 namespace TheSaga.SagaModels.Actions
@@ -86,21 +88,58 @@ namespace TheSaga.SagaModels.Actions
 
             return step;
         }
-        public static ISagaStep GetNextStep(
-            this ISagaAction sagaAction, ISagaStep stepToFind)
+        public static ISagaStep GetNextStepToExecute(
+            this ISagaAction sagaAction, ISagaStep currentStep, SagaExecutionState sagaState)
         {
-            if (stepToFind.ChildSteps.Any())
-                return stepToFind.ChildSteps.GetFirstStep();
+            IStepData currentStepData = sagaState.History.
+                GetLatestByStepName(currentStep.StepName);
 
-            return GetNextStep(sagaAction.ChildSteps, stepToFind.ParentStep, stepToFind);
+            if (currentStepData?.ExecutionData?.StepType?.Is(typeof(SagaStepIf<,>)) == true)
+            {
+                if (currentStepData.ExecutionData.ConditionResult == true)
+                {
+                    return currentStep.ChildSteps.GetFirstStep();
+                }
+                else
+                {
+                    return GetNextStep(sagaAction.ChildSteps, currentStep.ParentStep, currentStep);
+                }
+            }
+
+            if (currentStep.ChildSteps.Any())
+                return currentStep.ChildSteps.GetFirstStep();
+
+            ISagaStep nextStep = GetNextStep(sagaAction.ChildSteps, currentStep.ParentStep, currentStep);
+
+            if (nextStep.Is(typeof(SagaStepElse<>))/* &&
+                nextStep.ParentStep != currentStep.ParentStep*/)
+            {
+                ISagaStep prevStepIf = GetPrevStepSameLevel(sagaAction.ChildSteps, currentStep.ParentStep, currentStep);
+                if (prevStepIf.Is(typeof(SagaStepIf<,>)))
+                {
+                    IStepData stepDataIf = sagaState.History.
+                        GetLatestByStepName(prevStepIf.StepName);
+
+                    if (stepDataIf?.ExecutionData?.ConditionResult == true)
+                        nextStep = GetNextStep(sagaAction.ChildSteps, prevStepIf.ParentStep, prevStepIf);
+                }
+            }
+
+            return nextStep;
+        }
+
+        static ISagaStep GetNextStepSameLevel(
+            SagaSteps SagaSteps, ISagaStep parentStep, ISagaStep stepToFind)
+        {
+            return GetNextStep(SagaSteps, parentStep, stepToFind, true);
         }
 
         static ISagaStep GetNextStep(
-            SagaSteps SagaSteps, ISagaStep parentStep, ISagaStep stepToFind)
+            SagaSteps SagaSteps, ISagaStep parentStep, ISagaStep stepToFind, Boolean onTheSameLevel = false)
         {
+            bool stepFound = false;
             if (parentStep == null)
             {
-                bool stepFound = false;
                 foreach (ISagaStep childStep in SagaSteps)
                 {
                     if (stepFound)
@@ -113,7 +152,6 @@ namespace TheSaga.SagaModels.Actions
             }
             else
             {
-                bool stepFound = false;
                 foreach (ISagaStep childStep in parentStep.ChildSteps)
                 {
                     if (stepFound)
@@ -122,7 +160,42 @@ namespace TheSaga.SagaModels.Actions
                     if (childStep == stepToFind)
                         stepFound = true;
                 }
-                return GetNextStep(SagaSteps, stepToFind.ParentStep.ParentStep, stepToFind.ParentStep);
+
+                if (stepFound && onTheSameLevel)
+                    return null;
+
+                return GetNextStep(SagaSteps, stepToFind.ParentStep.ParentStep, stepToFind.ParentStep, onTheSameLevel);
+            }
+        }
+
+        static ISagaStep GetPrevStepSameLevel(
+            SagaSteps SagaSteps, ISagaStep parentStep, ISagaStep stepToFind)
+        {
+            ISagaStep prevStep = null;
+            if (parentStep == null)
+            {
+                foreach (ISagaStep childStep in SagaSteps)
+                {
+                    if (childStep == stepToFind)
+                    {
+                        return prevStep;
+                    }
+                    prevStep = childStep;
+                }
+                return null;
+            }
+            else
+            {
+                foreach (ISagaStep childStep in parentStep.ChildSteps)
+                {
+                    if (childStep == stepToFind)
+                    {
+                        return prevStep;
+                    }
+                    prevStep = childStep;
+                }
+
+                return GetPrevStepSameLevel(SagaSteps, stepToFind.ParentStep.ParentStep, stepToFind.ParentStep);
             }
         }
 

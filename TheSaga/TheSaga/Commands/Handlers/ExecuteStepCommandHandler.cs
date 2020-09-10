@@ -47,10 +47,10 @@ namespace TheSaga.Commands.Handlers
             saga.State.CurrentStep = sagaStep.StepName;
             saga.Info.Modified = dateTimeProvider.Now;
 
-            StepData executionData = saga.State.History.
+            StepData stepData = saga.State.History.
                 Create(saga, sagaStep, model);
 
-            executionData.
+            stepData.
                 MarkStarted(saga.State, dateTimeProvider);
 
             await sagaPersistance.Set(saga);
@@ -68,18 +68,18 @@ namespace TheSaga.Commands.Handlers
 
                 if (saga.State.IsResuming)
                 {
-                    await sagaStep.Compensate(serviceProvider, context, @event);
+                    await sagaStep.Compensate(serviceProvider, context, @event, stepData);
                 }
                 else if (saga.State.IsCompensating)
                 {
-                    await sagaStep.Compensate(serviceProvider, context, @event);
+                    await sagaStep.Compensate(serviceProvider, context, @event, stepData);
                 }
                 else
                 {
-                    await sagaStep.Execute(serviceProvider, context, @event);
+                    await sagaStep.Execute(serviceProvider, context, @event, stepData);
                 }
 
-                executionData.
+                stepData.
                     MarkSucceeded(saga.State, dateTimeProvider);
             }
             catch (SagaStopException)
@@ -90,12 +90,12 @@ namespace TheSaga.Commands.Handlers
             {
                 executionError = ex;
 
-                executionData.
+                stepData.
                     MarkFailed(saga.State, dateTimeProvider, executionError.ToSagaStepException());
             }
             finally
             {
-                executionData.
+                stepData.
                     MarkEnded(saga.State, dateTimeProvider);
             }
 
@@ -109,14 +109,14 @@ namespace TheSaga.Commands.Handlers
             }
             else
             {
-                nextStepName = CalculateNextStep(saga, sagaAction, sagaStep);
+                nextStepName = CalculateNextStep(saga, sagaAction, sagaStep, stepData);
                 saga.State.IsResuming = false;
             }
 
-            executionData.
+            stepData.
                 SetNextStepName(nextStepName);
 
-            executionData.
+            stepData.
                 SetEndStateName(saga.State.CurrentState);
 
             // czy ostatni krok
@@ -137,13 +137,11 @@ namespace TheSaga.Commands.Handlers
             return saga;
         }
 
-        private string CalculateNextStep(ISaga saga, ISagaAction sagaAction, ISagaStep sagaStep)
+        private string CalculateNextStep(ISaga saga, ISagaAction sagaAction, ISagaStep sagaStep, IStepData stepData = null)
         {
             if (saga.State.IsResuming)
-            {
                 return sagaStep.StepName;
-            }
-
+            
             if (saga.State.IsCompensating)
             {
                 StepData latestToCompensate = saga.State.History.
@@ -156,7 +154,7 @@ namespace TheSaga.Commands.Handlers
             }
 
             return sagaAction.
-                GetNextStep(sagaStep)?.StepName;
+                GetNextStepToExecute(sagaStep, saga.State)?.StepName;
         }
 
     }
