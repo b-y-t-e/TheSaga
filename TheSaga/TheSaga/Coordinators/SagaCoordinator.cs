@@ -179,6 +179,8 @@ namespace TheSaga.Coordinators
         private async Task<ISaga> ExecuteSaga(
             ISagaEvent @event, ISagaModel model, ISaga saga, IDictionary<string, object> executionValues)
         {
+            bool sagaStarted = false;
+
             try
             {
                 if (saga == null)
@@ -191,11 +193,16 @@ namespace TheSaga.Coordinators
                 await messageBus.
                     Publish(new ExecutionStartMessage(saga, model));
 
+                sagaStarted = true;
+
                 ExecuteActionCommandHandler handler = serviceProvider.
                     GetRequiredService<ExecuteActionCommandHandler>();
 
-                saga.ExecutionValues.Set(executionValues);
-                saga.ExecutionState.CurrentEvent = @event ?? new EmptyEvent();
+                saga.ExecutionValues.
+                    Set(executionValues);
+
+                saga.ExecutionState.
+                    CurrentEvent = @event ?? new EmptyEvent();
 
                 return await handler.Handle(new ExecuteActionCommand
                 {
@@ -206,8 +213,9 @@ namespace TheSaga.Coordinators
             }
             catch
             {
-                await messageBus.Publish(
-                    new ExecutionEndMessage(saga));
+                if (sagaStarted)
+                    await messageBus.Publish(
+                        new ExecutionEndMessage(saga));
 
                 throw;
             }

@@ -44,7 +44,7 @@ namespace TheSaga.Observables
 
             if (msg.Saga?.Data?.ID != null)
                 if (!await sagaLocking.Acquire(msg.Saga.Data.ID))
-                    throw new SagaIsBusyException(msg.Saga.Data.ID);
+                    throw new SagaIsBusyException(msg.Saga.Data.ID);                
         }
 
         private async Task OnSagaProcessingEnd(ExecutionEndMessage msg)

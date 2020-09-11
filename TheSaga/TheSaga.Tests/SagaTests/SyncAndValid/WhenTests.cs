@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -14,6 +15,32 @@ namespace TheSaga.Tests.SagaTests.SyncAndValid
 {
     public class WhenTests
     {
+        /*[Fact]
+        public async Task WHEN_eventIsSend_THEN_2222()
+        {
+            // given
+            ISaga saga = await sagaCoordinator.
+                Publish(new OrderCreatedEvent());
+
+            // when
+            for (var i = 0; i < 100; i++)
+                Task.Run(() =>
+                    sagaCoordinator.
+                        Publish(new OrderCompletedEvent() { ID = saga.Data.ID }));
+
+            Thread.Sleep(100000);
+
+            // then
+            ISaga persistedSaga = await sagaPersistance.
+                Get(saga.Data.ID);
+
+            persistedSaga.ShouldNotBeNull();
+            persistedSaga.ExecutionState.CurrentStep.ShouldBe(null);
+            persistedSaga.ExecutionState.CurrentState.ShouldBe(nameof(StateAlternative1));
+            persistedSaga.Data.ID.ShouldBe(saga.Data.ID);
+        }
+        */
+
         [Fact]
         public async Task WHEN_eventIsSend_THEN_sagaShouldMoveToValidState()
         {
