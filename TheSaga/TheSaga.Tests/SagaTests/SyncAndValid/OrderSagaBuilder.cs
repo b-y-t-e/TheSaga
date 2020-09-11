@@ -30,7 +30,11 @@ namespace TheSaga.Tests.SagaTests.SyncAndValid
             builder.
                 During<StateCreated>().
                 When<OrderCompletedEvent>().
-                    HandleBy<OrderCompletedEventHandler>();
+                    Then("OrderCompletedEventStep1", ctx => Task.CompletedTask).
+                    Then<SendEmailToClientEvent>("email").
+                    Then<SendMessageToTheManagerEvent>("SendMessageToTheManagerEventStep").
+                    Then<OrderCourierEvent>("OrderCourierEventStep").
+                    TransitionTo<StateCompleted>();
 
             builder.
                 During<StateCompleted>().
@@ -46,7 +50,7 @@ namespace TheSaga.Tests.SagaTests.SyncAndValid
 
             builder.
                 During<StateCreated>().
-                When<ToAlternative1Event>().
+                When<ToAlternative1Event>().                
                     TransitionTo<StateAlternative1>().
                 When<ToAlternative2Event>().
                     TransitionTo<StateAlternative2>();

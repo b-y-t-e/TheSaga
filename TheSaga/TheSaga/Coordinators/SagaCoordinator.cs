@@ -201,17 +201,13 @@ namespace TheSaga.Coordinators
                 if (saga == null)
                     throw new SagaInstanceNotFoundException();
 
-                if (!saga.IsIdle())
+                if (saga.IsIdle())
                 {
-
+                    saga.ExecutionState.CurrentError = null;
+                    saga.ExecutionState.ExecutionID = ExecutionID.New();
+                    if (model.HistoryPolicy == ESagaHistoryPolicy.StoreOnlyCurrentStep)
+                        saga.ExecutionState.History.Clear();
                 }
-
-                //debug.Add($"{saga.ExecutionState.ExecutionID} | {saga.Data.ID} | started");
-
-                saga.ExecutionState.CurrentError = null;
-                saga.ExecutionState.ExecutionID = ExecutionID.New();
-                if (model.HistoryPolicy == ESagaHistoryPolicy.StoreOnlyCurrentStep)
-                    saga.ExecutionState.History.Clear();
 
                 ExecuteActionCommandHandler handler = serviceProvider.
                     GetRequiredService<ExecuteActionCommandHandler>();

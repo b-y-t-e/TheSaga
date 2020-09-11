@@ -35,7 +35,7 @@ namespace TheSaga.Tests.SagaTests.IfElseIfElseSaga
             data.Value1.ShouldBe(3);
         }
 
-        [Fact]
+      /*  [Fact]
         public async Task WHEN_conditionIsNotMet_THEN_1()
         {
             // given
@@ -48,7 +48,7 @@ namespace TheSaga.Tests.SagaTests.IfElseIfElseSaga
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
             IfElseIfElseSagaData data = persistedSaga.Data as IfElseIfElseSagaData;
             data.Value1.ShouldBe(1);
-        }
+        }*/
 
         [Fact]
         public async Task WHEN_conditionIsNotMet_THEN_2()
