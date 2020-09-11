@@ -43,11 +43,12 @@ namespace TheSaga.Persistance.InMemory
             return Task.CompletedTask;
         }
 
-        public async Task Set(ISaga sagaData)
+        public async Task Set(ISaga saga)
         {
-            serializedInstances[sagaData.Data.ID] = JsonConvert.SerializeObject(sagaData,
+            serializedInstances[saga.Data.ID] = JsonConvert.SerializeObject(saga,
                 new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.All});
-            objectInstances[sagaData.Data.ID] = sagaData;
+            objectInstances[saga.Data.ID] = saga;
+            //debug.Add($"{saga.ExecutionState.ExecutionID} | {saga.Data.ID} | stored | {saga.ExecutionState.CurrentStep}");
         }
     }
 }

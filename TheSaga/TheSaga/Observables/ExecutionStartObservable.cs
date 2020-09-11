@@ -38,17 +38,23 @@ namespace TheSaga.Observables
 
         private async Task OnSagaProcessingStart(ExecutionStartMessage msg)
         {
-            ISaga saga = msg.Saga;
+            /*ISaga saga = msg.SagaID;
             ISagaModel model = msg.Model;
 
             if (!saga.IsIdle())
+            {
+                debug.GetMessages();
+                return;
+            }*/
+
+            /*if (!saga.IsIdle())
                 return;
 
             saga.ExecutionState.CurrentError = null;
             saga.ExecutionState.ExecutionID = ExecutionID.New();
 
             if (model.HistoryPolicy == ESagaHistoryPolicy.StoreOnlyCurrentStep)
-                saga.ExecutionState.History.Clear();
+                saga.ExecutionState.History.Clear();*/
         }
     }
 }

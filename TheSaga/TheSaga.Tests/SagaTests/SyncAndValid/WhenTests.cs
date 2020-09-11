@@ -15,7 +15,7 @@ namespace TheSaga.Tests.SagaTests.SyncAndValid
 {
     public class WhenTests
     {
-        /*[Fact]
+       /* [Fact]
         public async Task WHEN_eventIsSend_THEN_2222()
         {
             // given
@@ -23,12 +23,12 @@ namespace TheSaga.Tests.SagaTests.SyncAndValid
                 Publish(new OrderCreatedEvent());
 
             // when
-            for (var i = 0; i < 100; i++)
+            for (var i = 0; i < 1000; i++)
                 Task.Run(() =>
                     sagaCoordinator.
                         Publish(new OrderCompletedEvent() { ID = saga.Data.ID }));
 
-            Thread.Sleep(100000);
+            Thread.Sleep(200000);
 
             // then
             ISaga persistedSaga = await sagaPersistance.

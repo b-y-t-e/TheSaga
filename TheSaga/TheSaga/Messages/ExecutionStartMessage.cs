@@ -3,17 +3,18 @@ using TheSaga.MessageBus.Interfaces;
 using TheSaga.Models;
 using TheSaga.Models.Interfaces;
 using TheSaga.ModelsSaga.Interfaces;
+using TheSaga.ValueObjects;
 
 namespace TheSaga.Messages
 {
     internal class ExecutionStartMessage : IInternalMessage
     {
-        public ISaga Saga;
+        public SagaID SagaID;
         public ISagaModel Model;
 
-        public ExecutionStartMessage(ISaga saga, ISagaModel model)
+        public ExecutionStartMessage(SagaID saga, ISagaModel model)
         {
-            Saga = saga;
+            SagaID = saga;
             this.Model = model;
         }
     }

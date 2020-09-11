@@ -42,9 +42,9 @@ namespace TheSaga.Observables
         {
             ISagaLocking sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
 
-            if (msg.Saga?.Data?.ID != null)
-                if (!await sagaLocking.Acquire(msg.Saga.Data.ID))
-                    throw new SagaIsBusyException(msg.Saga.Data.ID);                
+            //if (msg.Saga?.Data?.ID != null)
+            if (!await sagaLocking.Acquire(msg.SagaID))
+                throw new SagaIsBusyException(msg.SagaID);
         }
 
         private async Task OnSagaProcessingEnd(ExecutionEndMessage msg)

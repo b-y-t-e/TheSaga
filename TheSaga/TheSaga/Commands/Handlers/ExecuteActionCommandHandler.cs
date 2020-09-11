@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using TheSaga.Errors;
@@ -111,6 +112,8 @@ namespace TheSaga.Commands.Handlers
                 {
                     if (saga.IsIdle())
                     {
+                        //debug.Add( $"{saga.ExecutionState.ExecutionID} | {saga.Data.ID} | ended");
+                        //Debug.WriteLine($"{saga.ExecutionState.ExecutionID} | {saga.Data.ID} ended");
                         await messageBus.Publish(
                             new ExecutionEndMessage(saga));
 
@@ -131,6 +134,5 @@ namespace TheSaga.Commands.Handlers
                 }
             }
         }
-
     }
 }

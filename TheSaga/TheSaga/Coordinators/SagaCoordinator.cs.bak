@@ -72,7 +72,6 @@ namespace TheSaga.Coordinators
                     new EmptyEvent(),
                     model,
                     saga,
-                    saga.Data.ID,
                     null);
             }
         }
@@ -93,7 +92,6 @@ namespace TheSaga.Coordinators
                 new EmptyEvent(),
                 model,
                 saga,
-                saga.Data.ID,
                 null);
         }
 
@@ -118,12 +116,14 @@ namespace TheSaga.Coordinators
 
             try
             {
+                ISaga saga =
+                    newSaga ??
+                    await sagaPersistance.Get(sagaId);
 
                 return await ExecuteSaga(
                     @event,
                     model,
-                    newSaga,
-                    SagaID.From(newSaga?.Data?.ID ?? sagaId.Value),
+                    saga,
                     executionValues);
             }
             catch
@@ -176,42 +176,39 @@ namespace TheSaga.Coordinators
             }
         }
 
+        static int c = 0;
+
         private async Task<ISaga> ExecuteSaga(
-            ISagaEvent @event, ISagaModel model,
-            ISaga saga,
-            Guid sagaID,
-            IDictionary<string, object> executionValues)
+            ISagaEvent @event, ISagaModel model, ISaga saga, IDictionary<string, object> executionValues)
         {
             bool sagaStarted = false;
 
             try
             {
+                if (saga == null)
+                    throw new SagaInstanceNotFoundException();
+
                 serviceProvider.
                     GetRequiredService<ObservableRegistrator>().
                     Initialize();
 
                 await messageBus.
-                    Publish(new ExecutionStartMessage(SagaID.From(sagaID), model));
+                    Publish(new ExecutionStartMessage(saga, model));
 
-                sagaStarted = true;
-
-                if (saga == null)
-                    saga = await sagaPersistance.Get(sagaID);
-
-                if (saga == null)
-                    throw new SagaInstanceNotFoundException();
-
-                if (!saga.IsIdle())
+                if(!saga.IsIdle())
                 {
 
                 }
 
-                //debug.Add($"{saga.ExecutionState.ExecutionID} | {saga.Data.ID} | started");
-
                 saga.ExecutionState.CurrentError = null;
                 saga.ExecutionState.ExecutionID = ExecutionID.New();
+                Debug.WriteLine($"{saga.ExecutionState.ExecutionID} | {saga.Data.ID} started");
+
                 if (model.HistoryPolicy == ESagaHistoryPolicy.StoreOnlyCurrentStep)
                     saga.ExecutionState.History.Clear();
+
+                sagaStarted = true;
+                c++;
 
                 ExecuteActionCommandHandler handler = serviceProvider.
                     GetRequiredService<ExecuteActionCommandHandler>();
@@ -219,15 +216,22 @@ namespace TheSaga.Coordinators
                 saga.ExecutionValues.
                     Set(executionValues);
 
+                if(c > 1)
+                {
+
+                }
+
                 saga.ExecutionState.
                     CurrentEvent = @event ?? new EmptyEvent();
 
-                return await handler.Handle(new ExecuteActionCommand
+                var r = await handler.Handle(new ExecuteActionCommand
                 {
                     Async = AsyncExecution.False(),
                     Saga = saga,
                     Model = model
                 });
+
+                return r;
             }
             catch
             {
@@ -236,6 +240,11 @@ namespace TheSaga.Coordinators
                         new ExecutionEndMessage(saga));
 
                 throw;
+            }
+            finally
+            {
+                if (sagaStarted)
+                    c--;
             }
         }
 
