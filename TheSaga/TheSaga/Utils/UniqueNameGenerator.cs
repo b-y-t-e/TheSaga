@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using TheSaga.Exceptions;
 
 namespace TheSaga.Utils
@@ -9,13 +10,14 @@ namespace TheSaga.Utils
 
         internal string Generate(params string[] names)
         {
-            string baseName = string.Join("_", names);
+            names = names.Select(n => !string.IsNullOrEmpty(n) ? n : "_").ToArray();
+            string baseName = string.Join(" | ", names);
             int index = 0;
-            string name = $"{baseName}_{index}";
+            string name = $"{baseName} | #{index}";
             while (usedNames.Contains(name))
             {
                 index++;
-                name = $"{baseName}_{index}";
+                name = $"{baseName} | #{index}";
             }
 
             usedNames.Add(name);
