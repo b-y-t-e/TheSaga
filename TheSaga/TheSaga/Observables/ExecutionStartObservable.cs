@@ -2,9 +2,12 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TheSaga.MessageBus;
+using TheSaga.MessageBus.Interfaces;
 using TheSaga.Messages;
 using TheSaga.Models;
-using TheSaga.SagaModels;
+using TheSaga.Models.Interfaces;
+using TheSaga.ModelsSaga.Interfaces;
+using TheSaga.Observables.Interfaces;
 using TheSaga.ValueObjects;
 
 namespace TheSaga.Observables
@@ -36,7 +39,7 @@ namespace TheSaga.Observables
         private async Task OnSagaProcessingStart(ExecutionStartMessage msg)
         {
             ISaga saga = msg.Saga;
-            SagaModels.ISagaModel model = msg.Model;
+            ISagaModel model = msg.Model;
 
             if (!saga.IsIdle())
                 return;

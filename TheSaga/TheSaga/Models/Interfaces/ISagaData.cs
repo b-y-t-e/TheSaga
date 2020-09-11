@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheSaga.Models
+namespace TheSaga.Models.Interfaces
 {
     public interface ISagaData
     {

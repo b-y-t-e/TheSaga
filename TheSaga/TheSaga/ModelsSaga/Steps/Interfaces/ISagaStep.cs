@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
-using TheSaga.SagaModels.Actions;
-using TheSaga.SagaModels.History;
-using TheSaga.ValueObjects;
+using TheSaga.ModelsSaga.History;
 
-namespace TheSaga.SagaModels.Steps
+namespace TheSaga.ModelsSaga.Steps.Interfaces
 {
     public interface ISagaStep 
     {

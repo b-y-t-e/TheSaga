@@ -9,8 +9,4 @@ namespace TheSaga.Events
         /// </summary>
         Guid ID { get; }
     }
-    public interface IHandlersEvent
-    {
-
-    }
 }

@@ -1,6 +1,6 @@
-﻿using TheSaga.Models;
+﻿using TheSaga.Models.Interfaces;
 
-namespace TheSaga.SagaModels
+namespace TheSaga.ModelsSaga.Interfaces
 {
     public interface ISagaModelBuilder<TSagaData>
         where TSagaData : ISagaData

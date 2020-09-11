@@ -1,4 +1,5 @@
-﻿using TheSaga.Utils;
+﻿using TheSaga.States.Interfaces;
+using TheSaga.Utils;
 
 namespace TheSaga.States
 {

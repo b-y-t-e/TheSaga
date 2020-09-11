@@ -10,12 +10,15 @@ using TheSaga.Locking;
 using TheSaga.Locking.InMemory;
 using TheSaga.MessageBus;
 using TheSaga.MessageBus.InMemory;
+using TheSaga.MessageBus.Interfaces;
+using TheSaga.ModelsSaga.Interfaces;
 using TheSaga.Observables.Registrator;
 using TheSaga.Persistance;
 using TheSaga.Persistance.InMemory;
 using TheSaga.Providers;
+using TheSaga.Providers.Interfaces;
 using TheSaga.Registrator;
-using TheSaga.SagaModels;
+using TheSaga.Registrator.Interfaces;
 
 [assembly: InternalsVisibleTo("TheSaga.Tests")]
 

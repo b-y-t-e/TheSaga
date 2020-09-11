@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TheSaga.MessageBus;
+using TheSaga.MessageBus.Interfaces;
 using TheSaga.Messages;
+using TheSaga.Observables.Interfaces;
 
 namespace TheSaga.Observables
 {

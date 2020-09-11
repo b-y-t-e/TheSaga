@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
+using TheSaga.Handlers.Events;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
 namespace TheSaga.Activities
 {
@@ -13,10 +15,4 @@ namespace TheSaga.Activities
         Task Execute(IExecutionContext<TSagaData> context);
     }
 
-    public interface IHandlersActivity
-    {
-        Task Compensate(IExecutionContext<HandlersData> context);
-
-        Task Execute(IExecutionContext<HandlersData> context);
-    }
 }

@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using TheSaga.SagaModels.Steps;
+using TheSaga.ModelsSaga.Steps;
 
-namespace TheSaga.SagaModels.Actions
+namespace TheSaga.ModelsSaga.Actions.Interfaces
 {
     public interface ISagaAction
     {

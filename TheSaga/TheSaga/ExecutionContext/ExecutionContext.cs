@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using TheSaga.Exceptions;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
 namespace TheSaga.ExecutionContext
 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 using TheSaga.Options;
 using TheSaga.States;
 

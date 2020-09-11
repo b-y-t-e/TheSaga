@@ -8,9 +8,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 using TheSaga.Persistance.SqlServer.Connection;
 using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Providers;
+using TheSaga.Providers.Interfaces;
 
 namespace TheSaga.Persistance.SqlServer.Utils
 {

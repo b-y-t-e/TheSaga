@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using TheSaga.ExecutionContext;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
 namespace TheSaga.Conditions
 {

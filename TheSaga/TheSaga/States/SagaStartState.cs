@@ -1,4 +1,6 @@
-﻿namespace TheSaga.States
+﻿using TheSaga.States.Interfaces;
+
+namespace TheSaga.States
 {
     public sealed class SagaStartState : IStateWithCustomName
     {

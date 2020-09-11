@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
-using TheSaga.SagaModels.Actions;
-using TheSaga.SagaModels.History;
-using TheSaga.ValueObjects;
+using TheSaga.ModelsSaga.History;
+using TheSaga.ModelsSaga.Steps.Interfaces;
 
-namespace TheSaga.SagaModels.Steps
+namespace TheSaga.ModelsSaga.Steps
 {
     internal class SagaContainerStep : ISagaStep
     {

@@ -1,15 +1,9 @@
 ﻿using System.Threading.Tasks;
-using TheSaga.Events;
 using TheSaga.ExecutionContext;
-using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
-namespace TheSaga.SagaModels.Steps.Delegates
+namespace TheSaga.ModelsSaga.Steps.Delegates
 {
     public delegate Task ThenActionDelegate<TSagaData>(IExecutionContext<TSagaData> context)
-        where TSagaData : ISagaData;
-
-    public delegate Task HandlersThenActionDelegate(IExecutionContext<HandlersData> context);
-
-    public delegate Task<bool> IfFuncDelegate<TSagaData>(IExecutionContext<TSagaData> context)
         where TSagaData : ISagaData;
 }

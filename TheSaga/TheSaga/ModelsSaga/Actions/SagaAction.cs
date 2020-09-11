@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Linq;
-using TheSaga.Models;
-using TheSaga.SagaModels.Steps;
+using TheSaga.ModelsSaga.Actions.Interfaces;
+using TheSaga.ModelsSaga.Steps;
 
-namespace TheSaga.SagaModels.Actions
+namespace TheSaga.ModelsSaga.Actions
 {
 
     public class SagaAction : ISagaAction
