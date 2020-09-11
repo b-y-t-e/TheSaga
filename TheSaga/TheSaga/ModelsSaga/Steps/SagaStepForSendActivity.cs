@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using TheSaga.Coordinators;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
 using TheSaga.Models.Interfaces;
 using TheSaga.ModelsSaga.History;
 using TheSaga.ModelsSaga.Steps.Delegates;
 using TheSaga.ModelsSaga.Steps.Interfaces;
-using TheSaga.ModelsSaga.Steps.SendMessage;
 
 namespace TheSaga.ModelsSaga.Steps
 {
@@ -38,46 +38,50 @@ namespace TheSaga.ModelsSaga.Steps
         public bool Async { get; }
         public string StepName { get; }
 
-        public async Task Compensate(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event, IStepData stepData)
+        public async Task Compensate(
+            IServiceProvider serviceProvider,
+            IExecutionContext context, 
+            ISagaEvent @event, 
+            IStepData stepData)
         {
             if (typeof(TCompensateEvent) == typeof(EmptyEvent))
                 return;
 
+            ISagaCoordinator sagaCoordinator = serviceProvider.
+                GetRequiredService<ISagaCoordinator>();
+
             IExecutionContext<TSagaData> contextForAction =
-                (IExecutionContext<TSagaData>) context;
+                (IExecutionContext<TSagaData>)context;
 
-            SendMessageCompensate<TSagaData, TCompensateEvent> activity =
-                ActivatorUtilities.CreateInstance<SendMessageCompensate<TSagaData, TCompensateEvent>>(serviceProvider);
+            TCompensateEvent compensationEvent = new TCompensateEvent();
+            if (compensate != null)
+                await compensate(contextForAction, compensationEvent);
 
-            TCompensateEvent eventToSend = new TCompensateEvent();
-            if (action != null)
-                await compensate(contextForAction, eventToSend);
-
-            if (activity != null)
-                await activity.Compensate(
-                    contextForAction,
-                    eventToSend);
+            await sagaCoordinator.
+                Publish(compensationEvent, contextForAction.ExecutionValues);
         }
 
-        public async Task Execute(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event, IStepData stepData)
+        public async Task Execute(
+            IServiceProvider serviceProvider,
+            IExecutionContext context, 
+            ISagaEvent @event, 
+            IStepData stepData)
         {
             if (typeof(TExecuteEvent) == typeof(EmptyEvent))
                 return;
 
+            ISagaCoordinator sagaCoordinator = serviceProvider.
+                GetRequiredService<ISagaCoordinator>();
+
             IExecutionContext<TSagaData> contextForAction =
-                (IExecutionContext<TSagaData>) context;
+                (IExecutionContext<TSagaData>)context;
 
-            SendMessageExecute<TSagaData, TExecuteEvent> activity =
-                ActivatorUtilities.CreateInstance<SendMessageExecute<TSagaData, TExecuteEvent>>(serviceProvider);
-
-            TExecuteEvent eventToSend = new TExecuteEvent();
+            TExecuteEvent executionEvent = new TExecuteEvent();
             if (action != null)
-                await action(contextForAction, eventToSend);
+                await action(contextForAction, executionEvent);
 
-            if (activity != null)
-                await activity.Execute(
-                    contextForAction,
-                    eventToSend);
+            await sagaCoordinator.
+                Publish(executionEvent, contextForAction.ExecutionValues);
         }
     }
 }
