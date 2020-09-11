@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
-using TheSaga.Tests.SagaTests.Sagas.SyncAndValid.Events;
+using TheSaga.Tests.SagaTests.SyncAndValid.Events;
 
-namespace TheSaga.Tests.SagaTests.Sagas.SyncAndValid.EventHandlers
+namespace TheSaga.Tests.SagaTests.SyncAndValid.EventHandlers
 {
     public class OrderCreatedEventHandler : ISagaEventHandler<OrderData, OrderCreatedEvent>
     {

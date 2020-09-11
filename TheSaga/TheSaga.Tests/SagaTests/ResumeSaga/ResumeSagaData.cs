@@ -1,7 +1,8 @@
 ﻿using System;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
-namespace TheSaga.Tests.SagaTests.Sagas.ResumeSaga
+namespace TheSaga.Tests.SagaTests.ResumeSaga
 {
     public class ResumeSagaData : ISagaData
     {

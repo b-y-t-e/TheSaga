@@ -1,20 +1,17 @@
-using Microsoft.Extensions.DependencyInjection;
-using Shouldly;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Shouldly;
 using TheSaga.Coordinators;
 using TheSaga.Events;
-using TheSaga.Locking.DistributedLock;
-using TheSaga.Locking.DistributedLock.Options;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 using TheSaga.Persistance;
-using TheSaga.Persistance.SqlServer;
-using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.States;
-using TheSaga.Tests.SagaTests.Sagas.AsyncAndValid.Events;
+using TheSaga.Tests.SagaTests.AsyncAndValid.Events;
 using Xunit;
 
-namespace TheSaga.Tests.SagaTests
+namespace TheSaga.Tests.SagaTests.AsyncAndValid
 {
     public class AsyncAndValidSagaTests
     {

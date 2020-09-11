@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TheSaga.Builders;
-using TheSaga.SagaModels;
-using TheSaga.Tests.SagaTests.Sagas.AsyncLockingSaga.EventHandlers;
-using TheSaga.Tests.SagaTests.Sagas.AsyncLockingSaga.Events;
-using TheSaga.Tests.SagaTests.Sagas.AsyncLockingSaga.States;
+using TheSaga.ModelsSaga.Interfaces;
+using TheSaga.Tests.SagaTests.AsyncLockingSaga.EventHandlers;
+using TheSaga.Tests.SagaTests.AsyncLockingSaga.Events;
+using TheSaga.Tests.SagaTests.AsyncLockingSaga.States;
 
-namespace TheSaga.Tests.SagaTests.Sagas.AsyncLockingSaga
+namespace TheSaga.Tests.SagaTests.AsyncLockingSaga
 {
     public class AsyncSagaBuilder : ISagaModelBuilder<AsyncData>
     {

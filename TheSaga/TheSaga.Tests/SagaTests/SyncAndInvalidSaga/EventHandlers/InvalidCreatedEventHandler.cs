@@ -2,9 +2,9 @@
 using TheSaga.Coordinators;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
-using TheSaga.Tests.SagaTests.Sagas.SyncAndInvalidSaga.Events;
+using TheSaga.Tests.SagaTests.SyncAndInvalidSaga.Events;
 
-namespace TheSaga.Tests.SagaTests.Sagas.SyncAndInvalidSaga.EventHandlers
+namespace TheSaga.Tests.SagaTests.SyncAndInvalidSaga.EventHandlers
 {
     public class InvalidCreatedEventHandler : ISagaEventHandler<SyncAndInvalidSagaData, InvalidCreatedEvent>
     {

@@ -2,7 +2,7 @@
 using TheSaga.Activities;
 using TheSaga.ExecutionContext;
 
-namespace TheSaga.Tests.SagaTests.Sagas.SyncAndValid.Activities
+namespace TheSaga.Tests.SagaTests.SyncAndValid.Activities
 {
     internal class SendMessageToTheManagerEvent : ISagaActivity<OrderData>
     {

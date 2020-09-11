@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
 using TheSaga.Builders;
-using TheSaga.SagaModels;
-using TheSaga.Tests.SagaTests.Sagas.SyncAndValid.Activities;
-using TheSaga.Tests.SagaTests.Sagas.SyncAndValid.EventHandlers;
-using TheSaga.Tests.SagaTests.Sagas.SyncAndValid.Events;
-using TheSaga.Tests.SagaTests.Sagas.SyncAndValid.States;
+using TheSaga.ModelsSaga.Interfaces;
+using TheSaga.Tests.SagaTests.SyncAndValid.Activities;
+using TheSaga.Tests.SagaTests.SyncAndValid.EventHandlers;
+using TheSaga.Tests.SagaTests.SyncAndValid.Events;
+using TheSaga.Tests.SagaTests.SyncAndValid.States;
 
-namespace TheSaga.Tests.SagaTests.Sagas.SyncAndValid
+namespace TheSaga.Tests.SagaTests.SyncAndValid
 {
     public class OrderSagaBuilder : ISagaModelBuilder<OrderData>
     {

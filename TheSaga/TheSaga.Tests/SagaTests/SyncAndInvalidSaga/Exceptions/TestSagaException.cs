@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheSaga.Tests.SagaTests.Sagas.SyncAndInvalidSaga.Exceptions
+namespace TheSaga.Tests.SagaTests.SyncAndInvalidSaga.Exceptions
 {
     [Serializable]
     public class TestSagaException : Exception

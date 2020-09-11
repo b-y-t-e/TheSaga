@@ -1,11 +1,11 @@
 ﻿using TheSaga.Builders;
-using TheSaga.SagaModels;
-using TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga.Activities;
-using TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga.Events;
-using TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga.Conditions;
-using TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga.States;
+using TheSaga.ModelsSaga.Interfaces;
+using TheSaga.Tests.SagaTests.ChildStepsSaga.Activities;
+using TheSaga.Tests.SagaTests.ChildStepsSaga.Conditions;
+using TheSaga.Tests.SagaTests.ChildStepsSaga.Events;
+using TheSaga.Tests.SagaTests.ChildStepsSaga.States;
 
-namespace TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga
+namespace TheSaga.Tests.SagaTests.ChildStepsSaga
 {
     public class ChildStepsSagaBuilder : ISagaModelBuilder<ChildStepsSagaData>
     {

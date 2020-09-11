@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
 namespace TheSaga.ExecutionContext
 {
@@ -20,13 +21,4 @@ namespace TheSaga.ExecutionContext
     public interface IExecutionContext
     {
     }
-    public interface IHandlersExecutionContext
-    {
-        SagaExecutionInfo Info { get; }
-
-        SagaExecutionState State { get; }
-
-        internal Task Stop();
-    }
-
 }

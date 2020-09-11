@@ -1,6 +1,7 @@
 ﻿using TheSaga.States;
+using TheSaga.States.Interfaces;
 
-namespace TheSaga.Tests.SagaTests.Sagas.ResumeSaga.States
+namespace TheSaga.Tests.SagaTests.ResumeSaga.States
 {
     public class Init : ISagaState { }
 }

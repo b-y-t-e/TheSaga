@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheSaga.Providers
+namespace TheSaga.Providers.Interfaces
 {
     public interface IDateTimeProvider
     {

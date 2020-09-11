@@ -2,9 +2,9 @@
 using TheSaga.Coordinators;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
-using TheSaga.Tests.SagaTests.Sagas.AsyncAndValid.Events;
+using TheSaga.Tests.SagaTests.AsyncAndValid.Events;
 
-namespace TheSaga.Tests.SagaTests.Sagas.AsyncAndValid.EventHandlers
+namespace TheSaga.Tests.SagaTests.AsyncAndValid.EventHandlers
 {
     public class CreatedEventHandler : ISagaEventHandler<AsyncData, CreatedEvent>
     {

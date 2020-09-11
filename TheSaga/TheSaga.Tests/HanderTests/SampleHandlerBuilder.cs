@@ -1,11 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-using TheSaga.Builders;
-using TheSaga.Builders.Handlers;
-using TheSaga.Events;
-using TheSaga.ExecutionContext;
-using TheSaga.ModelsHandlers;
-using TheSaga.SagaModels;
+﻿using TheSaga.Builders;
+using TheSaga.Handlers.Builders;
+using TheSaga.Handlers.ModelsHandlers;
 
 namespace TheSaga.Tests.HanderTests
 {
@@ -25,7 +20,7 @@ namespace TheSaga.Tests.HanderTests
                 When<OrderCreated>().
                     HandleBy<OrderCreated1Handler>().
                     HandleBy<OrderCreated2Handler>().
-                
+
                 When<OrderCreated>().
                     HandleBy<OrderCreated1Handler>().
                     HandleBy<OrderCreated2Handler>();
@@ -33,36 +28,5 @@ namespace TheSaga.Tests.HanderTests
             return builder.
                 Build();
         }
-    }
-
-    internal class OrderCreated1Handler : IHandlersCompensateEventHandler<OrderCreated>
-    {
-        public Task Compensate(IHandlersExecutionContext context, OrderCreated @event)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Execute(IHandlersExecutionContext context, OrderCreated @event)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    internal class OrderCreated2Handler : IHandlersCompensateEventHandler<OrderCreated>
-    {
-        public Task Compensate(IHandlersExecutionContext context, OrderCreated @event)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Execute(IHandlersExecutionContext context, OrderCreated @event)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    internal class OrderCreated : IHandlersEvent
-    {
-        public Guid ID => throw new NotImplementedException();
     }
 }

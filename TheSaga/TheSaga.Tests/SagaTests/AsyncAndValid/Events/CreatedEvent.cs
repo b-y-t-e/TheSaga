@@ -1,7 +1,7 @@
 ﻿using System;
 using TheSaga.Events;
 
-namespace TheSaga.Tests.SagaTests.Sagas.AsyncAndValid.Events
+namespace TheSaga.Tests.SagaTests.AsyncAndValid.Events
 {
     public class CreatedEvent : ISagaEvent
     {

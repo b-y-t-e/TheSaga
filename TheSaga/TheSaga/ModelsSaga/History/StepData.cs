@@ -1,10 +1,9 @@
 ﻿using System;
 using TheSaga.Events;
 using TheSaga.Models;
-using TheSaga.Providers;
-using TheSaga.ValueObjects;
+using TheSaga.Providers.Interfaces;
 
-namespace TheSaga.SagaModels.History
+namespace TheSaga.ModelsSaga.History
 {
     public class StepData : IStepData
     {

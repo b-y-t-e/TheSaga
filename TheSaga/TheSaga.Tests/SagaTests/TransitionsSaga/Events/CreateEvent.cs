@@ -1,7 +1,7 @@
 ﻿using System;
 using TheSaga.Events;
 
-namespace TheSaga.Tests.SagaTests.Sagas.TransitionsSaga.Events
+namespace TheSaga.Tests.SagaTests.TransitionsSaga.Events
 {
     public class CreateEvent : ISagaEvent
     {

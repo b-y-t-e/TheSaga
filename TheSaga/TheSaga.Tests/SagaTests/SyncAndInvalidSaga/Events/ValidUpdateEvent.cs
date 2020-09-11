@@ -1,7 +1,7 @@
 ﻿using System;
 using TheSaga.Events;
 
-namespace TheSaga.Tests.SagaTests.Sagas.SyncAndInvalidSaga.Events
+namespace TheSaga.Tests.SagaTests.SyncAndInvalidSaga.Events
 {
     public class ValidUpdateEvent : ISagaEvent
     {

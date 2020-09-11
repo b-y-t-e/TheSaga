@@ -1,7 +1,7 @@
 ﻿using System;
-using TheSaga.SagaModels;
+using TheSaga.ModelsSaga.Interfaces;
 
-namespace TheSaga.Registrator
+namespace TheSaga.Registrator.Interfaces
 {
     public interface ISagaRegistrator
     {

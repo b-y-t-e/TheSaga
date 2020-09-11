@@ -1,7 +1,8 @@
 ﻿using System;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
-namespace TheSaga.Tests.SagaTests.Sagas.SyncAndValid
+namespace TheSaga.Tests.SagaTests.SyncAndValid
 {
     public class OrderData : ISagaData
     {

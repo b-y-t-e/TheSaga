@@ -1,7 +1,8 @@
 ﻿using System;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
-namespace TheSaga.Tests.SagaTests.Sagas.AsyncAndInvalidSaga
+namespace TheSaga.Tests.SagaTests.AsyncAndInvalidSaga
 {
     public class InvalidSagaData : ISagaData
     {

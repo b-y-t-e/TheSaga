@@ -1,7 +1,8 @@
 ﻿using System;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
-namespace TheSaga.Tests.SagaTests.Sagas.TransitionsSaga
+namespace TheSaga.Tests.SagaTests.TransitionsSaga
 {
     public class TransitionsSagaData : ISagaData
     {

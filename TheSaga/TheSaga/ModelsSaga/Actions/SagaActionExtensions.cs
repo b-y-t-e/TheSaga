@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Models;
-using TheSaga.SagaModels.History;
-using TheSaga.SagaModels.Steps;
-using TheSaga.States;
+using TheSaga.Models.Interfaces;
+using TheSaga.ModelsSaga.Actions.Interfaces;
+using TheSaga.ModelsSaga.History;
+using TheSaga.ModelsSaga.Steps;
+using TheSaga.ModelsSaga.Steps.Interfaces;
 using TheSaga.Utils;
 
-namespace TheSaga.SagaModels.Actions
+namespace TheSaga.ModelsSaga.Actions
 {
     internal static class SagaActionExtensions
     {

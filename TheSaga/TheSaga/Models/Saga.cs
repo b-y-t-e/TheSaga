@@ -1,4 +1,6 @@
-﻿namespace TheSaga.Models
+﻿using TheSaga.Models.Interfaces;
+
+namespace TheSaga.Models
 {
     public class Saga : ISaga
     {

@@ -4,8 +4,11 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using TheSaga.MessageBus;
+using TheSaga.MessageBus.Interfaces;
 using TheSaga.Models;
-using TheSaga.SagaModels;
+using TheSaga.Models.Interfaces;
+using TheSaga.ModelsSaga.Interfaces;
+using TheSaga.Registrator.Interfaces;
 using TheSaga.Utils;
 
 namespace TheSaga.Registrator

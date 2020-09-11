@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheSaga.Tests.SagaTests.Sagas.ResumeSaga
+namespace TheSaga.Tests.SagaTests.ResumeSaga
 {
     public class ResumeSagaSettings
     {

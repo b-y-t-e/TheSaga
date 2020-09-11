@@ -1,7 +1,9 @@
 ﻿using System;
-using TheSaga.SagaModels.Actions;
+using TheSaga.ModelsSaga.Actions;
+using TheSaga.ModelsSaga.Actions.Interfaces;
+using TheSaga.ModelsSaga.Interfaces;
 
-namespace TheSaga.SagaModels
+namespace TheSaga.ModelsSaga
 {
     internal class SagaModel : ISagaModel
     {

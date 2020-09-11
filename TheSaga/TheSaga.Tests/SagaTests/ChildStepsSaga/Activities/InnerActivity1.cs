@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 using TheSaga.Activities;
 using TheSaga.ExecutionContext;
-using TheSaga.Tests.SagaTests.Sagas.ResumeSaga;
 
-namespace TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga.Activities
+namespace TheSaga.Tests.SagaTests.ChildStepsSaga.Activities
 {
     internal class InnerActivity1 : ISagaActivity<ChildStepsSagaData>
     {

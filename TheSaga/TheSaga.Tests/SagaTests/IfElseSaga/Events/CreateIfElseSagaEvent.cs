@@ -1,7 +1,7 @@
 ﻿using System;
 using TheSaga.Events;
 
-namespace TheSaga.Tests.SagaTests.Sagas.IfElseSaga.Events
+namespace TheSaga.Tests.SagaTests.IfElseSaga.Events
 {
     public class CreateIfElseSagaEvent : ISagaEvent
     {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TheSaga.Builders;
-using TheSaga.SagaModels;
-using TheSaga.Tests.SagaTests.Sagas.AsyncAndValid.EventHandlers;
-using TheSaga.Tests.SagaTests.Sagas.AsyncAndValid.Events;
+using TheSaga.ModelsSaga.Interfaces;
+using TheSaga.Tests.SagaTests.AsyncAndValid.EventHandlers;
+using TheSaga.Tests.SagaTests.AsyncAndValid.Events;
 
-namespace TheSaga.Tests.SagaTests.Sagas.AsyncAndValid
+namespace TheSaga.Tests.SagaTests.AsyncAndValid
 {
     public class AsyncSagaBuilder : ISagaModelBuilder<AsyncData>
     {

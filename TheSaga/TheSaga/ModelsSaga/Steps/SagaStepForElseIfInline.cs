@@ -1,15 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Threading.Tasks;
-using TheSaga.Conditions;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
-using TheSaga.Models;
-using TheSaga.SagaModels.Actions;
-using TheSaga.SagaModels.History;
-using TheSaga.SagaModels.Steps.Delegates;
+using TheSaga.Models.Interfaces;
+using TheSaga.ModelsSaga.History;
+using TheSaga.ModelsSaga.Steps.Delegates;
+using TheSaga.ModelsSaga.Steps.Interfaces;
 
-namespace TheSaga.SagaModels.Steps
+namespace TheSaga.ModelsSaga.Steps
 {
     internal class SagaStepForElseIfInline<TSagaData> : ISagaStep, ISagaStepForIf, ISagaStepElse
         where TSagaData : ISagaData

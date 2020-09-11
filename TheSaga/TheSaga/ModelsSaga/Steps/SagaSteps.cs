@@ -1,11 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using TheSaga.Models;
-using TheSaga.SagaModels.Steps;
+using TheSaga.ModelsSaga.Steps.Interfaces;
 
-namespace TheSaga.SagaModels.Actions
+namespace TheSaga.ModelsSaga.Steps
 {
     public class SagaSteps  : IEnumerable<ISagaStep>
     {

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TheSaga.ModelsSaga.Actions.Interfaces;
 using TheSaga.States;
 
-namespace TheSaga.SagaModels.Actions
+namespace TheSaga.ModelsSaga.Actions
 {
     internal class SagaActions : ISagaActions
     {

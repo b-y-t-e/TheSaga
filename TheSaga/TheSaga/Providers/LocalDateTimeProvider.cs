@@ -1,4 +1,5 @@
 ﻿using System;
+using TheSaga.Providers.Interfaces;
 
 namespace TheSaga.Providers
 {

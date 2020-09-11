@@ -1,7 +1,6 @@
 ﻿using System;
-using TheSaga.Events;
 
-namespace TheSaga.SagaModels.History
+namespace TheSaga.ModelsSaga.History
 {
     public class StepExecutionData
     {

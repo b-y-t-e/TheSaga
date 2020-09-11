@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace TheSaga.MessageBus
+namespace TheSaga.MessageBus.Interfaces
 {
     public interface IMessageBus
     {

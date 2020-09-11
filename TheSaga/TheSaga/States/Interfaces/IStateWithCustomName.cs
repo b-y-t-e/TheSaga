@@ -1,4 +1,4 @@
-﻿namespace TheSaga.States
+﻿namespace TheSaga.States.Interfaces
 {
     public interface IStateWithCustomName : ISagaState
     {

@@ -1,7 +1,8 @@
 ﻿using System;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
-namespace TheSaga.Tests.SagaTests.Sagas.SendTests
+namespace TheSaga.Tests.SagaTests.SendTests
 {
     public class SendTestsData : ISagaData
     {

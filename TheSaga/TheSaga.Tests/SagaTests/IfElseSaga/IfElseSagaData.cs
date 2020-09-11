@@ -1,7 +1,8 @@
 ﻿using System;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
-namespace TheSaga.Tests.SagaTests.Sagas.IfElseSaga
+namespace TheSaga.Tests.SagaTests.IfElseSaga
 {
     public class IfElseSagaData : ISagaData
     {

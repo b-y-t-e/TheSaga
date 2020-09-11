@@ -1,6 +1,8 @@
 ﻿using TheSaga.MessageBus;
+using TheSaga.MessageBus.Interfaces;
 using TheSaga.Models;
-using TheSaga.SagaModels;
+using TheSaga.Models.Interfaces;
+using TheSaga.ModelsSaga.Interfaces;
 
 namespace TheSaga.Messages
 {

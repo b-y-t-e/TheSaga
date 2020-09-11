@@ -1,21 +1,17 @@
+using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using TheSaga.Coordinators;
 using TheSaga.Locking;
-using TheSaga.Locking.DistributedLock;
-using TheSaga.Locking.DistributedLock.Options;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 using TheSaga.Persistance;
-using TheSaga.Persistance.SqlServer;
-using TheSaga.Persistance.SqlServer.Options;
-using TheSaga.Tests.SagaTests.Sagas.IfElseSaga;
-using TheSaga.Tests.SagaTests.Sagas.IfElseSaga.Events;
+using TheSaga.Tests.SagaTests.IfElseSaga.Classes;
+using TheSaga.Tests.SagaTests.IfElseSaga.Events;
 using Xunit;
 
-namespace TheSaga.Tests.SagaTests
+namespace TheSaga.Tests.SagaTests.IfElseSaga
 {
     public class IfElseTests
     {
@@ -79,66 +75,6 @@ namespace TheSaga.Tests.SagaTests
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
             IfElseSagaData data = persistedSaga.Data as IfElseSagaData;
             data.Value1.ShouldBeOfType<FalseValue>();
-        }
-
-        [Fact]
-        public async Task WHEN_conditionIsNotMet_THEN_null()
-        {
-            // given
-            ISaga saga = await sagaCoordinator.Publish(new CreateIfElseSagaEvent());
-
-            // when
-            await sagaCoordinator.Publish(new Test4Event() { ID = saga.Data.ID, Condition = 0 });
-
-            // then
-            ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
-            IfElseSagaData data = persistedSaga.Data as IfElseSagaData;
-            data.Value1.ShouldBe(3);
-        }
-
-        [Fact]
-        public async Task WHEN_conditionIsNotMet_THEN_1()
-        {
-            // given
-            ISaga saga = await sagaCoordinator.Publish(new CreateIfElseSagaEvent());
-
-            // when
-            await sagaCoordinator.Publish(new Test4Event() { ID = saga.Data.ID, Condition = 1 });
-
-            // then
-            ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
-            IfElseSagaData data = persistedSaga.Data as IfElseSagaData;
-            data.Value1.ShouldBe(1);
-        }
-
-        [Fact]
-        public async Task WHEN_conditionIsNotMet_THEN_2()
-        {
-            // given
-            ISaga saga = await sagaCoordinator.Publish(new CreateIfElseSagaEvent());
-
-            // when
-            await sagaCoordinator.Publish(new Test4Event() { ID = saga.Data.ID, Condition = 2 });
-
-            // then
-            ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
-            IfElseSagaData data = persistedSaga.Data as IfElseSagaData;
-            data.Value1.ShouldBe(2);
-        }
-
-        [Fact]
-        public async Task WHEN_conditionIsNotMet_THEN_3()
-        {
-            // given
-            ISaga saga = await sagaCoordinator.Publish(new CreateIfElseSagaEvent());
-
-            // when
-            await sagaCoordinator.Publish(new Test4Event() { ID = saga.Data.ID, Condition = 3 });
-
-            // then
-            ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
-            IfElseSagaData data = persistedSaga.Data as IfElseSagaData;
-            data.Value1.ShouldBe(3);
         }
 
         #region Arrange

@@ -1,6 +1,7 @@
 ﻿using TheSaga.Events;
 using TheSaga.Models;
-using TheSaga.SagaModels;
+using TheSaga.Models.Interfaces;
+using TheSaga.ModelsSaga.Interfaces;
 using TheSaga.ValueObjects;
 
 namespace TheSaga.Commands

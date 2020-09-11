@@ -1,10 +1,10 @@
 ﻿using System;
 using TheSaga.Builders;
-using TheSaga.SagaModels;
-using TheSaga.Tests.SagaTests.Sagas.TransitionsSaga.Events;
-using TheSaga.Tests.SagaTests.Sagas.TransitionsSaga.States;
+using TheSaga.ModelsSaga.Interfaces;
+using TheSaga.Tests.SagaTests.TransitionsSaga.Events;
+using TheSaga.Tests.SagaTests.TransitionsSaga.States;
 
-namespace TheSaga.Tests.SagaTests.Sagas.TransitionsSaga
+namespace TheSaga.Tests.SagaTests.TransitionsSaga
 {
     public class TransitionsSagaBuilder : ISagaModelBuilder<TransitionsSagaData>
     {

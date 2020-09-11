@@ -1,7 +1,8 @@
 ﻿using System;
 using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
-namespace TheSaga.Tests.SagaTests.Sagas.AsyncLockingSaga
+namespace TheSaga.Tests.SagaTests.AsyncLockingSaga
 {
     public class AsyncData : ISagaData
     {

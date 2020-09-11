@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using TheSaga.Events;
 using TheSaga.Exceptions;
-using TheSaga.Models;
-using TheSaga.Providers;
-using TheSaga.SagaModels.Steps;
+using TheSaga.Models.Interfaces;
+using TheSaga.ModelsSaga.Interfaces;
+using TheSaga.ModelsSaga.Steps.Interfaces;
 using TheSaga.ValueObjects;
 
-namespace TheSaga.SagaModels.History
+namespace TheSaga.ModelsSaga.History
 {
     public class SagaHistory : List<StepData>
     {

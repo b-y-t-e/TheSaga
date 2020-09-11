@@ -1,7 +1,7 @@
 ﻿using System;
 using TheSaga.Events;
 
-namespace TheSaga.Tests.SagaTests.Sagas.ResumeSaga.Events
+namespace TheSaga.Tests.SagaTests.ResumeSaga.Events
 {
     public class ResumeSagaCreateEvent : ISagaEvent
     {

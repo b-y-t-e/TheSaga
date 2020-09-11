@@ -1,9 +1,9 @@
 ﻿using TheSaga.Builders;
-using TheSaga.SagaModels;
-using TheSaga.Tests.SagaTests.Sagas.ResumeSaga.Events;
-using TheSaga.Tests.SagaTests.Sagas.ResumeSaga.States;
+using TheSaga.ModelsSaga.Interfaces;
+using TheSaga.Tests.SagaTests.ResumeSaga.Events;
+using TheSaga.Tests.SagaTests.ResumeSaga.States;
 
-namespace TheSaga.Tests.SagaTests.Sagas.ResumeSaga
+namespace TheSaga.Tests.SagaTests.ResumeSaga
 {
     public class ResumeSagaBuilder : ISagaModelBuilder<ResumeSagaData>
     {

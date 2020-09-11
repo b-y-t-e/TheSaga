@@ -1,6 +1,7 @@
 ﻿using TheSaga.States;
+using TheSaga.States.Interfaces;
 
-namespace TheSaga.Tests.SagaTests.Sagas.AsyncAndInvalidSaga.States
+namespace TheSaga.Tests.SagaTests.AsyncAndInvalidSaga.States
 {
     internal class StateUpdated : ISagaState { }
 }

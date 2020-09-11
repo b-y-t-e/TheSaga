@@ -1,4 +1,4 @@
-﻿namespace TheSaga.Observables
+﻿namespace TheSaga.Observables.Interfaces
 {
     internal interface IObservable
     {

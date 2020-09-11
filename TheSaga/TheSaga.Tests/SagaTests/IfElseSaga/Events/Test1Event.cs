@@ -1,27 +1,11 @@
-﻿using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
-using System;
-using System.Threading.Tasks;
+﻿using System;
 using TheSaga.Events;
-using TheSaga.ExecutionContext;
 
-namespace TheSaga.Tests.SagaTests.Sagas.IfElseSaga.Events
+namespace TheSaga.Tests.SagaTests.IfElseSaga.Events
 {
     public class Test1Event : ISagaEvent
     {
         public Guid ID { get; set; }
         public int Condition { get; set; }
-    }
-
-    public class Test1EventHandler : ISagaEventHandler<IfElseSagaData, Test1Event>
-    {
-        public async Task Compensate(IExecutionContext<IfElseSagaData> context, Test1Event @event)
-        {
-
-        }
-
-        public async Task Execute(IExecutionContext<IfElseSagaData> context, Test1Event @event)
-        {
-            context.Data.Condition = @event.Condition;
-        }
     }
 }

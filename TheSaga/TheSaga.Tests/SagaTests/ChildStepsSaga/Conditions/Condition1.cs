@@ -1,10 +1,8 @@
 ﻿using System.Threading.Tasks;
-using TheSaga.Activities;
-using TheSaga.ExecutionContext;
 using TheSaga.Conditions;
-using TheSaga.Tests.SagaTests.Sagas.ResumeSaga;
+using TheSaga.ExecutionContext;
 
-namespace TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga.Conditions
+namespace TheSaga.Tests.SagaTests.ChildStepsSaga.Conditions
 {
     internal class Condition1 : ISagaCondition<ChildStepsSagaData>
     {

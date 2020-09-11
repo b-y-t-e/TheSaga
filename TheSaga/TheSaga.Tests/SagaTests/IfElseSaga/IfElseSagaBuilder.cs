@@ -1,9 +1,10 @@
 ﻿using TheSaga.Builders;
-using TheSaga.SagaModels;
-using TheSaga.Tests.SagaTests.Sagas.IfElseSaga.Events;
-using TheSaga.Tests.SagaTests.Sagas.IfElseSaga.States;
+using TheSaga.ModelsSaga.Interfaces;
+using TheSaga.Tests.SagaTests.IfElseSaga.Classes;
+using TheSaga.Tests.SagaTests.IfElseSaga.Events;
+using TheSaga.Tests.SagaTests.IfElseSaga.States;
 
-namespace TheSaga.Tests.SagaTests.Sagas.IfElseSaga
+namespace TheSaga.Tests.SagaTests.IfElseSaga
 {
     public class IfElseSagaBuilder : ISagaModelBuilder<IfElseSagaData>
     {
@@ -44,18 +45,7 @@ namespace TheSaga.Tests.SagaTests.Sagas.IfElseSaga
                         Then(async c => c.Data.Value1 = new TrueValue())).
                     Else(b=> b.
                         Then(async c => c.Data.Value1 = new FalseValue())).
-                    TransitionTo<SecondState>().
-
-                During<Init>().
-                    When<Test4Event>().
-                        HandleBy<Test4EventHandler>().
-                    If(async c => c.Data.Condition == 1, b => b.
-                        Then(async c => c.Data.Value1 = 1)).
-                    ElseIf(async c => c.Data.Condition == 2, b => b.
-                        Then(async c => c.Data.Value1 = 2)).
-                    Else(b => b.
-                        Then(async c => c.Data.Value1 = 3)).
-                    TransitionTo<SecondState>(); 
+                    TransitionTo<SecondState>();
 
             return builder.
                 Build();

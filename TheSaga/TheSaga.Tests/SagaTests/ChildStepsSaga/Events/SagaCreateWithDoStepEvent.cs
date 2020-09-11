@@ -1,7 +1,7 @@
 ﻿using System;
 using TheSaga.Events;
 
-namespace TheSaga.Tests.SagaTests.Sagas.ChildStepsSaga.Events
+namespace TheSaga.Tests.SagaTests.ChildStepsSaga.Events
 {
     public class SagaCreateWithDoStepEvent : ISagaEvent
     {

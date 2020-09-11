@@ -2,9 +2,9 @@
 using TheSaga.Coordinators;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
-using TheSaga.Models;
+using TheSaga.Models.Interfaces;
 
-namespace TheSaga.SagaModels.Steps.SendMessage
+namespace TheSaga.ModelsSaga.Steps.SendMessage
 {
     internal class SendMessageExecute<TSagaData, TEvent> : ISagaEventHandler<TSagaData, TEvent>
         where TSagaData : ISagaData

@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
-using TheSaga.Models;
-using TheSaga.SagaModels.Actions;
-using TheSaga.SagaModels.History;
-using TheSaga.SagaModels.Steps.Delegates;
-using TheSaga.SagaModels.Steps.SendMessage;
+using TheSaga.Models.Interfaces;
+using TheSaga.ModelsSaga.History;
+using TheSaga.ModelsSaga.Steps.Delegates;
+using TheSaga.ModelsSaga.Steps.Interfaces;
+using TheSaga.ModelsSaga.Steps.SendMessage;
 
-namespace TheSaga.SagaModels.Steps
+namespace TheSaga.ModelsSaga.Steps
 {
     internal class SagaStepForSendActivity<TSagaData, TExecuteEvent, TCompensateEvent> : ISagaStep
         where TSagaData : ISagaData
