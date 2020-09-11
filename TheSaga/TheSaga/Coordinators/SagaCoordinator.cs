@@ -73,7 +73,8 @@ namespace TheSaga.Coordinators
                     model,
                     saga,
                     saga.Data.ID,
-                    null);
+                    null,
+                    true);
             }
         }
         public async Task Resume(Guid id)
@@ -94,7 +95,8 @@ namespace TheSaga.Coordinators
                 model,
                 saga,
                 saga.Data.ID,
-                null);
+                null,
+                true);
         }
 
         public Task<ISaga> Publish(
@@ -124,7 +126,8 @@ namespace TheSaga.Coordinators
                     model,
                     newSaga,
                     SagaID.From(newSaga?.Data?.ID ?? sagaId.Value),
-                    executionValues);
+                    executionValues,
+                    false);
             }
             catch
             {
@@ -180,7 +183,8 @@ namespace TheSaga.Coordinators
             ISagaEvent @event, ISagaModel model,
             ISaga saga,
             Guid sagaID,
-            IDictionary<string, object> executionValues)
+            IDictionary<string, object> executionValues,
+            bool resume)
         {
             bool sagaStarted = false;
 
@@ -207,6 +211,11 @@ namespace TheSaga.Coordinators
                     saga.ExecutionState.ExecutionID = ExecutionID.New();
                     if (model.HistoryPolicy == ESagaHistoryPolicy.StoreOnlyCurrentStep)
                         saga.ExecutionState.History.Clear();
+                }
+                else
+                {
+                    if (!resume)
+                        throw new SagaNeedToBeResumedException(saga.Data.ID);
                 }
 
                 ExecuteActionCommandHandler handler = serviceProvider.
