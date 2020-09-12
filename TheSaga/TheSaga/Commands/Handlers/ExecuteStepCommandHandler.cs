@@ -49,14 +49,11 @@ namespace TheSaga.Commands.Handlers
 
             await sagaPersistance.Set(saga);
 
-            ISagaEvent @event = stepData.Event;
-            if (@event is EmptyEvent)
-                @event = null;
 
             Exception executionError = null;
             try
             {
-                await ExecuteStep(saga, sagaStep, stepData, @event);
+                await ExecuteStep(saga, sagaStep, stepData);
 
                 stepData.
                     SetSucceeded(saga.ExecutionState, dateTimeProvider);
@@ -127,10 +124,14 @@ namespace TheSaga.Commands.Handlers
             return nextStepName;
         }
 
-        private async Task ExecuteStep(ISaga saga, ISagaStep sagaStep, StepData stepData, ISagaEvent @event)
+        private async Task ExecuteStep(ISaga saga, ISagaStep sagaStep, StepData stepData)
         {
+            ISagaEvent @event = stepData.Event;
+            if (@event is EmptyEvent)
+                @event = null;
+
             Type executionContextType =
-                                typeof(ExecutionContext<>).ConstructGenericType(saga.Data.GetType());
+                typeof(ExecutionContext<>).ConstructGenericType(saga.Data.GetType());
 
             IExecutionContext context = (IExecutionContext)ActivatorUtilities.CreateInstance(serviceProvider,
                 executionContextType, saga.Data, saga.ExecutionInfo, saga.ExecutionState, saga.ExecutionValues);
@@ -158,7 +159,6 @@ namespace TheSaga.Commands.Handlers
                 Create(saga, sagaStep, model).
                 SetStarted(saga.ExecutionState, dateTimeProvider);
 
-            saga.ExecutionState.CurrentEvent = new EmptyEvent();
             return stepData;
         }
 

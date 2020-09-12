@@ -120,7 +120,6 @@ namespace TheSaga.Coordinators
 
             try
             {
-
                 return await ExecuteSaga(
                     @event,
                     model,

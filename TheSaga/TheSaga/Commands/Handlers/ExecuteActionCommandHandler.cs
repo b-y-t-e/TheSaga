@@ -47,7 +47,7 @@ namespace TheSaga.Commands.Handlers
                 throw new SagaInstanceNotFoundException(command.Model.SagaStateType);
 
             ISagaStep step = command.Model.Actions.
-                FindStep(saga, saga.ExecutionState.CurrentEvent.GetType());
+                FindStepForExecutionStateAndEvent(saga);
 
             ISagaAction action = command.Model.
                 FindActionForStep(step);
