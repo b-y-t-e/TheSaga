@@ -134,7 +134,7 @@ namespace TheSaga.Commands.Handlers
                 typeof(ExecutionContext<>).ConstructGenericType(saga.Data.GetType());
 
             IExecutionContext context = (IExecutionContext)ActivatorUtilities.CreateInstance(serviceProvider,
-                executionContextType, saga.Data, saga.ExecutionInfo, saga.ExecutionState, saga.ExecutionValues);
+                executionContextType, saga.Data, saga.ExecutionInfo, saga.ExecutionState, saga.ExecutionValues, stepData.ExecutionValues);
 
             if (saga.ExecutionState.IsResuming)
             {

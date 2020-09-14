@@ -68,6 +68,8 @@ namespace TheSaga.Coordinators
 
                 ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
 
+                Console.WriteLine($"Trying to resume saga: {id}");
+
                 await ExecuteSaga(
                     new EmptyEvent(),
                     model,
@@ -204,27 +206,35 @@ namespace TheSaga.Coordinators
                 if (saga == null)
                     throw new SagaInstanceNotFoundException();
 
-                if (saga.IsIdle())
+                if (!resume)
                 {
-                    saga.ExecutionState.CurrentError = null;
-                    saga.ExecutionState.ExecutionID = ExecutionID.New();
-                    if (model.HistoryPolicy == ESagaHistoryPolicy.StoreOnlyCurrentStep)
-                        saga.ExecutionState.History.Clear();
+                    if (saga.IsIdle())
+                    {
+                        saga.ExecutionState.CurrentError = null;
+                        saga.ExecutionState.ExecutionID = ExecutionID.New();
+                        if (model.HistoryPolicy == ESagaHistoryPolicy.StoreOnlyCurrentStep)
+                            saga.ExecutionState.History.Clear();
+
+                        saga.ExecutionValues.
+                            Set(executionValues);
+
+                        saga.ExecutionState.
+                            CurrentEvent = @event ?? new EmptyEvent();
+                    }
+                    else
+                    {
+                        throw new SagaNeedToBeResumedException(saga.Data.ID);
+                    }
+
+                    Console.WriteLine($"Executing saga: {saga.Data.ID}");
                 }
                 else
                 {
-                    if (!resume)
-                        throw new SagaNeedToBeResumedException(saga.Data.ID);
+                    Console.WriteLine($"Resuming saga: {saga.Data.ID}");
                 }
 
                 ExecuteActionCommandHandler handler = serviceProvider.
                     GetRequiredService<ExecuteActionCommandHandler>();
-
-                saga.ExecutionValues.
-                    Set(executionValues);
-
-                saga.ExecutionState.
-                    CurrentEvent = @event ?? new EmptyEvent();
 
                 return await handler.Handle(new ExecuteActionCommand
                 {

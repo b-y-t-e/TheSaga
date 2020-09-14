@@ -10,6 +10,7 @@ namespace TheSaga.ModelsSaga.History
         public Guid ExecutionID { get; set; }
         public string StepName { get; set; }
         public string StateName { get; set; }
+        public StepExecutionValues ExecutionValues { get; set; }
         public StepExecutionData ExecutionData { get; set; }
         public StepExecutionData CompensationData { get; set; }
         public StepExecutionData ResumeData { get; set; }

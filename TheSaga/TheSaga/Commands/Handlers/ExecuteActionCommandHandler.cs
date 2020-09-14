@@ -63,6 +63,8 @@ namespace TheSaga.Commands.Handlers
                 Model = command.Model
             };
 
+            Console.WriteLine($"Saga: {saga.Data.ID}; Executing {(step.Async ? "async " : "")}step: {step.StepName}");
+
             if (step.Async)
             {
                 DispatchStepAsync(executeStepCommand);

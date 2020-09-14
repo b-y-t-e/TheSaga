@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using TheSaga.Exceptions;
+using TheSaga.Models;
 using TheSaga.Models.Interfaces;
 using TheSaga.ModelsSaga.Interfaces;
 using TheSaga.ModelsSaga.Steps.Interfaces;
@@ -115,6 +116,7 @@ namespace TheSaga.ModelsSaga.History
                     StateName = saga.ExecutionState.CurrentState,
                     StepName = saga.ExecutionState.CurrentStep,
                     Event = saga.ExecutionState.CurrentEvent,
+                    ExecutionValues = new StepExecutionValues(),
                     ExecutionData = new StepExecutionData
                     {
                         EndStateName = saga.ExecutionState.CurrentState,

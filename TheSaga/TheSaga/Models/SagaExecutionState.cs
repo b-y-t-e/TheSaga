@@ -6,7 +6,7 @@ using TheSaga.ValueObjects;
 
 namespace TheSaga.Models
 {
-    public class SagaExecutionState
+    public class SagaExecutionState : ISagaExecutionState
     {
         public SagaExecutionState()
         {

@@ -9,11 +9,13 @@ namespace TheSaga.ExecutionContext
     {
         TSagaData Data { get; }
 
-        SagaExecutionInfo ExecutionInfo { get; }
+        ISagaExecutionInfo ExecutionInfo { get; }
 
-        SagaExecutionState ExecutionState { get; }
+        ISagaExecutionState ExecutionState { get; }
 
-        SagaExecutionValues ExecutionValues { get; }
+        ISagaExecutionValues ExecutionValues { get; }
+
+        IStepExecutionValues StepExecutionValues { get; }
 
         internal Task Stop();
     }

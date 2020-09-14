@@ -2,7 +2,7 @@
 
 namespace TheSaga.Models
 {
-    public class SagaExecutionInfo
+    public class SagaExecutionInfo : ISagaExecutionInfo
     {
         public DateTime Created { get; set; }
         public DateTime Modified { get; set; }

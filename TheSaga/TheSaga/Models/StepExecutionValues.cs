@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TheSaga.Models
 {
-    public class SagaExecutionValues : Dictionary<String, Object>, ISagaExecutionValues
+    public class StepExecutionValues : Dictionary<String, Object>, IStepExecutionValues
     {
         public object Get(string name)
         {
