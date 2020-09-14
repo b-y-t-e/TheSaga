@@ -48,7 +48,6 @@ namespace TheSaga.Persistance.InMemory
             serializedInstances[saga.Data.ID] = JsonConvert.SerializeObject(saga,
                 new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.All});
             objectInstances[saga.Data.ID] = saga;
-            //debug.Add($"{saga.ExecutionState.ExecutionID} | {saga.Data.ID} | stored | {saga.ExecutionState.CurrentStep}");
         }
     }
 }

@@ -10,6 +10,10 @@ using TheSaga.Persistance;
 using TheSaga.Tests.SagaTests.IfElseSaga.Classes;
 using TheSaga.Tests.SagaTests.IfElseSaga.Events;
 using Xunit;
+using TheSaga.Persistance.SqlServer;
+using TheSaga.Persistance.SqlServer.Options;
+using TheSaga.Locking.DistributedLock;
+using TheSaga.Locking.DistributedLock.Options;
 
 namespace TheSaga.Tests.SagaTests.IfElseSaga
 {

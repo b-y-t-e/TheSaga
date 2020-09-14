@@ -238,7 +238,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
 
             if (!(await tableExists(_sqlServerOptions.TableName)))
                 script.
-                    Append($" if object_id('{_sqlServerOptions.TableName}') is null").
+                    Append($" if object_id('{_sqlServerOptions.TableName}') is null ").
                     Append($" create table {_sqlServerOptions.TableName} (").
                     Append($"   {idColumn} uniqueidentifier not null primary key, ").
                     Append($"   {stateNameColumn} nvarchar(500) not null, ").

@@ -11,6 +11,10 @@ using TheSaga.Tests.SagaTests.SyncAndInvalidSaga.Events;
 using TheSaga.Tests.SagaTests.SyncAndInvalidSaga.Exceptions;
 using TheSaga.Tests.SagaTests.SyncAndInvalidSaga.States;
 using Xunit;
+using TheSaga.Persistance.SqlServer;
+using TheSaga.Persistance.SqlServer.Options;
+using TheSaga.Locking.DistributedLock;
+using TheSaga.Locking.DistributedLock.Options;
 
 namespace TheSaga.Tests.SagaTests.SyncAndInvalidSaga
 {
