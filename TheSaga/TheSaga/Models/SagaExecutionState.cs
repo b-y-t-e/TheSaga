@@ -23,6 +23,8 @@ namespace TheSaga.Models
         public SagaHistory History { get; set; }
         public ExecutionID ExecutionID { get; set; }
         public AsyncExecution AsyncExecution { get; set; }
+        public bool IsDeleted { get; set; }
+
         public string GetExecutionState()
         {
             StepData item = History.FirstOrDefault(i => i.ExecutionID == ExecutionID);

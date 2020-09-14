@@ -75,7 +75,7 @@ namespace TheSaga.Tests.SagaTests.SyncAndInvalidSaga
 
             // then
             ISaga persistedSaga = await sagaPersistance.Get(id);
-            persistedSaga.ShouldBeNull();
+            persistedSaga?.ExecutionState.IsDeleted.ShouldBeTrue();
         }
 
         [Fact]

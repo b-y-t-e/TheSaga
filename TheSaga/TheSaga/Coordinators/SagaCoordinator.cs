@@ -132,8 +132,8 @@ namespace TheSaga.Coordinators
             }
             catch
             {
-                if (newSaga != null)
-                    await sagaPersistance.Remove(newSaga.Data.ID);
+                //if (newSaga != null)
+                //    await sagaPersistance.Remove(newSaga.Data.ID);
 
                 throw;
             }
@@ -205,6 +205,9 @@ namespace TheSaga.Coordinators
 
                 if (saga == null)
                     throw new SagaInstanceNotFoundException();
+
+                if (saga.ExecutionState.IsDeleted)
+                    throw new CountNotExecuteDeletedSagaException(sagaID);
 
                 if (!resume)
                 {

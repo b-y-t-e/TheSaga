@@ -17,6 +17,7 @@ using TheSaga.ModelsSaga.Steps.Interfaces;
 using TheSaga.Persistance;
 using TheSaga.Providers;
 using TheSaga.Providers.Interfaces;
+using TheSaga.States;
 using TheSaga.Utils;
 using TheSaga.ValueObjects;
 
@@ -77,12 +78,20 @@ namespace TheSaga.Commands.Handlers
 
             string nextStepName = CalculateNextStepName(
                 saga, sagaStep, sagaAction, stepData, executionError);
-            
+
             SaveNextStep(saga, stepData, nextStepName);
+
+            CheckIfSagaIsDeleted(saga);
 
             await sagaPersistance.Set(saga);
 
             return saga;
+        }
+
+        private static void CheckIfSagaIsDeleted(ISaga saga)
+        {
+            if (saga.HasError() && saga.ExecutionState.CurrentState == new SagaStartState().GetStateName())
+                saga.ExecutionState.IsDeleted = true;
         }
 
         private void SaveNextStep(ISaga saga, StepData stepData, string nextStepName)

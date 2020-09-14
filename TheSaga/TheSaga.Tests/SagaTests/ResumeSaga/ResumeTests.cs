@@ -36,12 +36,12 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
         }
 
         [Fact]
-        public async Task WHEN_sagaIsStoppedOnInvalidCreation_THEN_resumingSagaToInitState()
+        public async Task WHEN_sagaIsStoppedOnCreation_THEN_resumingSagaToInitState()
         {
             // given
             Guid id = Guid.NewGuid();
             ResumeSagaSettings.StopSagaExecution = true;
-            await sagaCoordinator.Publish(new InvalidCreateEvent() { ID = id });
+            await sagaCoordinator.Publish(new CreateWithBreakEvent() { ID = id });
             await sagaLocking.Banish(id);
 
             // when
@@ -53,6 +53,31 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
             ISaga persistedSaga = await sagaPersistance.Get(id);
             persistedSaga.IsIdle().ShouldBeTrue();
             persistedSaga.ExecutionState.CurrentState.ShouldBe(nameof(Init));
+            persistedSaga.ExecutionState.History.Count.ShouldBe(3);
+        }
+
+        [Fact]
+        public async Task WHEN_sagaIsStoppedOnInvalidCreation_THEN_resumingShouldRemoveSaga()
+        {
+            // given
+            Guid id = Guid.NewGuid();
+            ResumeSagaSettings.StopSagaExecution = true;
+            await sagaCoordinator.Publish(new CreateWithErrorEvent() { ID = id });
+            await sagaLocking.Banish(id);
+
+            // when
+            await Assert.ThrowsAsync<Exception>(async () =>
+            {
+                ResumeSagaSettings.StopSagaExecution = false;
+                await sagaCoordinator.
+                    Resume(id);
+            });
+
+            // then
+            ISaga persistedSaga = await sagaPersistance.Get(id);
+            persistedSaga.IsIdle().ShouldBeTrue();
+            persistedSaga.ExecutionState.IsDeleted.ShouldBeTrue();
+            persistedSaga.ExecutionState.CurrentState.ShouldBe("");
             persistedSaga.ExecutionState.History.Count.ShouldBe(3);
         }
 
