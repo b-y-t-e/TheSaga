@@ -38,7 +38,7 @@ namespace TheSaga.Builders
         {
         }
 
-        public ISagaBuilderThen<TSagaData> HandleBy<TEventHandler>(string stepName)
+        public ISagaBuilderHandle<TSagaData, TEvent> HandleBy<TEventHandler>(string stepName)
             where TEventHandler : ISagaEventHandler<TSagaData, TEvent>
         {
             builderState.UniqueNameGenerator.ThrowIfNotUnique(stepName);
@@ -55,10 +55,10 @@ namespace TheSaga.Builders
                 false,
                 builderState.ParentStep));
 
-            return new SagaBuilder<TSagaData>(builderState);
+            return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
 
-        public ISagaBuilderThen<TSagaData> HandleByAsync<TEventHandler>(string stepName)
+        public ISagaBuilderHandle<TSagaData, TEvent> HandleByAsync<TEventHandler>(string stepName)
             where TEventHandler : ISagaEventHandler<TSagaData, TEvent>
         {
             builderState.UniqueNameGenerator.ThrowIfNotUnique(stepName);
@@ -75,10 +75,10 @@ namespace TheSaga.Builders
                 true,
                 builderState.ParentStep));
 
-            return new SagaBuilder<TSagaData>(builderState);
+            return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
 
-        public ISagaBuilderThen<TSagaData> HandleBy<TEventHandler>()
+        public ISagaBuilderHandle<TSagaData, TEvent> HandleBy<TEventHandler>()
             where TEventHandler : ISagaEventHandler<TSagaData, TEvent>
         {
             if (builderState.CurrentEvent == null)
@@ -94,10 +94,10 @@ namespace TheSaga.Builders
                 false,
                 builderState.ParentStep));
 
-            return new SagaBuilder<TSagaData>(builderState);
+            return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
 
-        public ISagaBuilderThen<TSagaData> HandleByAsync<TEventHandler>()
+        public ISagaBuilderHandle<TSagaData, TEvent> HandleByAsync<TEventHandler>()
             where TEventHandler : ISagaEventHandler<TSagaData, TEvent>
         {
             if (builderState.CurrentEvent == null)
@@ -113,7 +113,7 @@ namespace TheSaga.Builders
                 true,
                 builderState.ParentStep));
 
-            return new SagaBuilder<TSagaData>(builderState);
+            return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
     }
 

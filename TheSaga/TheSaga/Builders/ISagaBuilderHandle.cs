@@ -8,14 +8,14 @@ namespace TheSaga.Builders
         where TSagaData : ISagaData
         where TEvent : ISagaEvent
     {
-        ISagaBuilderThen<TSagaData> HandleBy<TEventHandler>()
+        ISagaBuilderHandle<TSagaData, TEvent> HandleBy<TEventHandler>()
             where TEventHandler : ISagaEventHandler<TSagaData, TEvent>;
-        ISagaBuilderThen<TSagaData> HandleByAsync<TEventHandler>()
+        ISagaBuilderHandle<TSagaData, TEvent> HandleByAsync<TEventHandler>()
             where TEventHandler : ISagaEventHandler<TSagaData, TEvent>;
 
-        ISagaBuilderThen<TSagaData> HandleBy<TEventHandler>(string stepName)
+        ISagaBuilderHandle<TSagaData, TEvent> HandleBy<TEventHandler>(string stepName)
             where TEventHandler : ISagaEventHandler<TSagaData, TEvent>;
-        ISagaBuilderThen<TSagaData> HandleByAsync<TEventHandler>(string stepName)
+        ISagaBuilderHandle<TSagaData, TEvent> HandleByAsync<TEventHandler>(string stepName)
             where TEventHandler : ISagaEventHandler<TSagaData, TEvent>;
     }
 }
