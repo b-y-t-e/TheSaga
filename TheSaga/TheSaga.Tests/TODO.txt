@@ -1,5 +1,6 @@
 ﻿TODO:
 
+ + sqlpersistance - inmemoery for few seconds
  + resume - usuwanie sagi z bazy - coś nie tak?
  + testy kompensacji if / else
  + dodanie elseif
