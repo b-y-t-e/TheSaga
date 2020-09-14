@@ -38,14 +38,14 @@ namespace TheSaga.ModelsSaga.Actions
             return new SagaActions(
                 actions.Where(s => s.State == state));
         }
-        public static ISagaStep FindStep(
-            this ISagaActions actions, ISaga saga, Type eventType)
-
+        public static ISagaStep FindStepForExecutionStateAndEvent(
+            this ISagaActions actions, ISaga saga)
         {
             ISagaActions foundActions = actions.
                 FindActionsByState(saga.ExecutionState.GetExecutionState());
 
-            if (!eventType.Is<EmptyEvent>())
+            Type eventType = saga.ExecutionState.CurrentEvent.GetType();
+            if (saga.IsIdle() && !eventType.Is<EmptyEvent>())
                 return FindStepForEventType(saga, eventType, foundActions);
 
             return FindStepForCurrentState(saga, foundActions);
