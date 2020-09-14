@@ -311,9 +311,10 @@ namespace TheSaga.Builders
                     builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Finish)),
                     ctx =>
                     {
-                        ctx.ExecutionState.CurrentState = new SagaFinishState().GetStateName();
-                        ctx.ExecutionState.CurrentStep = null;
-                        ctx.ExecutionState.IsCompensating = false;
+                        SagaExecutionState executionState = ctx.ExecutionState as SagaExecutionState;
+                        executionState.CurrentState = new SagaFinishState().GetStateName();
+                        executionState.CurrentStep = null;
+                        executionState.IsCompensating = false;
                         return Task.CompletedTask;
                     },
                     null,
@@ -556,13 +557,15 @@ namespace TheSaga.Builders
                     builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(TransitionTo), typeof(TState).Name),
                     ctx =>
                     {
-                        ctx.ExecutionState.CurrentState = typeof(TState).Name;
+                        SagaExecutionState executionState = ctx.ExecutionState as SagaExecutionState;
+                        executionState.CurrentState = typeof(TState).Name;
                         return Task.CompletedTask;
                     },
                     ctx =>
                     {
-                        StepData data = ctx.ExecutionState.CurrentStepData();
-                        ctx.ExecutionState.CurrentState = data.StateName;
+                        SagaExecutionState executionState = ctx.ExecutionState as SagaExecutionState;
+                        StepData data = executionState.CurrentStepData();
+                        executionState.CurrentState = data.StateName;
                         return Task.CompletedTask;
                     },
                     false,
