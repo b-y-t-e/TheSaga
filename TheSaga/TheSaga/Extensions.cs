@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Builders;
 using TheSaga.Commands.Handlers;
@@ -75,13 +76,13 @@ namespace TheSaga
             return services;
         }
 
-        public static IServiceProvider ResumeSagas(
+        public static async Task<IServiceProvider> ResumeSagas(
             this IServiceProvider provider)
         {
             ISagaCoordinator coordinator = provider.
                 GetRequiredService<ISagaCoordinator>();
 
-            coordinator.ResumeAll();
+            await coordinator.ResumeAll();
 
             return provider;
         }

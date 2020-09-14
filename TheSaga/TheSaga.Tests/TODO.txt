@@ -1,5 +1,6 @@
 ﻿TODO:
 
+ + testy kompensacji if / else
  + dodanie elseif
  + publish (fire&forget)
  + krok OnError
