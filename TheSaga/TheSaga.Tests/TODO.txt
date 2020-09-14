@@ -1,5 +1,6 @@
 ﻿TODO:
 
+ + resume - usuwanie sagi z bazy - coś nie tak?
  + testy kompensacji if / else
  + dodanie elseif
  + publish (fire&forget)
