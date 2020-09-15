@@ -6,8 +6,8 @@ namespace TheSaga.Exceptions
     [Serializable]
     public class SagaStepNotRegisteredException : Exception
     {
-        public SagaStepNotRegisteredException(string state, string step) :
-            base($"Step {step} is not registered for state {state}")
+        public SagaStepNotRegisteredException(Guid id, string state, string step) :
+            base($"Step {step} is not registered for state {state} (for saga {id})")
         {
         }
 

@@ -59,13 +59,13 @@ namespace TheSaga.ModelsSaga.Actions
                 FindActionByStep(saga.ExecutionState.CurrentStep);
 
             if (action == null)
-                throw new SagaStepNotRegisteredException(saga.ExecutionState.GetExecutionState(), saga.ExecutionState.CurrentStep);
+                throw new SagaStepNotRegisteredException(saga.Data.ID, saga.ExecutionState.GetExecutionState(), saga.ExecutionState.CurrentStep);
 
             ISagaStep step = action.
                 GetStep(saga.ExecutionState.CurrentStep);
 
             if (step == null)
-                throw new SagaStepNotRegisteredException(saga.ExecutionState.GetExecutionState(), saga.ExecutionState.CurrentStep);
+                throw new SagaStepNotRegisteredException(saga.Data.ID, saga.ExecutionState.GetExecutionState(), saga.ExecutionState.CurrentStep);
 
             return step;
         }
@@ -78,13 +78,13 @@ namespace TheSaga.ModelsSaga.Actions
                 FindActionByEventType(eventType);
 
             if (action == null)
-                throw new SagaInvalidEventForStateException(saga.ExecutionState.GetExecutionState(), eventType);
+                throw new SagaInvalidEventForStateException(saga.Data.ID, saga.ExecutionState.GetExecutionState(), eventType);
 
             ISagaStep step = action.
                 ChildSteps.GetFirstStep();
 
             if (step == null)
-                throw new SagaStepNotRegisteredException(saga.ExecutionState.GetExecutionState(), saga.ExecutionState.CurrentStep);
+                throw new SagaStepNotRegisteredException(saga.Data.ID, saga.ExecutionState.GetExecutionState(), saga.ExecutionState.CurrentStep);
 
             return step;
         }
