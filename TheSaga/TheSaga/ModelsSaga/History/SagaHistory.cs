@@ -34,6 +34,20 @@ namespace TheSaga.ModelsSaga.History
             return executionData;
         }
 
+        public StepData GetLastWithStepName(
+            ExecutionID executionID,
+            string stepName)
+        {
+            StepData executionData = this.LastOrDefault();
+
+            if (executionData != null &&
+                executionData.ExecutionID == executionID &&
+                executionData.StepName == stepName)
+                return executionData;
+
+            return null;
+        }
+
         public StepData GetLatestByStepName(
             string stepName)
         {
@@ -58,16 +72,14 @@ namespace TheSaga.ModelsSaga.History
             ISagaStep step,
             ISagaModel model)
         {
-            StepData currentExecutionData = saga.ExecutionState.History.
-                LastOrDefault();
+            StepData stepData = saga.ExecutionState.History.
+                GetLastWithStepName(saga.ExecutionState.ExecutionID, saga.ExecutionState.CurrentStep);
 
             if (!saga.ExecutionState.IsCompensating &&
-                currentExecutionData != null &&
-                currentExecutionData.CompensationData == null &&
-                currentExecutionData.ExecutionData != null &&
-                currentExecutionData.ExecutionID == saga.ExecutionState.ExecutionID &&
-                currentExecutionData.StepName == saga.ExecutionState.CurrentStep &&
-                currentExecutionData.ResumeData?.EndTime == null)
+                stepData != null &&
+                stepData.CompensationData == null &&
+                stepData.ExecutionData != null &&
+                stepData.ResumeData?.EndTime == null)
             {
                 if (model.ResumePolicy == ESagaResumePolicy.DoCurrentStepCompensation)
                 {
@@ -82,12 +94,13 @@ namespace TheSaga.ModelsSaga.History
                     saga.ExecutionState.IsResuming = false;
                 }
             }
+            else
+            {
+                //stepData = null;
+            }
 
-            StepData stepData = null;
             if (saga.ExecutionState.IsResuming)
             {
-                stepData = currentExecutionData;
-
                 stepData.ResumeData = new StepExecutionData
                 {
                     EndStateName = saga.ExecutionState.CurrentState,
@@ -108,22 +121,28 @@ namespace TheSaga.ModelsSaga.History
             }
             else
             {
-                stepData = new StepData
+                if (stepData == null)
                 {
-                    ExecutionID = saga.ExecutionState.ExecutionID,
-                    AsyncExecution = saga.ExecutionState.AsyncExecution,
-                    AsyncStep = step.Async,
-                    StateName = saga.ExecutionState.CurrentState,
-                    StepName = saga.ExecutionState.CurrentStep,
-                    Event = saga.ExecutionState.CurrentEvent,
-                    ExecutionValues = new StepExecutionValues(),
-                    ExecutionData = new StepExecutionData
-                    {
-                        EndStateName = saga.ExecutionState.CurrentState,
-                        StepType = step.GetType()
-                    }
+                    stepData = new StepData();
+                    stepData.ExecutionValues = new StepExecutionValues();
+                    stepData.ExecutionID = saga.ExecutionState.ExecutionID;
+                    stepData.AsyncExecution = saga.ExecutionState.AsyncExecution;
+                    stepData.AsyncStep = step.Async;
+                    stepData.StateName = saga.ExecutionState.CurrentState;
+                    stepData.StepName = saga.ExecutionState.CurrentStep;
+                    stepData.Event = saga.ExecutionState.CurrentEvent;
+                    saga.ExecutionState.History.Add(stepData);
+                }
+                else
+                {
+
+                }
+
+                stepData.ExecutionData = new StepExecutionData
+                {
+                    EndStateName = saga.ExecutionState.CurrentState,
+                    StepType = step.GetType()
                 };
-                saga.ExecutionState.History.Add(stepData);
             }
 
             return stepData;

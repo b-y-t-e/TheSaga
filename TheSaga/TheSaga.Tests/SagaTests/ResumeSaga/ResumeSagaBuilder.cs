@@ -24,8 +24,16 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
                     OnResumeDoCurrentStepCompensation().
                     InHistoryStoreOnlyCurrentStep()).
 
-                Start<ResumeSagaCreateEvent>().
+                Start<CreateEvent>().
                     TransitionTo<Init>().
+
+                Start<CreateWithBreakEvent>().
+                    Then(async ctx => { if (ResumeSagaSettings.StopSagaExecution) await ctx.Stop(); }).
+                    TransitionTo<Init>().
+
+                Start<CreateWithErrorEvent>().
+                    Then(async ctx => { if (ResumeSagaSettings.StopSagaExecution) await ctx.Stop(); }).
+                    Then(async ctx => throw new System.Exception("!!!")).
 
                 During<Init>().
                     When<ResumeSagaUpdateEvent>().

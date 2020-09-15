@@ -3,6 +3,22 @@ using System.Runtime.Serialization;
 
 namespace TheSaga.Exceptions
 {
+
+    [Serializable]
+    public class CountNotExecuteDeletedSagaException : Exception
+    {
+        public CountNotExecuteDeletedSagaException(Guid id) :
+            base($"Count not execute deleted saga {id}!")
+        {
+        }
+
+        protected CountNotExecuteDeletedSagaException(
+            SerializationInfo info,
+            StreamingContext context) : base(info, context)
+        {
+        }
+    }
+
     [Serializable]
     public class SagaInstanceNotFoundException : Exception
     {
