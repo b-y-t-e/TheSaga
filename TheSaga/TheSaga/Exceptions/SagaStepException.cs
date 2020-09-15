@@ -10,10 +10,13 @@ namespace TheSaga.Exceptions
         [JsonIgnore]
         public Exception OriginalException { get; set; }
 
-        public SagaStepException(string message, string stackTrace, Exception originalException) :
-            base(message)
+        public Type ExceptionType { get; set; }
+
+        public SagaStepException(Exception originalException) :
+            base(originalException.Message)
         {
-            this.StackTrace = stackTrace;
+            this.ExceptionType = originalException.GetType();
+            this.StackTrace = originalException.StackTrace;
             this.OriginalException = originalException;
         }
 

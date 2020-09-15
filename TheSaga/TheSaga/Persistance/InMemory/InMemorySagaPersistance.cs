@@ -21,12 +21,12 @@ namespace TheSaga.Persistance.InMemory
 
         public async Task<ISaga> Get(Guid id)
         {
-            string instance = null;
-            serializedInstances.TryGetValue(id, out instance);
-            if (instance == null)
+            string json = null;
+            serializedInstances.TryGetValue(id, out json);
+            if (json == null)
                 return null;
 
-            return (ISaga) JsonConvert.DeserializeObject(instance,
+            return (ISaga) JsonConvert.DeserializeObject(json,
                 new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.All});
         }
 
