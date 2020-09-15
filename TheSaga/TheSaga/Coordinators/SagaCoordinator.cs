@@ -151,10 +151,12 @@ namespace TheSaga.Coordinators
 
                 messageBus.Subscribe<ExecutionEndMessage>(this, mesage =>
                 {
-                    if (mesage.Saga.Data.ID == id &&
-                        mesage.Saga.IsIdle())
-                        isSagaInIdleState = true;
-
+                    if (mesage.SagaId.Value == id)
+                    {
+                        ISaga saga = sagaPersistance.Get(id).GetAwaiter().GetResult();
+                        if (saga?.IsIdle() == true)
+                            isSagaInIdleState = true;
+                    }
                     return Task.CompletedTask;
                 });
 
@@ -250,7 +252,7 @@ namespace TheSaga.Coordinators
             {
                 if (sagaStarted)
                     await messageBus.Publish(
-                        new ExecutionEndMessage(saga));
+                        new ExecutionEndMessage(SagaID.From(sagaID)));
 
                 throw;
             }

@@ -10,8 +10,8 @@ namespace TheSaga.Persistance.InMemory
 {
     public class InMemorySagaPersistance : ISagaPersistance
     {
-        private readonly Dictionary<Guid, ISaga> objectInstances;
-        private readonly Dictionary<Guid, string> serializedInstances;
+        private Dictionary<Guid, ISaga> objectInstances;
+        private Dictionary<Guid, string> serializedInstances;
 
         public InMemorySagaPersistance()
         {

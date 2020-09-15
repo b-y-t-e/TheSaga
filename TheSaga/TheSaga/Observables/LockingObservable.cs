@@ -24,7 +24,6 @@ namespace TheSaga.Observables
             IMessageBus messageBus = serviceProvider.GetRequiredService<IMessageBus>();
 
             messageBus.Subscribe<ExecutionStartMessage>(this, OnSagaProcessingStart);
-
             messageBus.Subscribe<ExecutionEndMessage>(this, OnSagaProcessingEnd);
         }
 
@@ -33,7 +32,6 @@ namespace TheSaga.Observables
             IMessageBus messageBus = serviceProvider.GetRequiredService<IMessageBus>();
 
             messageBus.Unsubscribe<ExecutionStartMessage>(this);
-
             messageBus.Unsubscribe<ExecutionEndMessage>(this);
         }
 
@@ -42,7 +40,6 @@ namespace TheSaga.Observables
         {
             ISagaLocking sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
 
-            //if (msg.Saga?.Data?.ID != null)
             if (!await sagaLocking.Acquire(msg.SagaID))
                 throw new SagaIsBusyException(msg.SagaID);
         }
@@ -51,8 +48,7 @@ namespace TheSaga.Observables
         {
             ISagaLocking sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
 
-            if (msg.Saga?.Data?.ID != null)
-                await sagaLocking.Banish(msg.Saga.Data.ID);
+            await sagaLocking.Banish(msg.SagaId);
         }
     }
 }

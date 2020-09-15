@@ -2,16 +2,17 @@
 using TheSaga.MessageBus.Interfaces;
 using TheSaga.Models;
 using TheSaga.Models.Interfaces;
+using TheSaga.ValueObjects;
 
 namespace TheSaga.Messages
 {
     internal class ExecutionEndMessage : IInternalMessage
     {
-        public ExecutionEndMessage(ISaga saga)
+        public ExecutionEndMessage(SagaID sagaId)
         {
-            Saga = saga;
+            SagaId = sagaId;
         }
 
-        public ISaga Saga { get; set; }
+        public SagaID SagaId { get; set; }
     }
 }

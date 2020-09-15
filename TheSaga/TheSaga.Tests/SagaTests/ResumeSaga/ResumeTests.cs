@@ -42,7 +42,7 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
             Guid id = Guid.NewGuid();
             ResumeSagaSettings.StopSagaExecution = true;
             await sagaCoordinator.Publish(new CreateWithBreakEvent() { ID = id });
-            await sagaLocking.Banish(id);
+            //await sagaLocking.Banish(id);
 
             // when
             ResumeSagaSettings.StopSagaExecution = false;
@@ -63,7 +63,7 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
             Guid id = Guid.NewGuid();
             ResumeSagaSettings.StopSagaExecution = true;
             await sagaCoordinator.Publish(new CreateWithErrorEvent() { ID = id });
-            await sagaLocking.Banish(id);
+            //await sagaLocking.Banish(id);
 
             // when
             await Assert.ThrowsAsync<Exception>(async () =>
@@ -82,7 +82,7 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
         }
 
         [Fact]
-        public async Task WHEN_sagaIsStopped_THEN_sagaLockShouldBeAcquired()
+        public async Task WHEN_sagaIsStopped_THEN_sagaLockShouldNotBeAcquired()
         {
             // given
             ResumeSagaSettings.StopSagaExecution = true;
@@ -93,7 +93,7 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
 
             // then
             (await sagaLocking.IsAcquired(saga.Data.ID)).
-                ShouldBeTrue();
+                ShouldBeFalse();
         }
 
         [Fact]
@@ -104,7 +104,7 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
             ISaga saga = await sagaCoordinator.Publish(new CreateEvent());
             await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
             ResumeSagaSettings.StopSagaExecution = false;
-            await sagaLocking.Banish(saga.Data.ID);
+            //await sagaLocking.Banish(saga.Data.ID);
 
             // when
             await sagaCoordinator.
@@ -123,7 +123,7 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
             ISaga saga = await sagaCoordinator.Publish(new CreateEvent());
             await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
             ResumeSagaSettings.StopSagaExecution = false;
-            await sagaLocking.Banish(saga.Data.ID);
+            //await sagaLocking.Banish(saga.Data.ID);
 
             // when
             await sagaCoordinator.
