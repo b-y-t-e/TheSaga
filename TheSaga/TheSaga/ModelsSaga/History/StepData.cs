@@ -2,6 +2,7 @@
 using TheSaga.Events;
 using TheSaga.Models;
 using TheSaga.Providers.Interfaces;
+using TheSaga.Utils;
 
 namespace TheSaga.ModelsSaga.History
 {
@@ -55,17 +56,17 @@ namespace TheSaga.ModelsSaga.History
         {
             if (state.IsResuming)
             {
-                ResumeData.Error = error;
+                ResumeData.Error = error.ToSagaStepException();
                 ResumeData.FailTime = dateTimeProvider.Now;
             }
             else if (state.IsCompensating)
             {
-                CompensationData.Error = error;
+                CompensationData.Error = error.ToSagaStepException();
                 CompensationData.FailTime = dateTimeProvider.Now;
             }
             else
             {
-                ExecutionData.Error = error;
+                ExecutionData.Error = error.ToSagaStepException();
                 ExecutionData.FailTime = dateTimeProvider.Now;
             }
             return this;
