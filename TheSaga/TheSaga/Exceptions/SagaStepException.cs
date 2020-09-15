@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Runtime.Serialization;
 
 namespace TheSaga.Exceptions
@@ -6,10 +7,14 @@ namespace TheSaga.Exceptions
     [Serializable]
     public class SagaStepException : Exception
     {
-        public SagaStepException(string message, string stackTrace) :
+        [JsonIgnore]
+        public Exception OriginalException { get; set; }
+
+        public SagaStepException(string message, string stackTrace, Exception originalException) :
             base(message)
         {
-            StackTrace = stackTrace;
+            this.StackTrace = stackTrace;
+            this.OriginalException = originalException;
         }
 
         protected SagaStepException(

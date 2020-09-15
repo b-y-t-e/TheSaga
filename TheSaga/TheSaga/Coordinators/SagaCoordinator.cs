@@ -248,11 +248,14 @@ namespace TheSaga.Coordinators
                     Model = model
                 });
             }
-            catch
+            catch (Exception ex)
             {
                 if (sagaStarted)
                     await messageBus.Publish(
                         new ExecutionEndMessage(SagaID.From(sagaID)));
+
+                if (ex is SagaStepException sagaStepException && sagaStepException?.OriginalException != null)
+                    throw sagaStepException.OriginalException;
 
                 throw;
             }

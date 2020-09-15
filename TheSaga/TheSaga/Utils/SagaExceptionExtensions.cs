@@ -16,7 +16,8 @@ namespace TheSaga.Utils
 
             return new SagaStepException(
                 exception.Message,
-                exception.StackTrace);
+                exception.StackTrace,
+                exception);
         }
     }
 }
