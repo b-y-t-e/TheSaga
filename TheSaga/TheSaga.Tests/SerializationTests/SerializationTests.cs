@@ -22,7 +22,7 @@ namespace TheSaga.Tests.SerializationTests
 {
     public class SerializationTests
     {
-        [Fact]
+        /*[Fact]
         public async Task WHEN_sagaIsStopped_THEN_sagaShouldNotBeInIdleState()
         {
             // given
@@ -44,20 +44,15 @@ namespace TheSaga.Tests.SerializationTests
                     TypeNameHandling = TypeNameHandling.All,
                     Error = (s, e) =>
                     {
-
                         if (e.CurrentObject is StepExecutionData executionData &&
                             executionData != null &&
                             nameof(executionData.Error).Equals(e.ErrorContext.Member))
                         {
-                            
+                            executionData.Error = 
                         }
                     }
                 });
-
-            // then
-            //ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
-            //persistedSaga.IsIdle().ShouldBeFalse();
-        }
+        }*/
 
     }
 
