@@ -32,10 +32,10 @@ namespace TheSaga.Tests.SagaTests.IfElseIfElseSaga
             // then
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
             IfElseIfElseSagaData data = persistedSaga.Data as IfElseIfElseSagaData;
-            data.Value1.ShouldBe(3);
+            data.Value1.ShouldBe(100);
         }
 
-      /*  [Fact]
+        [Fact]
         public async Task WHEN_conditionIsNotMet_THEN_1()
         {
             // given
@@ -48,7 +48,7 @@ namespace TheSaga.Tests.SagaTests.IfElseIfElseSaga
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
             IfElseIfElseSagaData data = persistedSaga.Data as IfElseIfElseSagaData;
             data.Value1.ShouldBe(1);
-        }*/
+        }
 
         [Fact]
         public async Task WHEN_conditionIsNotMet_THEN_2()
@@ -78,6 +78,51 @@ namespace TheSaga.Tests.SagaTests.IfElseIfElseSaga
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
             IfElseIfElseSagaData data = persistedSaga.Data as IfElseIfElseSagaData;
             data.Value1.ShouldBe(3);
+        }
+
+        [Fact]
+        public async Task WHEN_elseIf_else_THEN_100()
+        {
+            // given
+            ISaga saga = await sagaCoordinator.Publish(new CreateIfElseSagaEvent());
+
+            // when
+            await sagaCoordinator.Publish(new Test4Event() { ID = saga.Data.ID, Condition = 4 });
+
+            // then
+            ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
+            IfElseIfElseSagaData data = persistedSaga.Data as IfElseIfElseSagaData;
+            data.Value1.ShouldBe(100);
+        }
+
+        [Fact]
+        public async Task WHEN_elseIf_if_THEN_4()
+        {
+            // given
+            ISaga saga = await sagaCoordinator.Publish(new CreateIfElseSagaEvent());
+
+            // when
+            await sagaCoordinator.Publish(new Test4Event() { ID = saga.Data.ID, Condition = 4, SubCondition = 1 });
+
+            // then
+            ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
+            IfElseIfElseSagaData data = persistedSaga.Data as IfElseIfElseSagaData;
+            data.Value1.ShouldBe(4);
+        }
+
+        [Fact]
+        public async Task WHEN_conditionIsNotMet_THEN_5()
+        {
+            // given
+            ISaga saga = await sagaCoordinator.Publish(new CreateIfElseSagaEvent());
+
+            // when
+            await sagaCoordinator.Publish(new Test4Event() { ID = saga.Data.ID, Condition = 5 });
+
+            // then
+            ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
+            IfElseIfElseSagaData data = persistedSaga.Data as IfElseIfElseSagaData;
+            data.Value1.ShouldBe(5);
         }
 
         #region Arrange

@@ -405,7 +405,7 @@ namespace TheSaga.Builders
             SagaAction currentAction = builderState.CurrentAction;
 
             SagaStepForElseIfInline<TSagaData> parentStep = new SagaStepForElseIfInline<TSagaData>(
-                builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(If)),
+                builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(ElseIf)),
                 condition,
                 null,
                 builderState.ParentStep);

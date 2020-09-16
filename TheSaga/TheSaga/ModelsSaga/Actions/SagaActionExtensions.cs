@@ -89,7 +89,9 @@ namespace TheSaga.ModelsSaga.Actions
             return step;
         }
         public static ISagaStep GetNextStepToExecute(
-            this ISagaAction sagaAction, ISagaStep currentStep, SagaExecutionState sagaState)
+            this ISagaAction sagaAction, 
+            ISagaStep currentStep,
+            SagaExecutionState sagaState)
         {
             IStepData currentStepData = sagaState.History.
                 GetLatestByStepName(currentStep.StepName);
@@ -109,27 +111,112 @@ namespace TheSaga.ModelsSaga.Actions
             if (currentStep.ChildSteps.Any())
                 return currentStep.ChildSteps.GetFirstStep();
 
-            ISagaStep nextStep = GetNextStep(sagaAction.ChildSteps, currentStep.ParentStep, currentStep);
+            ISagaStep nextStep = GetNextStep(
+                sagaAction.ChildSteps, 
+                currentStep.ParentStep, 
+                currentStep);
 
-            if (nextStep.Is<ISagaStepElse>()/* &&
-                nextStep.ParentStep != currentStep.ParentStep*/)
+            nextStep = getNextStepForElse(
+                sagaAction,
+                nextStep,
+                currentStep.ParentStep,
+                sagaState);
+
+            return nextStep;
+        }
+
+        static ISagaStep getNextStepForElse(
+            ISagaAction sagaAction, 
+            ISagaStep currentStep,
+            ISagaStep parentStep,
+            SagaExecutionState sagaState)
+        {
+            ISagaStep step = currentStep;
+            if (step.Is<ISagaStepElse>())
             {
-                ISagaStep prevStepIf = GetPrevStepSameLevel(sagaAction.ChildSteps, nextStep.ParentStep, nextStep);
+                bool ifElseResult = getResultFromPrevIfElse(sagaAction.ChildSteps, step, sagaState);
+                if (ifElseResult)
+                {
+                    step = GetNextStepAfterIfElse(
+                        sagaAction.ChildSteps,
+                        step);
+
+                    if (step == null)
+                    {
+                        // odszukanie nastepnego kroku dla rodzica
+                        step = GetNextStep(
+                            sagaAction.ChildSteps,
+                            currentStep.ParentStep,
+                            currentStep);
+
+                        // sprawdzenie czy rodzic to ELSE
+                        step = getNextStepForElse(
+                            sagaAction,
+                            step,
+                            step?.ParentStep,
+                            sagaState);
+                    }
+                }
+                else
+                {
+                    step = GetNextStep(
+                        sagaAction.ChildSteps,
+                        step.ParentStep,
+                        step);
+                }
+            }
+
+            return step;
+        }
+
+        private static ISagaStep GetNextStepAfterIfElse(
+            SagaSteps childSteps,
+            ISagaStep step)
+        {
+            while (true)
+            {
+                ISagaStep nextStep = GetNextStepSameLevel(childSteps, step.ParentStep, step);
+                if (nextStep.Is<ISagaStepForIf>() && nextStep.Is<ISagaStepElse>())
+                {
+                    step = nextStep;
+                }
+                else if (!nextStep.Is<ISagaStepForIf>() && nextStep.Is<ISagaStepElse>())
+                {
+                    step = nextStep;
+                }
+                else
+                {
+                    return nextStep;
+                }
+            }
+        }
+
+        private static bool getResultFromPrevIfElse(
+            SagaSteps childSteps,
+            ISagaStep step,
+            SagaExecutionState sagaState)
+        {
+            while (true)
+            {
+                ISagaStep prevStepIf = GetPrevStepSameLevel(childSteps, step.ParentStep, step);
                 if (prevStepIf.Is<ISagaStepForIf>())
                 {
                     IStepData stepDataIf = sagaState.History.
                         GetLatestByStepName(prevStepIf.StepName);
 
                     if (stepDataIf?.ExecutionData?.ConditionResult == true)
-                        nextStep = GetNextStep(sagaAction.ChildSteps, nextStep.ParentStep, nextStep);
+                        return true;
+
+                    if (!prevStepIf.Is<ISagaStepElse>())
+                        return false;
+
+                    step = prevStepIf;
                 }
                 else
                 {
-                    throw new NotSupportedException($"'Else' must be after 'If'");
+                    return false;
                 }
             }
-
-            return nextStep;
         }
 
         static ISagaStep GetNextStepSameLevel(

@@ -1,5 +1,6 @@
 ﻿TODO:
  
+ + TheSaga.WebApi.Convey
  + dodanie logowania - serilog
  + sqlpersistance - inmemoery for few seconds
  + resume - usuwanie sagi z bazy - coś nie tak?
