@@ -119,7 +119,6 @@ namespace TheSaga.ModelsSaga.Actions
             nextStep = getNextStepForElse(
                 sagaAction,
                 nextStep,
-                currentStep.ParentStep,
                 sagaState);
 
             return nextStep;
@@ -128,13 +127,15 @@ namespace TheSaga.ModelsSaga.Actions
         static ISagaStep getNextStepForElse(
             ISagaAction sagaAction, 
             ISagaStep currentStep,
-            ISagaStep parentStep,
             SagaExecutionState sagaState)
         {
             ISagaStep step = currentStep;
             if (step.Is<ISagaStepElse>())
             {
                 bool ifElseResult = getResultFromPrevIfElse(sagaAction.ChildSteps, step, sagaState);
+                
+                // jesli if-else jest spelniony to nie wchodzimy juz do niego
+                // czyli szukamy kolengo kroku poza if-else
                 if (ifElseResult)
                 {
                     step = GetNextStepAfterIfElse(
@@ -153,16 +154,22 @@ namespace TheSaga.ModelsSaga.Actions
                         step = getNextStepForElse(
                             sagaAction,
                             step,
-                            step?.ParentStep,
                             sagaState);
                     }
                 }
                 else
                 {
+                    // szukamy kolejnego kroku dla if-else
                     step = GetNextStep(
                         sagaAction.ChildSteps,
                         step.ParentStep,
                         step);
+
+                    // sprawdzenie czy rodzic to ELSE
+                    step = getNextStepForElse(
+                        sagaAction,
+                        step,
+                        sagaState);
                 }
             }
 
