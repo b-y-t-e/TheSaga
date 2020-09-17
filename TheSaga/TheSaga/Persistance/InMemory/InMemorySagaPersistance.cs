@@ -21,33 +21,44 @@ namespace TheSaga.Persistance.InMemory
 
         public async Task<ISaga> Get(Guid id)
         {
-            string json = null;
-            serializedInstances.TryGetValue(id, out json);
-            if (json == null)
-                return null;
+            lock (serializedInstances)
+            {
+                string json = null;
+                serializedInstances.TryGetValue(id, out json);
+                if (json == null)
+                    return null;
 
-            return (ISaga) JsonConvert.DeserializeObject(json,
-                new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.All});
+                return (ISaga)JsonConvert.DeserializeObject(json,
+                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+            }
         }
 
         public async Task<IList<Guid>> GetUnfinished()
         {
-            IList<ISaga> unfinished = objectInstances.Values.Where(v => !v.IsIdle()).ToArray();
-
-            return unfinished.Select(i => i.Data.ID).ToArray();
+            lock (serializedInstances)
+            {
+                IList<ISaga> unfinished = objectInstances.Values.Where(v => !v.IsIdle()).ToArray();
+                return unfinished.Select(i => i.Data.ID).ToArray();
+            }
         }
 
         public Task Remove(Guid id)
         {
-            serializedInstances.Remove(id);
-            return Task.CompletedTask;
+            lock (serializedInstances)
+            {
+                serializedInstances.Remove(id);
+                return Task.CompletedTask;
+            }
         }
 
         public async Task Set(ISaga saga)
         {
-            serializedInstances[saga.Data.ID] = JsonConvert.SerializeObject(saga,
-                new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.All});
-            objectInstances[saga.Data.ID] = saga;
+            lock (serializedInstances)
+            {
+                serializedInstances[saga.Data.ID] = JsonConvert.SerializeObject(saga,
+                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+                objectInstances[saga.Data.ID] = saga;
+            }
         }
     }
 }

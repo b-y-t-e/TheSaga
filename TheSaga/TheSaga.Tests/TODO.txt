@@ -1,11 +1,9 @@
 ﻿TODO:
  
  + TheSaga.WebApi.Convey
- + dodanie logowania - serilog
- + sqlpersistance - inmemoery for few seconds
  + resume - usuwanie sagi z bazy - coś nie tak?
  + testy kompensacji if / else
- + dodanie elseif
+ + testy kompensacji while
  + publish (fire&forget)
  + krok OnError
  + krok OnFinish
@@ -33,6 +31,9 @@
  + retry
 
 DONE:
+ + dodanie elseif
+ + sqlpersistance - inmemoery for few seconds
+ + dodanie logowania - serilog
  + while
  + metoda: HandleBy dla start
  + dodanie testow if / else

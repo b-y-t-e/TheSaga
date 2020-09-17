@@ -19,7 +19,7 @@ namespace TheSaga.Persistance.SqlServer
         ISqlServerConnection sqlServerConnection;
         IDateTimeProvider dateTimeProvider;
         SqlServerOptions sqlServerOptions;
-        InMemorySagaPersistance inMemorySagaPersistance;
+        WeakInMemorySagaPersistance weakInMemorySagaPersistance;
 
         public SqlServerSagaPersistance(ISqlServerConnection sqlServerConnection, IDateTimeProvider dateTimeProvider, SqlServerOptions sqlServerOptions)
         {
@@ -27,37 +27,38 @@ namespace TheSaga.Persistance.SqlServer
             this.sqlServerConnection = sqlServerConnection;
             this.dateTimeProvider = dateTimeProvider;
             this.sqlServerOptions = sqlServerOptions;
-            this.inMemorySagaPersistance = new InMemorySagaPersistance();
+            this.weakInMemorySagaPersistance = new WeakInMemorySagaPersistance(
+                TimeSpan.FromSeconds(15));
         }
 
         public async Task<ISaga> Get(Guid id)
         {
-            ISaga saga = await inMemorySagaPersistance.Get(id);
+            ISaga saga = await weakInMemorySagaPersistance.Get(id);
             if (saga != null)
                 return saga;
 
-            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))            
-                return await sagaStore.Get(id);            
+            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
+                return await sagaStore.Get(id);
         }
 
         public Task<IList<Guid>> GetUnfinished()
         {
-            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))            
-                return sagaStore.GetUnfinished();            
+            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
+                return sagaStore.GetUnfinished();
         }
 
         public async Task Remove(Guid id)
         {
-            await inMemorySagaPersistance.Remove(id);
-            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))            
-                await sagaStore.Remove(id);            
+            await weakInMemorySagaPersistance.Remove(id);
+            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
+                await sagaStore.Remove(id);
         }
 
         public async Task Set(ISaga saga)
         {
-            await inMemorySagaPersistance.Set(saga);
-            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))            
-                await sagaStore.Store(saga);            
+            await weakInMemorySagaPersistance.Set(saga);
+            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
+                await sagaStore.Store(saga);
         }
 
     }
