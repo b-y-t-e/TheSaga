@@ -105,12 +105,13 @@ namespace TheSaga.Builders
             string stepName,
             ThenActionDelegate<TSagaData> action)
         {
+            ThenActionDelegate<TSagaData> a = action;
             builderState.UniqueNameGenerator.ThrowIfNotUnique(stepName);
 
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForThenInline<TSagaData>(
                     stepName,
-                    ctx => { action?.Invoke(ctx); return Task.CompletedTask; },
+                    ctx => { a?.Invoke(ctx); return Task.CompletedTask; },
                     null,
                     false,
                     builderState.ParentStep));
@@ -122,11 +123,14 @@ namespace TheSaga.Builders
             ThenActionDelegate<TSagaData> action,
             ThenActionDelegate<TSagaData> compensation)
         {
+            ThenActionDelegate<TSagaData> a = action;
+            ThenActionDelegate<TSagaData> c = compensation;
+
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForThenInline<TSagaData>(
                     builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Then)),
-                    ctx => { action?.Invoke(ctx); return Task.CompletedTask; },
-                    ctx => { compensation?.Invoke(ctx); return Task.CompletedTask; },
+                    ctx => { a?.Invoke(ctx); return Task.CompletedTask; },
+                    ctx => { c?.Invoke(ctx); return Task.CompletedTask; },
                     false,
                     builderState.ParentStep));
 
@@ -138,13 +142,15 @@ namespace TheSaga.Builders
             ThenActionDelegate<TSagaData> action,
             ThenActionDelegate<TSagaData> compensation)
         {
+            ThenActionDelegate<TSagaData> a = action;
+            ThenActionDelegate<TSagaData> c = compensation;
             builderState.UniqueNameGenerator.ThrowIfNotUnique(stepName);
 
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForThenInline<TSagaData>(
                     stepName,
-                    ctx => { action?.Invoke(ctx); return Task.CompletedTask; },
-                    ctx => { compensation?.Invoke(ctx); return Task.CompletedTask; },
+                    ctx => { a?.Invoke(ctx); return Task.CompletedTask; },
+                    ctx => { c?.Invoke(ctx); return Task.CompletedTask; },
                     false,
                     builderState.ParentStep));
 
@@ -155,10 +161,12 @@ namespace TheSaga.Builders
         public ISagaBuilderThen<TSagaData, TEvent> Then(
             ThenActionDelegate<TSagaData> action)
         {
+            ThenActionDelegate<TSagaData> a = action;
+
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForThenInline<TSagaData>(
                     builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Then)),
-                    ctx => { action?.Invoke(ctx); return Task.CompletedTask; },
+                    ctx => { a?.Invoke(ctx); return Task.CompletedTask; },
                     null,
                     false,
                     builderState.ParentStep));
@@ -261,10 +269,12 @@ namespace TheSaga.Builders
         public ISagaBuilderThen<TSagaData, TEvent> ThenAsync(
             ThenActionDelegate<TSagaData> action)
         {
+            ThenActionDelegate<TSagaData> a = action;
+
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForThenInline<TSagaData>(
                     builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(ThenAsync)),
-                    ctx => { action?.Invoke(ctx); return Task.CompletedTask; },
+                    ctx => { a?.Invoke(ctx); return Task.CompletedTask; },
                     null,
                     true,
                     builderState.ParentStep));
@@ -276,12 +286,13 @@ namespace TheSaga.Builders
             string stepName,
             ThenActionDelegate<TSagaData> action)
         {
+            ThenActionDelegate<TSagaData> a = action;
             builderState.UniqueNameGenerator.ThrowIfNotUnique(stepName);
 
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForThenInline<TSagaData>(
                     stepName,
-                    ctx => { action?.Invoke(ctx); return Task.CompletedTask; },
+                    ctx => { a?.Invoke(ctx); return Task.CompletedTask; },
                     null,
                     true,
                     builderState.ParentStep));
@@ -293,11 +304,14 @@ namespace TheSaga.Builders
             ThenActionDelegate<TSagaData> action,
             ThenActionDelegate<TSagaData> compensation)
         {
+            ThenActionDelegate<TSagaData> a = action;
+            ThenActionDelegate<TSagaData> c = compensation;
+
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForThenInline<TSagaData>(
                     builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(ThenAsync)),
-                    ctx => { action?.Invoke(ctx); return Task.CompletedTask; },
-                    ctx => { compensation?.Invoke(ctx); return Task.CompletedTask; },
+                    ctx => { a?.Invoke(ctx); return Task.CompletedTask; },
+                    ctx => { c?.Invoke(ctx); return Task.CompletedTask; },
                     true,
                     builderState.ParentStep));
 
@@ -309,13 +323,15 @@ namespace TheSaga.Builders
             ThenActionDelegate<TSagaData> action,
             ThenActionDelegate<TSagaData> compensation)
         {
+            ThenActionDelegate<TSagaData> a = action;
+            ThenActionDelegate<TSagaData> c = compensation;
             builderState.UniqueNameGenerator.ThrowIfNotUnique(stepName);
 
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForThenInline<TSagaData>(
                     stepName,
-                    ctx => { action?.Invoke(ctx); return Task.CompletedTask; },
-                    ctx => { compensation?.Invoke(ctx); return Task.CompletedTask; },
+                    ctx => { a?.Invoke(ctx); return Task.CompletedTask; },
+                    ctx => { c?.Invoke(ctx); return Task.CompletedTask; },
                     true,
                     builderState.ParentStep));
 
@@ -525,11 +541,12 @@ namespace TheSaga.Builders
             IfFuncDelegate<TSagaData> condition,
             Action<ISagaBuilderThen<TSagaData, TEvent>> builderAction)
         {
+            IfFuncDelegate<TSagaData> c = condition;
             SagaAction currentAction = builderState.CurrentAction;
 
             SagaStepForIfInline<TSagaData> parentStep = new SagaStepForIfInline<TSagaData>(
                 builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(If)),
-                ctx => Task.FromResult(condition?.Invoke(ctx) ?? false),
+                ctx => Task.FromResult(c?.Invoke(ctx) ?? false),
                 null,
                 builderState.ParentStep);
 
@@ -676,11 +693,12 @@ namespace TheSaga.Builders
             IfFuncDelegate<TSagaData> condition,
             Action<ISagaBuilderThen<TSagaData, TEvent>> builderAction)
         {
+            IfFuncDelegate<TSagaData> c = condition;
             SagaAction currentAction = builderState.CurrentAction;
 
             SagaStepForWhileInline<TSagaData> parentStep = new SagaStepForWhileInline<TSagaData>(
                 builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(While)),
-                ctx => Task.FromResult(condition?.Invoke(ctx) ?? false),
+                ctx => Task.FromResult(c?.Invoke(ctx) ?? false),
                 null,
                 builderState.ParentStep);
 
@@ -711,14 +729,15 @@ namespace TheSaga.Builders
             return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
         public ISagaBuilderThen<TSagaData, TEvent> ElseIf(
-            IfFuncDelegate<TSagaData> condition, 
+            IfFuncDelegate<TSagaData> condition,
             Action<ISagaBuilderThen<TSagaData, TEvent>> builderAction)
         {
+            IfFuncDelegate<TSagaData> c = condition;
             SagaAction currentAction = builderState.CurrentAction;
 
             SagaStepForElseIfInline<TSagaData> parentStep = new SagaStepForElseIfInline<TSagaData>(
                 builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(ElseIf)),
-                ctx => Task.FromResult(condition?.Invoke(ctx) ?? false),
+                ctx => Task.FromResult(c?.Invoke(ctx) ?? false),
                 null,
                 builderState.ParentStep);
 
