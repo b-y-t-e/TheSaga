@@ -7,5 +7,6 @@ namespace TheSaga.Tests.SagaTests.IfElseIfElseSaga.Events
     {
         public Guid ID { get; set; }
         public int Condition { get; set; }
+        public int SubCondition { get; set; }
     }
 }

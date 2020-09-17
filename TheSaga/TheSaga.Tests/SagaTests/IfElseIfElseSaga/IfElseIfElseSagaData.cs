@@ -16,5 +16,6 @@ namespace TheSaga.Tests.SagaTests.IfElseIfElseSaga
         public int Condition { get; set; }
 
         public object Value1 { get; set; }
+        public int SubCondition { get; internal set; }
     }
 }

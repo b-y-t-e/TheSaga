@@ -14,6 +14,7 @@ namespace TheSaga.Tests.SagaTests.IfElseIfElseSaga.Events
         public async Task Execute(IExecutionContext<IfElseIfElseSagaData> context, Test4Event @event)
         {
             context.Data.Condition = @event.Condition;
+            context.Data.SubCondition = @event.SubCondition;
         }
     }
 }
