@@ -32,14 +32,20 @@ namespace TheSaga
             this IServiceCollection services,
             Action<ITheSagaConfig> configAction = null)
         {
+
             services.AddSingleton<ObservableRegistrator>();
             services.AddSingleton<IMessageBus, InMemoryMessageBus>();
             services.AddSingleton<ISagaPersistance, InMemorySagaPersistance>();
             services.AddSingleton<ISagaLocking, InMemorySagaLocking>();
             services.AddSingleton<IDateTimeProvider, LocalDateTimeProvider>();
             services.AddSingleton<IAsyncSagaErrorHandler, AsyncSagaErrorHandler>();
-            services.AddSingleton<ILogger>(r => new Microsoft.Extensions.Logging.Debug.DebugLoggerProvider().CreateLogger("TheSaga"));
-
+            services.AddSingleton<ILogger>(r =>
+            {
+                var loggerFactory = r.GetService<ILoggerFactory>();
+                if (loggerFactory != null)
+                    return loggerFactory.CreateLogger("TheSaga");
+                return new Microsoft.Extensions.Logging.Debug.DebugLoggerProvider().CreateLogger("TheSaga");
+            });
             services.AddTransient<ISagaRegistrator, SagaRegistrator>();
             services.AddTransient<ISagaCoordinator, SagaCoordinator>();
 
