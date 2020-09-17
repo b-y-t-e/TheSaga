@@ -27,9 +27,9 @@ namespace TheSaga.Tests.SagaTests.WhileSaga
                 During<Init>().
                     When<Test1Event>().
                         HandleBy<Test1EventHandler>().
-                    While(async c => c.Data.Counter > 0, b => b.
-                        Then(async c => c.Data.Value += 10).
-                        Then(async c => c.Data.Counter--)).
+                    While(c => c.Data.Counter > 0, b => b.
+                        Then(c => c.Data.Value += 10).
+                        Then(c => c.Data.Counter--)).
                     TransitionTo<SecondState>();
 
             return builder.

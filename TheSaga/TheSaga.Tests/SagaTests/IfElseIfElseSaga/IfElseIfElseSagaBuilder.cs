@@ -27,22 +27,22 @@ namespace TheSaga.Tests.SagaTests.IfElseIfElseSaga
                 During<Init>().
                     When<Test4Event>().
                         HandleBy<Test4EventHandler>().
-                        If(async c => c.Data.Condition == 1, b => b.
-                            Then(async c => c.Data.Value1 = 1)).
-                        ElseIf(async c => c.Data.Condition == 2, b => b.
-                            Then(async c => c.Data.Value1 = 2)).
-                        ElseIf(async c => c.Data.Condition == 3, b => b.
-                            If(async c => c.Data.SubCondition == 0, b => b.
-                                Then(async c => c.Data.Value1 = 3)).
+                        If(c => c.Data.Condition == 1, b => b.
+                            Then(c => c.Data.Value1 = 1)).
+                        ElseIf(c => c.Data.Condition == 2, b => b.
+                            Then(c => c.Data.Value1 = 2)).
+                        ElseIf(c => c.Data.Condition == 3, b => b.
+                            If(c => c.Data.SubCondition == 0, b => b.
+                                Then(c => c.Data.Value1 = 3)).
                             Else(b => b.
-                                Then(async c => c.Data.Value1 = 33))).
-                        ElseIf(async c => c.Data.Condition == 4, b => b.
-                            If(async c => c.Data.SubCondition == 1, b => b.
-                                Then(async c => c.Data.Value1 = 4))).
-                        ElseIf(async c => c.Data.Condition == 5, b => b.
-                            Then(async c => c.Data.Value1 = 5)).
+                                Then(c => c.Data.Value1 = 33))).
+                        ElseIf(c => c.Data.Condition == 4, b => b.
+                            If(c => c.Data.SubCondition == 1, b => b.
+                                Then(c => c.Data.Value1 = 4))).
+                        ElseIf(c => c.Data.Condition == 5, b => b.
+                            Then(c => c.Data.Value1 = 5)).
                         Else(b => b.
-                            Then(async c => c.Data.Value1 = 100));
+                            Then(c => c.Data.Value1 = 100));
 
             return builder.
                 Build();

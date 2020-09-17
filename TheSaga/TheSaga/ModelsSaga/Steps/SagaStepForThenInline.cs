@@ -14,8 +14,8 @@ namespace TheSaga.ModelsSaga.Steps
     {
         public SagaStepForThenInline(
             string stepName,
-            ThenActionDelegate<TSagaData> action,
-            ThenActionDelegate<TSagaData> compensation,
+            ThenAsyncActionDelegate<TSagaData> action,
+            ThenAsyncActionDelegate<TSagaData> compensation,
             bool async, ISagaStep parentStep)
         {
             StepName = stepName;
@@ -30,8 +30,8 @@ namespace TheSaga.ModelsSaga.Steps
         public SagaSteps ChildSteps { get; }
         public ISagaStep ParentStep { get; }
         public string StepName { get; }
-        private ThenActionDelegate<TSagaData> action { get; }
-        private ThenActionDelegate<TSagaData> compensation { get; }
+        private ThenAsyncActionDelegate<TSagaData> action { get; }
+        private ThenAsyncActionDelegate<TSagaData> compensation { get; }
 
         public async Task Compensate(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event, IStepData stepData)
         {

@@ -52,22 +52,36 @@ namespace TheSaga.Builders
         ISagaBuilderThen<TSagaData, TEvent> While<TSagaCondition>(Action<ISagaBuilderThen<TSagaData, TEvent>> builder)
             where TSagaCondition : ISagaCondition<TSagaData>;
 
+        ISagaBuilderThen<TSagaData, TEvent> While(IfFuncAsyncDelegate<TSagaData> action, Action<ISagaBuilderThen<TSagaData, TEvent>> builder);
+
         ISagaBuilderThen<TSagaData, TEvent> While(IfFuncDelegate<TSagaData> action, Action<ISagaBuilderThen<TSagaData, TEvent>> builder);
 
         ISagaBuilderThen<TSagaData, TEvent> If<TSagaCondition>(Action<ISagaBuilderThen<TSagaData, TEvent>> builder)
             where TSagaCondition : ISagaCondition<TSagaData>;
+
+        ISagaBuilderThen<TSagaData, TEvent> If(IfFuncAsyncDelegate<TSagaData> action, Action<ISagaBuilderThen<TSagaData, TEvent>> builder);
+
+        ISagaBuilderThen<TSagaData, TEvent> ElseIf(IfFuncAsyncDelegate<TSagaData> action, Action<ISagaBuilderThen<TSagaData, TEvent>> builder);
 
         ISagaBuilderThen<TSagaData, TEvent> If(IfFuncDelegate<TSagaData> action, Action<ISagaBuilderThen<TSagaData, TEvent>> builder);
 
         ISagaBuilderThen<TSagaData, TEvent> ElseIf(IfFuncDelegate<TSagaData> action, Action<ISagaBuilderThen<TSagaData, TEvent>> builder);
 
         ISagaBuilderThen<TSagaData, TEvent> Else(Action<ISagaBuilderThen<TSagaData, TEvent>> builder);
+        ISagaBuilderThen<TSagaData, TEvent> Then(ThenAsyncActionDelegate<TSagaData> action);
+        ISagaBuilderThen<TSagaData, TEvent> Then(string stepName, ThenAsyncActionDelegate<TSagaData> action);
+
+        ISagaBuilderThen<TSagaData, TEvent> Then(ThenAsyncActionDelegate<TSagaData> action,
+            ThenAsyncActionDelegate<TSagaData> compensation);
+
+        ISagaBuilderThen<TSagaData, TEvent> Then(string stepName, ThenAsyncActionDelegate<TSagaData> action,
+            ThenAsyncActionDelegate<TSagaData> compensation);
+
         ISagaBuilderThen<TSagaData, TEvent> Then(ThenActionDelegate<TSagaData> action);
         ISagaBuilderThen<TSagaData, TEvent> Then(string stepName, ThenActionDelegate<TSagaData> action);
 
         ISagaBuilderThen<TSagaData, TEvent> Then(ThenActionDelegate<TSagaData> action,
             ThenActionDelegate<TSagaData> compensation);
-
         ISagaBuilderThen<TSagaData, TEvent> Then(string stepName, ThenActionDelegate<TSagaData> action,
             ThenActionDelegate<TSagaData> compensation);
 
@@ -75,13 +89,18 @@ namespace TheSaga.Builders
 
         ISagaBuilderThen<TSagaData, TEvent> Then<TSagaActivity>(string stepName) where TSagaActivity : ISagaActivity<TSagaData>;
 
+        ISagaBuilderThen<TSagaData, TEvent> ThenAsync(ThenAsyncActionDelegate<TSagaData> action);
+        ISagaBuilderThen<TSagaData, TEvent> ThenAsync(string stepName, ThenAsyncActionDelegate<TSagaData> action);
+        ISagaBuilderThen<TSagaData, TEvent> ThenAsync(ThenAsyncActionDelegate<TSagaData> action,
+            ThenAsyncActionDelegate<TSagaData> compensation);
+        ISagaBuilderThen<TSagaData, TEvent> ThenAsync(string stepName, ThenAsyncActionDelegate<TSagaData> action,
+            ThenAsyncActionDelegate<TSagaData> compensation);
+
+
         ISagaBuilderThen<TSagaData, TEvent> ThenAsync(ThenActionDelegate<TSagaData> action);
-
         ISagaBuilderThen<TSagaData, TEvent> ThenAsync(string stepName, ThenActionDelegate<TSagaData> action);
-
         ISagaBuilderThen<TSagaData, TEvent> ThenAsync(ThenActionDelegate<TSagaData> action,
             ThenActionDelegate<TSagaData> compensation);
-
         ISagaBuilderThen<TSagaData, TEvent> ThenAsync(string stepName, ThenActionDelegate<TSagaData> action,
             ThenActionDelegate<TSagaData> compensation);
 
