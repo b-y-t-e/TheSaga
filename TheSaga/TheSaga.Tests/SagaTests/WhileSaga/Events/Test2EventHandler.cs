@@ -13,7 +13,7 @@ namespace TheSaga.Tests.SagaTests.WhileSaga.Events
 
         public async Task Execute(IExecutionContext<WhileSagaData> context, Test2Event @event)
         {
-            context.Data.Counter = @event.Condition;
+            context.Data.Counter = @event.Counter;
         }
     }
 }

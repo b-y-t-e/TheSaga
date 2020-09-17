@@ -15,5 +15,6 @@ namespace TheSaga.Tests.SagaTests.WhileSaga
 
         public int Counter { get; set; }
         public int Value { get; set; }
+        public int SecondValue { get; set; }
     }
 }

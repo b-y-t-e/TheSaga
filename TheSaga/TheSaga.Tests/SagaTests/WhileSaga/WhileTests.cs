@@ -14,13 +14,14 @@ using TheSaga.Persistance.SqlServer;
 using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Locking.DistributedLock;
 using TheSaga.Locking.DistributedLock.Options;
+using System.Linq;
 
 namespace TheSaga.Tests.SagaTests.WhileSaga
 {
     public class WhileTests
     {
         [Fact]
-        public async Task WHEN_conditionIsMet_THEN_shouldDoIf()
+        public async Task WHEN_whiteIsUsed_THEN_shouldRunProperly()
         {
             // given
             ISaga saga = await sagaCoordinator.Publish(new CreateWhileSagaEvent());
@@ -38,6 +39,36 @@ namespace TheSaga.Tests.SagaTests.WhileSaga
                 3 * 10 + // while + steps
                 1 + // last while check
                 1); // transition to
+        }
+
+        [Fact]
+        public async Task WHEN_conditionIsMet_THEN_shouldDoIf()
+        {
+            // given
+            ISaga saga = await sagaCoordinator.Publish(new CreateWhileSagaEvent());
+
+            // when
+            await Assert.ThrowsAsync<Exception>(async () =>
+                await sagaCoordinator.Publish(new Test2Event() { ID = saga.Data.ID, Counter = 2 }));
+
+            // then
+            ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
+            WhileSagaData data = persistedSaga.Data as WhileSagaData;
+            data.Counter.ShouldBe(0);
+            data.Value.ShouldBe(20);
+            data.SecondValue.ShouldBe(1);
+            persistedSaga.ExecutionState.History.Count.ShouldBe(
+                1 + // event handler
+                3 * 2 + // while + steps
+                1 + // last while check
+                1 + // then
+                1); // exception
+
+            persistedSaga.ExecutionState.History.
+                Where(s => s.CompensationData == null).Count().ShouldBe(0);
+            
+            persistedSaga.ExecutionState.History.
+                Where(s => s.ResumeData != null).Count().ShouldBe(0);
         }
 
         #region Arrange
