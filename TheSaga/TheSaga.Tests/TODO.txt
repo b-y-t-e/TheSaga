@@ -1,5 +1,6 @@
 ﻿TODO:
  
+ + while
  + TheSaga.WebApi.Convey
  + dodanie logowania - serilog
  + sqlpersistance - inmemoery for few seconds

@@ -8,7 +8,7 @@ using TheSaga.ModelsSaga.Steps.Interfaces;
 
 namespace TheSaga.ModelsSaga.Steps
 {
-    internal class SagaStepForElse<TSagaData> : ISagaStep, ISagaStepElse
+    internal class SagaStepForElse<TSagaData> : ISagaStep, ISagaStepForElse
         where TSagaData : ISagaData
     {
         public ISagaStep ParentStep { get; }
