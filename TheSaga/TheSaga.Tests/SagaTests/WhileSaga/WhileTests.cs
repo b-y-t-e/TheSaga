@@ -21,7 +21,7 @@ namespace TheSaga.Tests.SagaTests.WhileSaga
     public class WhileTests
     {
         [Fact]
-        public async Task WHEN_whiteIsUsed_THEN_shouldRunProperly()
+        public async Task WHEN_whileIsUsed_THEN_shouldRunProperly()
         {
             // given
             ISaga saga = await sagaCoordinator.Publish(new CreateWhileSagaEvent());
@@ -42,7 +42,7 @@ namespace TheSaga.Tests.SagaTests.WhileSaga
         }
 
         [Fact]
-        public async Task WHEN_conditionIsMet_THEN_shouldDoIf()
+        public async Task WHEN_exceptionAfterWhile_THEN_wholeWhileShouldBeCompensated()
         {
             // given
             ISaga saga = await sagaCoordinator.Publish(new CreateWhileSagaEvent());
