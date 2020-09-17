@@ -32,7 +32,7 @@ namespace TheSaga.Tests.SagaTests.SendTests
             builder.
                 During<Init>().
                 When<TestSendActionEvent>().
-                Publish<SendAlternativeCreateEvent>(async (ctx, ev) =>
+                Publish<SendAlternativeCreateEvent>((ctx, ev) =>
                     ctx.Data.CreatedSagaID = ev.ID = Guid.NewGuid()).
                 TransitionTo<AfterInit>();
 

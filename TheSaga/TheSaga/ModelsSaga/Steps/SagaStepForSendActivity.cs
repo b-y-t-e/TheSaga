@@ -16,15 +16,15 @@ namespace TheSaga.ModelsSaga.Steps
         where TExecuteEvent : ISagaEvent, new()
         where TCompensateEvent : ISagaEvent, new()
     {
-        private readonly SendActionDelegate<TSagaData, TExecuteEvent> action;
+        private readonly SendActionAsyncDelegate<TSagaData, TExecuteEvent> action;
 
-        private readonly SendActionDelegate<TSagaData, TCompensateEvent> compensate;
+        private readonly SendActionAsyncDelegate<TSagaData, TCompensateEvent> compensate;
         public SagaSteps ChildSteps { get; }
         public ISagaStep ParentStep { get; }
 
         public SagaStepForSendActivity(
-            SendActionDelegate<TSagaData, TExecuteEvent> action,
-            SendActionDelegate<TSagaData, TCompensateEvent> compensate,
+            SendActionAsyncDelegate<TSagaData, TExecuteEvent> action,
+            SendActionAsyncDelegate<TSagaData, TCompensateEvent> compensate,
             string StepName, bool async, ISagaStep parentStep)
         {
             this.StepName = StepName;

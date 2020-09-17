@@ -34,18 +34,29 @@ namespace TheSaga.Builders
         ISagaBuilderThen<TSagaData, TEvent> Publish<TEventToSend>()
             where TEventToSend : ISagaEvent, new();
 
-        ISagaBuilderThen<TSagaData, TEvent> Publish<TEventToSend>(SendActionDelegate<TSagaData, TEventToSend> action)
+        ISagaBuilderThen<TSagaData, TEvent> Publish<TEventToSend>(
+            SendActionAsyncDelegate<TSagaData, TEventToSend> action)
+            where TEventToSend : ISagaEvent, new();
+
+        ISagaBuilderThen<TSagaData, TEvent> Publish<TEventToSend>(
+            SendActionDelegate<TSagaData, TEventToSend> action)
             where TEventToSend : ISagaEvent, new();
 
         ISagaBuilderThen<TSagaData, TEvent> Publish<TEventToSend, TCompensateEvent>()
             where TEventToSend : ISagaEvent, new()
             where TCompensateEvent : ISagaEvent, new();
 
-        ISagaBuilderThen<TSagaData, TEvent> Publish<TEventToSend, TCompensateEvent>(SendActionDelegate<TSagaData, TEventToSend> action,
-            SendActionDelegate<TSagaData, TCompensateEvent> compensation)
+        ISagaBuilderThen<TSagaData, TEvent> Publish<TEventToSend, TCompensateEvent>(
+            SendActionAsyncDelegate<TSagaData, TEventToSend> action,
+            SendActionAsyncDelegate<TSagaData, TCompensateEvent> compensation)
             where TEventToSend : ISagaEvent, new()
             where TCompensateEvent : ISagaEvent, new();
 
+        ISagaBuilderThen<TSagaData, TEvent> Publish<TEventToSend, TCompensateEvent>(
+            SendActionDelegate<TSagaData, TEventToSend> action,
+            SendActionDelegate<TSagaData, TCompensateEvent> compensation)
+            where TEventToSend : ISagaEvent, new()
+            where TCompensateEvent : ISagaEvent, new();
 
         ISagaBuilderThen<TSagaData, TEvent> Do(Action<ISagaBuilderThen<TSagaData, TEvent>> builder);
 
