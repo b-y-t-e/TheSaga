@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,6 +29,7 @@ namespace TheSaga.Coordinators
 {
     public class SagaCoordinator : ISagaCoordinator
     {
+        private readonly ILogger logger;
         private readonly IDateTimeProvider dateTimeProvider;
         private readonly IMessageBus messageBus;
         private readonly ISagaPersistance sagaPersistance;
@@ -36,13 +38,14 @@ namespace TheSaga.Coordinators
 
         public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance,
             IMessageBus messageBus, IDateTimeProvider dateTimeProvider,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider, ILogger logger)
         {
             this.sagaRegistrator = sagaRegistrator;
             this.sagaPersistance = sagaPersistance;
             this.messageBus = messageBus;
             this.dateTimeProvider = dateTimeProvider;
             this.serviceProvider = serviceProvider;
+            this.logger = logger;
         }
 
         public async Task ResumeAll()
@@ -68,7 +71,8 @@ namespace TheSaga.Coordinators
 
                 ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
 
-                Console.WriteLine($"Trying to resume saga: {id}");
+                logger.
+                    LogInformation($"Trying to resume saga: {id}");
 
                 await ExecuteSaga(
                     new EmptyEvent(),
@@ -231,11 +235,13 @@ namespace TheSaga.Coordinators
                         throw new SagaNeedToBeResumedException(saga.Data.ID);
                     }
 
-                    Console.WriteLine($"Executing saga: {saga.Data.ID}");
+                    logger.
+                        LogInformation($"Executing saga: {saga.Data.ID}");
                 }
                 else
                 {
-                    Console.WriteLine($"Resuming saga: {saga.Data.ID}");
+                    logger.
+                        LogInformation($"Resuming saga: {saga.Data.ID}");
                 }
 
                 ExecuteActionCommandHandler handler = serviceProvider.

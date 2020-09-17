@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,20 +26,21 @@ namespace TheSaga.Commands.Handlers
 {
     internal class ExecuteActionCommandHandler
     {
-        private readonly ISagaPersistance sagaPersistance;
         private readonly IServiceScopeFactory serviceScopeFactory;
         private IMessageBus messageBus;
         private IAsyncSagaErrorHandler asyncErrorHandler;
+        private readonly ILogger logger;
 
         public ExecuteActionCommandHandler(
-            ISagaPersistance sagaPersistance,
             IServiceScopeFactory serviceScopeFactory,
-            IMessageBus messageBus, IAsyncSagaErrorHandler errorHandler)
+            IMessageBus messageBus,
+            IAsyncSagaErrorHandler errorHandler,
+            ILogger logger)
         {
-            this.sagaPersistance = sagaPersistance;
             this.serviceScopeFactory = serviceScopeFactory;
             this.messageBus = messageBus;
             this.asyncErrorHandler = errorHandler;
+            this.logger = logger;
         }
 
         public async Task<ISaga> Handle(ExecuteActionCommand command)
@@ -64,7 +66,8 @@ namespace TheSaga.Commands.Handlers
                 Model = command.Model
             };
 
-            Console.WriteLine($"Saga: {saga.Data.ID}; Executing {(step.Async ? "async " : "")}step: {step.StepName}");
+            logger.
+                LogDebug($"Saga: {saga.Data.ID}; Executing {(step.Async ? "async " : "")}step: {step.StepName}");
 
             if (step.Async)
             {
@@ -115,8 +118,6 @@ namespace TheSaga.Commands.Handlers
                 {
                     if (saga.IsIdle())
                     {
-                        //debug.Add( $"{saga.ExecutionState.ExecutionID} | {saga.Data.ID} | ended");
-                        //Debug.WriteLine($"{saga.ExecutionState.ExecutionID} | {saga.Data.ID} ended");
                         await messageBus.Publish(
                             new ExecutionEndMessage(SagaID.From(saga.Data.ID)));
 

@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TheSaga.Builders;
 using TheSaga.Commands.Handlers;
 using TheSaga.Config;
@@ -37,6 +38,7 @@ namespace TheSaga
             services.AddSingleton<ISagaLocking, InMemorySagaLocking>();
             services.AddSingleton<IDateTimeProvider, LocalDateTimeProvider>();
             services.AddSingleton<IAsyncSagaErrorHandler, AsyncSagaErrorHandler>();
+            services.AddSingleton<ILogger>(r => new Microsoft.Extensions.Logging.Debug.DebugLoggerProvider().CreateLogger("TheSaga"));
 
             services.AddTransient<ISagaRegistrator, SagaRegistrator>();
             services.AddTransient<ISagaCoordinator, SagaCoordinator>();

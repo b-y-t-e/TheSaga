@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.ExecutionContext;
@@ -28,25 +29,27 @@ namespace TheSaga.Commands.Handlers
         private readonly IDateTimeProvider dateTimeProvider;
         private readonly ISagaPersistance sagaPersistance;
         private readonly IServiceProvider serviceProvider;
+        private readonly ILogger logger;
 
         public ExecuteStepCommandHandler(
             ISagaPersistance sagaPersistance,
             IServiceProvider serviceProvider,
-            IDateTimeProvider dateTimeProvider)
+            IDateTimeProvider dateTimeProvider, ILogger logger)
         {
             this.sagaPersistance = sagaPersistance;
             this.serviceProvider = serviceProvider;
             this.dateTimeProvider = dateTimeProvider;
+            this.logger = logger;
         }
 
         public async Task<ISaga> Handle(ExecuteStepCommand command)
         {
             ISaga saga = command.Saga;
-            ISagaStep sagaStep = command.SagaStep;
+            ISagaStep step = command.SagaStep;
             ISagaAction sagaAction = command.SagaAction;
             ISagaModel model = command.Model;
 
-            StepData stepData = GetOrCreateStepData(saga, sagaStep, model);
+            StepData stepData = GetOrCreateStepData(saga, step, model);
 
             await sagaPersistance.Set(saga);
 
@@ -54,7 +57,7 @@ namespace TheSaga.Commands.Handlers
             Exception executionError = null;
             try
             {
-                await ExecuteStep(saga, sagaStep, stepData);
+                await ExecuteStep(saga, step, stepData);
 
                 stepData.
                     SetSucceeded(saga.ExecutionState, dateTimeProvider);
@@ -65,6 +68,9 @@ namespace TheSaga.Commands.Handlers
             }
             catch (Exception ex)
             {
+                logger.
+                    LogError(ex, $"Saga: {saga.Data.ID}; Executing {(step.Async ? "async " : "")}step: {step.StepName}");
+
                 executionError = ex;
 
                 stepData.
@@ -77,7 +83,7 @@ namespace TheSaga.Commands.Handlers
             }
 
             string nextStepName = CalculateNextStepName(
-                saga, sagaStep, sagaAction, stepData, executionError);
+                saga, step, sagaAction, stepData, executionError);
 
             SaveNextStep(saga, stepData, nextStepName);
 
