@@ -1,6 +1,5 @@
 ﻿TODO:
  
- + while
  + TheSaga.WebApi.Convey
  + dodanie logowania - serilog
  + sqlpersistance - inmemoery for few seconds
@@ -34,6 +33,7 @@
  + retry
 
 DONE:
+ + while
  + metoda: HandleBy dla start
  + dodanie testow if / else
  + if / else

@@ -19,6 +19,10 @@ namespace TheSaga.ModelsSaga.Actions
             ISagaStep step,
             SagaExecutionState sagaState)
         {
+            ISagaStep nextStepForWhile = getNextStepForWhile(sagaAction, step, sagaState);
+            if (nextStepForWhile != null)
+                return nextStepForWhile;
+
             ISagaStep nextStepForIf = getNextStepForIf(sagaAction, step, sagaState);
             if (nextStepForIf != null)
                 return nextStepForIf;
@@ -34,8 +38,12 @@ namespace TheSaga.ModelsSaga.Actions
             ISagaStep step,
             SagaExecutionState sagaState)
         {
-            // szukamy kolejnego kroku dla if-else
-            ISagaStep nextStep = GetNextStepAnywhere(
+            ISagaStep nextStepForWhile = getNextStepForWhile(sagaAction, step);
+            if (nextStepForWhile != null)
+                return nextStepForWhile;
+
+            // szukamy kolejnego kroku 
+            ISagaStep nextStep = GetNextStepElsewhere(
                 sagaAction.ChildSteps,
                 step);
 
@@ -54,6 +62,18 @@ namespace TheSaga.ModelsSaga.Actions
                 return step.ChildSteps.GetFirstStep();
             return null;
         }
+        static ISagaStep getNextStepForWhile(
+            ISagaAction sagaAction,
+            ISagaStep step)
+        {
+            ISagaStep nextStep = GetNextStepSameLevel(
+                sagaAction.ChildSteps,
+                step);
+
+            if (nextStep == null && step.ParentStep.Is<ISagaStepForWhile>())
+                return step.ParentStep;
+            return null;
+        }
         static ISagaStep getNextStepForIf(
             ISagaAction sagaAction,
             ISagaStep step,
@@ -70,7 +90,7 @@ namespace TheSaga.ModelsSaga.Actions
                 }
                 else
                 {
-                    return GetNextStepAnywhere(sagaAction.ChildSteps, step);
+                    return GetNextStepElsewhere(sagaAction.ChildSteps, step);
                 }
             }
             return null;
@@ -91,7 +111,7 @@ namespace TheSaga.ModelsSaga.Actions
                 }
                 else
                 {
-                    return GetNextStepAnywhere(sagaAction.ChildSteps, step);
+                    return GetNextStepElsewhere(sagaAction.ChildSteps, step);
                 }
             }
             return null;
@@ -175,9 +195,9 @@ namespace TheSaga.ModelsSaga.Actions
         static ISagaStep GetNextStepSameLevel(
             SagaSteps SagaSteps, ISagaStep stepToFind)
         {
-            return GetNextStepAnywhere(SagaSteps, stepToFind, true);
+            return GetNextStepElsewhere(SagaSteps, stepToFind, true);
         }
-        static ISagaStep GetNextStepAnywhere(
+        static ISagaStep GetNextStepElsewhere(
             SagaSteps SagaSteps, ISagaStep stepToFind,
             Boolean onTheSameLevel = false)
         {
@@ -210,7 +230,7 @@ namespace TheSaga.ModelsSaga.Actions
                 if (stepFound && onTheSameLevel)
                     return null;
 
-                return GetNextStepAnywhere(SagaSteps, stepToFind.ParentStep, onTheSameLevel);
+                return GetNextStepElsewhere(SagaSteps, stepToFind.ParentStep, onTheSameLevel);
             }
         }
         static ISagaStep GetPrevStepSameLevel(

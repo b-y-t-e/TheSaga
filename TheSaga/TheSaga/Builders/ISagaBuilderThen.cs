@@ -49,6 +49,11 @@ namespace TheSaga.Builders
 
         ISagaBuilderThen<TSagaData, TEvent> Do(Action<ISagaBuilderThen<TSagaData, TEvent>> builder);
 
+        ISagaBuilderThen<TSagaData, TEvent> While<TSagaCondition>(Action<ISagaBuilderThen<TSagaData, TEvent>> builder)
+            where TSagaCondition : ISagaCondition<TSagaData>;
+
+        ISagaBuilderThen<TSagaData, TEvent> While(IfFuncDelegate<TSagaData> action, Action<ISagaBuilderThen<TSagaData, TEvent>> builder);
+
         ISagaBuilderThen<TSagaData, TEvent> If<TSagaCondition>(Action<ISagaBuilderThen<TSagaData, TEvent>> builder)
             where TSagaCondition : ISagaCondition<TSagaData>;
 
