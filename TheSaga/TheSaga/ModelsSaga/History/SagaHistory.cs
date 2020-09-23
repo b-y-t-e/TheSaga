@@ -103,8 +103,7 @@ namespace TheSaga.ModelsSaga.History
             {
                 stepData.ResumeData = new StepExecutionData
                 {
-                    EndStateName = saga.ExecutionState.CurrentState,
-                    StepType = step.GetType()
+
                 };
             }
             else if (saga.ExecutionState.IsCompensating)
@@ -116,7 +115,7 @@ namespace TheSaga.ModelsSaga.History
 
                 stepData.CompensationData = new StepExecutionData()
                 {
-                    StepType = step.GetType()
+
                 };
             }
             else
@@ -140,8 +139,6 @@ namespace TheSaga.ModelsSaga.History
 
                 stepData.ExecutionData = new StepExecutionData
                 {
-                    EndStateName = saga.ExecutionState.CurrentState,
-                    StepType = step.GetType()
                 };
             }
 

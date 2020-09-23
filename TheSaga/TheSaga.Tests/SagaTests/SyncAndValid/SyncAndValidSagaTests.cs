@@ -15,6 +15,7 @@ using TheSaga.Persistance.SqlServer;
 using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Locking.DistributedLock;
 using TheSaga.Locking.DistributedLock.Options;
+using TheSaga.ModelsSaga.History;
 
 namespace TheSaga.Tests.SagaTests.SyncAndValid
 {

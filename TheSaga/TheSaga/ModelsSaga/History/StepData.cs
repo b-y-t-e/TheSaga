@@ -12,89 +12,89 @@ namespace TheSaga.ModelsSaga.History
         public Guid ExecutionID { get; set; }
         public string StepName { get; set; }
         public string StateName { get; set; }
+        public string EndStateName { get; set; }
+        public string NextStepName { get; set; }
+        public bool AsyncExecution { get; set; }
+        public bool AsyncStep { get; set; }
+        public ISagaEvent Event { get; set; }
         public StepExecutionValues ExecutionValues { get; set; }
         public StepExecutionData ExecutionData { get; set; }
         public StepExecutionData CompensationData { get; set; }
         public StepExecutionData ResumeData { get; set; }
         //public StepRetry Retry { get; set; }
-        public bool AsyncExecution { get; set; }
-        public bool AsyncStep { get; set; }
-        public ISagaEvent Event { get; set; }
 
-        public StepData SetStarted(SagaExecutionState state, IDateTimeProvider dateTimeProvider)
+    }
+
+    public static class StepDataExtensions
+    {
+        static public StepData SetStarted(this StepData data, SagaExecutionState state, IDateTimeProvider dateTimeProvider)
         {
             if (state.IsResuming)
-                ResumeData.StartTime = dateTimeProvider.Now;
+                data.ResumeData.StartTime = dateTimeProvider.Now;
             else if (state.IsCompensating)
-                CompensationData.StartTime = dateTimeProvider.Now;
+                data.CompensationData.StartTime = dateTimeProvider.Now;
             else
-                ExecutionData.StartTime = dateTimeProvider.Now;
-            return this;
+                data.ExecutionData.StartTime = dateTimeProvider.Now;
+            return data;
         }
 
-        public StepData SetEnded(SagaExecutionState state, IDateTimeProvider dateTimeProvider)
+        static public StepData SetEnded(this StepData data, SagaExecutionState state, IDateTimeProvider dateTimeProvider)
         {
             if (state.IsResuming)
-                ResumeData.EndTime = dateTimeProvider.Now;
+                data.ResumeData.EndTime = dateTimeProvider.Now;
             else if (state.IsCompensating)
-                CompensationData.EndTime = dateTimeProvider.Now;
+                data.CompensationData.EndTime = dateTimeProvider.Now;
             else
-                ExecutionData.EndTime = dateTimeProvider.Now;
-            return this;
+                data.ExecutionData.EndTime = dateTimeProvider.Now;
+            return data;
         }
 
-        public StepData SetSucceeded(SagaExecutionState state, IDateTimeProvider dateTimeProvider)
+        static public StepData SetSucceeded(this StepData data, SagaExecutionState state, IDateTimeProvider dateTimeProvider)
         {
             if (state.IsResuming)
-                ResumeData.SucceedTime = dateTimeProvider.Now;
+                data.ResumeData.SucceedTime = dateTimeProvider.Now;
             else if (state.IsCompensating)
-                CompensationData.SucceedTime = dateTimeProvider.Now;
+                data.CompensationData.SucceedTime = dateTimeProvider.Now;
             else
-                ExecutionData.SucceedTime = dateTimeProvider.Now;
-            return this;
+                data.ExecutionData.SucceedTime = dateTimeProvider.Now;
+            return data;
         }
 
-        public StepData SetFailed(SagaExecutionState state, IDateTimeProvider dateTimeProvider, Exception error)
+        static public StepData SetFailed(this StepData data, SagaExecutionState state, IDateTimeProvider dateTimeProvider, Exception error)
         {
             if (state.IsResuming)
             {
-                ResumeData.Error = error.ToSagaStepException();
-                ResumeData.FailTime = dateTimeProvider.Now;
+                data.ResumeData.Error = error.ToSagaStepException();
+                data.ResumeData.FailTime = dateTimeProvider.Now;
             }
             else if (state.IsCompensating)
             {
-                CompensationData.Error = error.ToSagaStepException();
-                CompensationData.FailTime = dateTimeProvider.Now;
+                data.CompensationData.Error = error.ToSagaStepException();
+                data.CompensationData.FailTime = dateTimeProvider.Now;
             }
             else
             {
-                ExecutionData.Error = error.ToSagaStepException();
-                ExecutionData.FailTime = dateTimeProvider.Now;
+                data.ExecutionData.Error = error.ToSagaStepException();
+                data.ExecutionData.FailTime = dateTimeProvider.Now;
             }
-            return this;
+            return data;
         }
 
-        internal StepData SetNextStepName(string stepName)
+        static internal StepData SetNextStepName(this StepData data, string stepName)
         {
-            if (CompensationData != null)
-                CompensationData.NextStepName = stepName;
-            else
-                ExecutionData.NextStepName = stepName;
-            return this;
+            data.NextStepName = stepName;
+            return data;
         }
 
-        internal StepData SetEndStateName(string currentState)
+        static internal StepData SetEndStateName(this StepData data, string currentState)
         {
-            if (CompensationData != null)
-                CompensationData.EndStateName = currentState;
-            else
-                ExecutionData.EndStateName = currentState;
-            return this;
+            data.EndStateName = currentState;
+            return data;
         }
 
-        internal bool HasSucceeded()
+        internal static bool HasSucceeded(this StepData data)
         {
-            return ExecutionData?.SucceedTime != null;
+            return data.ExecutionData?.SucceedTime != null;
         }
     }
 
