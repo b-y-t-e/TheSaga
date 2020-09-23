@@ -120,23 +120,26 @@ namespace TheSaga.Commands.Handlers
             saga.ExecutionInfo.Modified = dateTimeProvider.Now;
         }
 
-        private string CalculateNextStepName(ISaga saga, ISagaStep sagaStep, ISagaAction sagaAction, StepData stepData, Exception executionError)
+        private string CalculateNextStepName(
+            ISaga saga, 
+            ISagaStep sagaStep, 
+            ISagaAction sagaAction, 
+            StepData stepData, 
+            Exception executionError)
         {
-            string nextStepName = null;
             if (executionError != null)
             {
                 saga.ExecutionState.IsResuming = false;
                 saga.ExecutionState.IsCompensating = true;
                 saga.ExecutionState.CurrentError = executionError.ToSagaStepException();
-                nextStepName = CalculateNextCompensationStep(saga);
+                return CalculateNextCompensationStep(saga);
             }
             else
             {
-                nextStepName = CalculateNextStep(saga, sagaAction, sagaStep, stepData);
+                string nextStepName = CalculateNextStep(saga, sagaAction, sagaStep, stepData);
                 saga.ExecutionState.IsResuming = false;
+                return nextStepName;
             }
-
-            return nextStepName;
         }
 
         private async Task ExecuteStep(ISaga saga, ISagaStep sagaStep, StepData stepData)
@@ -181,9 +184,9 @@ namespace TheSaga.Commands.Handlers
         {
             if (saga.ExecutionState.IsResuming)
                 return sagaStep.StepName;
-            
-            if (saga.ExecutionState.IsCompensating)            
-                return CalculateNextCompensationStep(saga);            
+
+            if (saga.ExecutionState.IsCompensating)
+                return CalculateNextCompensationStep(saga);
 
             return sagaAction.
                 GetNextStepToExecute(sagaStep, saga.ExecutionState)?.StepName;

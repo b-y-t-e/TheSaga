@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using TheSaga.Events;
 using TheSaga.Models;
 using TheSaga.Providers.Interfaces;
@@ -15,6 +16,7 @@ namespace TheSaga.ModelsSaga.History
         public StepExecutionData ExecutionData { get; set; }
         public StepExecutionData CompensationData { get; set; }
         public StepExecutionData ResumeData { get; set; }
+        //public StepRetry Retry { get; set; }
         public bool AsyncExecution { get; set; }
         public bool AsyncStep { get; set; }
         public ISagaEvent Event { get; set; }
@@ -94,5 +96,30 @@ namespace TheSaga.ModelsSaga.History
         {
             return ExecutionData?.SucceedTime != null;
         }
+    }
+
+    public class StepRetry
+    {
+        public StepRetryDelayCount DelayCount { get; set; }
+        public StepRetryDelayTime DelayTime { get; set; }
+        public StepRetry()
+        {
+
+        }
+    }
+
+    public class StepRetryDelayTime
+    {
+        public List<TimeSpan> Delays { get; set; }
+
+        public StepRetryDelayTime()
+        {
+            Delays = new List<TimeSpan>();
+        }
+    }
+
+    public class StepRetryDelayCount
+    {
+        public int Count { get; set; }
     }
 }

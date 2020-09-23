@@ -114,6 +114,7 @@ namespace TheSaga.Tests.SagaTests.SyncAndValid
             IServiceCollection services = new ServiceCollection();
             services.AddSaga(cfg =>
             {
+                cfg.UseFilePersistance();
 #if SQL_SERVER
                 cfg.UseSqlServer(new SqlServerOptions()
                 {

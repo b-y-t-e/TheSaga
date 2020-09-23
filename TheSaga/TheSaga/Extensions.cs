@@ -16,6 +16,7 @@ using TheSaga.MessageBus.Interfaces;
 using TheSaga.ModelsSaga.Interfaces;
 using TheSaga.Observables.Registrator;
 using TheSaga.Persistance;
+using TheSaga.Persistance.InFile;
 using TheSaga.Persistance.InMemory;
 using TheSaga.Providers;
 using TheSaga.Providers.Interfaces;
@@ -93,6 +94,10 @@ namespace TheSaga
             await coordinator.ResumeAll();
 
             return provider;
+        }
+        public static void UseFilePersistance(this ITheSagaConfig config)
+        {
+            config.Services.AddTransient<ISagaPersistance, InFileSagaPersistance>();
         }
     }
 }

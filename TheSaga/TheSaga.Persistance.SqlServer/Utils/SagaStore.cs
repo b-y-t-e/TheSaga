@@ -40,6 +40,10 @@ namespace TheSaga.Persistance.SqlServer.Utils
 
         string compensatingColumn = "iscompensating";
 
+        string isresumingColumn = "isresuming";
+
+        string isdeletedColumn = "isdeleted";
+
         JsonSerializerSettings _serializerSettings;
 
         public SagaStore(ISqlServerConnection con, IDateTimeProvider dateTimeProvider, SqlServerOptions sqlServerOptions)

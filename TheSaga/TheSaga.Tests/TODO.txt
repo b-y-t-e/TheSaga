@@ -9,6 +9,7 @@
  + krok OnFinish
  + local transaction - one scope
  + TheHandlers -> powiazanie eventów i ich obsługi w systemie
+ + 
 
  + mozliwosc wysolania eventow i odbierania eventow
  + metoda: Publish(IEvent @event)
