@@ -30,7 +30,6 @@ namespace TheSaga.Tests.SagaTests.WhileSaga
                         While(c => c.Data.Counter > 0, b => b.
                             Then(c => c.Data.Value += 10).
                             Then(c => c.Data.Counter--)).
-                        TransitionTo<SecondState>().
 
                 During<Init>().
                     When<Test2Event>().
@@ -39,7 +38,18 @@ namespace TheSaga.Tests.SagaTests.WhileSaga
                             Then(c => c.Data.Value += 10).
                             Then(c => c.Data.Counter--)).
                         Then(c => c.Data.SecondValue = 1).
-                        Then(c => throw new System.Exception("!!!"));
+                        Then(c => throw new System.Exception("!!!")).
+
+                During<Init>().
+                    When<Test3Event>().
+                        Then(c => c.Data.Counter = 10).
+                        Then(c => c.Data.Counter2 = 5).
+                        While(c => c.Data.Counter > 0, b => b.
+                            Then(c => c.Data.Value += 1).
+                            Then(c => c.Data.Counter--)).
+                        While(c => c.Data.Counter2 > 0, b => b.
+                            Then(c => c.Data.Value += 1).
+                            Then(c => c.Data.Counter2--));
 
             return builder.
                 Build();

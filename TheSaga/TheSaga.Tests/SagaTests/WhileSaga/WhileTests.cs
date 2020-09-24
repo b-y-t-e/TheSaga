@@ -37,8 +37,7 @@ namespace TheSaga.Tests.SagaTests.WhileSaga
             persistedSaga.ExecutionState.History.Count.ShouldBe(
                 1 + // event handler
                 3 * 10 + // while + steps
-                1 + // last while check
-                1); // transition to
+                1); // last while check
         }
 
         [Fact]
@@ -69,6 +68,22 @@ namespace TheSaga.Tests.SagaTests.WhileSaga
             
             persistedSaga.ExecutionState.History.
                 Where(s => s.ResumeData != null).Count().ShouldBe(0);
+        }
+
+        [Fact]
+        public async Task WHEN_twoWhiles_THEN_shouldRunProperly()
+        {
+            // given
+            ISaga saga = await sagaCoordinator.Publish(new CreateWhileSagaEvent());
+
+            // when
+            await sagaCoordinator.Publish(
+                new Test3Event() { ID = saga.Data.ID });
+
+            // then
+            ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
+            WhileSagaData data = persistedSaga.Data as WhileSagaData;
+            data.Value.ShouldBe(15);
         }
 
         #region Arrange
