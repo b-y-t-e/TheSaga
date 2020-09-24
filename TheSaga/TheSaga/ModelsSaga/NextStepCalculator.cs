@@ -19,17 +19,17 @@ namespace TheSaga.ModelsSaga.Actions
             ISagaStep step,
             SagaExecutionState sagaState)
         {
-            ISagaStep nextStepForWhile = getNextStepForWhile(sagaAction, step, sagaState);
+            NextStepInfo nextStepForWhile = getNextStepForWhile(sagaAction, step, sagaState);
             if (nextStepForWhile != null)
-                return nextStepForWhile;
+                return nextStepForWhile.NextStep;
 
-            ISagaStep nextStepForIf = getNextStepForIf(sagaAction, step, sagaState);
+            NextStepInfo nextStepForIf = getNextStepForIf(sagaAction, step, sagaState);
             if (nextStepForIf != null)
-                return nextStepForIf;
+                return nextStepForIf.NextStep;
 
-            ISagaStep nextChildStep = getChildNextStep(step);
+            NextStepInfo nextChildStep = getChildNextStep(step);
             if (nextChildStep != null)
-                return nextChildStep;
+                return nextChildStep.NextStep;
 
             return getNextStep(sagaAction, step, sagaState);
         }
@@ -55,11 +55,11 @@ namespace TheSaga.ModelsSaga.Actions
 
             return nextStep;
         }
-        static ISagaStep getChildNextStep(
+        static NextStepInfo getChildNextStep(
             ISagaStep step)
         {
             if (step.ChildSteps.Any())
-                return step.ChildSteps.GetFirstStep();
+                return new NextStepInfo { NextStep = step.ChildSteps.GetFirstStep() };
             return null;
         }
         static ISagaStep getNextStepForWhile(
@@ -74,7 +74,7 @@ namespace TheSaga.ModelsSaga.Actions
                 return step.ParentStep;
             return null;
         }
-        static ISagaStep getNextStepForIf(
+        static NextStepInfo getNextStepForIf(
             ISagaAction sagaAction,
             ISagaStep step,
             SagaExecutionState sagaState)
@@ -86,16 +86,16 @@ namespace TheSaga.ModelsSaga.Actions
 
                 if (currentStepData?.ExecutionData?.ConditionResult == true)
                 {
-                    return step.ChildSteps.GetFirstStep();
+                    return new NextStepInfo { NextStep = step.ChildSteps.GetFirstStep() };
                 }
                 else
                 {
-                    return GetNextStepElsewhere(sagaAction.ChildSteps, step);
+                    return new NextStepInfo { NextStep = GetNextStepElsewhere(sagaAction.ChildSteps, step) };
                 }
             }
             return null;
         }
-        static ISagaStep getNextStepForWhile(
+        static NextStepInfo getNextStepForWhile(
             ISagaAction sagaAction,
             ISagaStep step,
             SagaExecutionState sagaState)
@@ -107,11 +107,11 @@ namespace TheSaga.ModelsSaga.Actions
 
                 if (currentStepData?.ExecutionData?.ConditionResult == true)
                 {
-                    return step.ChildSteps.GetFirstStep();
+                    return new NextStepInfo { NextStep = step.ChildSteps.GetFirstStep() };
                 }
                 else
                 {
-                    return GetNextStepElsewhere(sagaAction.ChildSteps, step);
+                    return new NextStepInfo { NextStep = GetNextStepElsewhere(sagaAction.ChildSteps, step) };
                 }
             }
             return null;
@@ -263,5 +263,9 @@ namespace TheSaga.ModelsSaga.Actions
                 return GetPrevStepSameLevel(SagaSteps, stepToFind.ParentStep.ParentStep, stepToFind.ParentStep);
             }
         }
+    }
+    internal class NextStepInfo
+    {
+        public ISagaStep NextStep;
     }
 }

@@ -36,6 +36,22 @@ namespace TheSaga.Tests.SagaTests.IfElseSaga
         }
 
         [Fact]
+        public async Task WHEN_conditionIsNotMet_THEN_shouldAvoidIf0()
+        {
+            // given
+            ISaga saga = await sagaCoordinator.Publish(new CreateIfElseSagaEvent());
+
+            // when
+            await sagaCoordinator.Publish(new Test1Event() { ID = saga.Data.ID, Condition = 0 });
+
+            // then
+            ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
+            IfElseSagaData data = persistedSaga.Data as IfElseSagaData;
+            data.Condition.ShouldBe(0);
+            data.Value1.ShouldNotBeOfType<TrueValue>();
+        }
+
+        [Fact]
         public async Task WHEN_conditionIsNotMet_THEN_shouldAvoidIf()
         {
             // given

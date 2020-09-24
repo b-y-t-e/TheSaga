@@ -1,5 +1,7 @@
 ﻿TODO:
  
+ + Nadawanie id wpisom w historii 
+ + 
  + TheSaga.WebApi.Convey
  + resume - usuwanie sagi z bazy - coś nie tak?
  + testy kompensacji if / else
@@ -9,7 +11,8 @@
  + krok OnFinish
  + local transaction - one scope
  + TheHandlers -> powiazanie eventów i ich obsługi w systemie
- + 
+ + https://stackoverflow.com/questions/60726123/invalidcastexception-deserializing-a-sqlexception-with-newtonsoft-json
+ + Dodać name do iactivity i do ifow ?
 
  + mozliwosc wysolania eventow i odbierania eventow
  + metoda: Publish(IEvent @event)
