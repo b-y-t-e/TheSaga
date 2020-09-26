@@ -151,11 +151,11 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
 #if SQL_SERVER
                 cfg.UseSqlServer(new SqlServerOptions()
                 {
-                    ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
+                    ConnectionString = "data source=.;initial catalog=sagatest;uid=dba;pwd=sql;"
                 });
                 cfg.UseDistributedLock(new SqlServerLockingOptions()
                 {
-                    ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
+                    ConnectionString = "data source=.;initial catalog=sagatest;uid=dba;pwd=sql;"
                 });
 #endif
             });

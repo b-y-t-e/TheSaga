@@ -15,7 +15,7 @@ using TheSaga.Persistance.SqlServer;
 using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Locking.DistributedLock;
 using TheSaga.Locking.DistributedLock.Options;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 
 namespace TheSaga.Tests.SagaTests.SyncAndValid
 {
@@ -119,11 +119,11 @@ namespace TheSaga.Tests.SagaTests.SyncAndValid
 #if SQL_SERVER
                 cfg.UseSqlServer(new SqlServerOptions()
                 {
-                    ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
+                    ConnectionString = "data source=.;initial catalog=sagatest;uid=dba;pwd=sql;"
                 });
                 cfg.UseDistributedLock(new SqlServerLockingOptions()
                 {
-                    ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
+                    ConnectionString = "data source=.;initial catalog=sagatest;uid=dba;pwd=sql;"
                 });
 #endif
             });

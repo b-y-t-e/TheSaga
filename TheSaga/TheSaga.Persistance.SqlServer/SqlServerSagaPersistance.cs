@@ -33,9 +33,9 @@ namespace TheSaga.Persistance.SqlServer
 
         public async Task<ISaga> Get(Guid id)
         {
-            ISaga saga = await weakInMemorySagaPersistance.Get(id);
+            /*ISaga saga = await weakInMemorySagaPersistance.Get(id);
             if (saga != null)
-                return saga;
+                return saga;*/
 
             using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
                 return await sagaStore.Get(id);

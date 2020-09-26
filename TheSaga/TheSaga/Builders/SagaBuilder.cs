@@ -6,11 +6,12 @@ using TheSaga.Conditions;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Models;
+
 using TheSaga.Models.Interfaces;
 using TheSaga.ModelsSaga;
 using TheSaga.ModelsSaga.Actions;
 using TheSaga.ModelsSaga.Actions.Interfaces;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.ModelsSaga.Interfaces;
 using TheSaga.ModelsSaga.Steps;
 using TheSaga.ModelsSaga.Steps.Delegates;

@@ -7,7 +7,7 @@ using TheSaga.ModelsSaga.Interfaces;
 using TheSaga.ModelsSaga.Steps.Interfaces;
 using TheSaga.ValueObjects;
 
-namespace TheSaga.ModelsSaga.History
+namespace TheSaga.Models.History
 {
     public class SagaHistory : List<StepData>
     {

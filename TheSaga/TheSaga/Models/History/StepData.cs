@@ -5,13 +5,14 @@ using TheSaga.Models;
 using TheSaga.Providers.Interfaces;
 using TheSaga.Utils;
 
-namespace TheSaga.ModelsSaga.History
+namespace TheSaga.Models.History
 {
     public class StepData : IStepData
     {
+        public Guid ID { get; set; }
         public Guid ExecutionID { get; set; }
-        public string StepName { get; set; }
         public string StateName { get; set; }
+        public string StepName { get; set; }
         public string EndStateName { get; set; }
         public string NextStepName { get; set; }
         public bool AsyncExecution { get; set; }
@@ -21,8 +22,13 @@ namespace TheSaga.ModelsSaga.History
         public StepExecutionData ExecutionData { get; set; }
         public StepExecutionData CompensationData { get; set; }
         public StepExecutionData ResumeData { get; set; }
+
         //public StepRetry Retry { get; set; }
 
+        public StepData()
+        {
+            ID = Guid.NewGuid();
+        }
     }
 
     public static class StepDataExtensions

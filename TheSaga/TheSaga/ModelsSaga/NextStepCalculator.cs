@@ -5,7 +5,7 @@ using TheSaga.Exceptions;
 using TheSaga.Models;
 using TheSaga.Models.Interfaces;
 using TheSaga.ModelsSaga.Actions.Interfaces;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.ModelsSaga.Steps;
 using TheSaga.ModelsSaga.Steps.Interfaces;
 using TheSaga.Utils;
