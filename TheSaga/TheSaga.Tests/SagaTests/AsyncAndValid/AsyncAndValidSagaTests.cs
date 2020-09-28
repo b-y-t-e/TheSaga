@@ -8,7 +8,7 @@ using TheSaga.Locking.DistributedLock;
 using TheSaga.Locking.DistributedLock.Options;
 using TheSaga.Models;
 using TheSaga.Models.Interfaces;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.Persistance;
 using TheSaga.Persistance.SqlServer;
 using TheSaga.Persistance.SqlServer.Options;
@@ -81,11 +81,11 @@ namespace TheSaga.Tests.SagaTests.AsyncAndValid
 #if SQL_SERVER
                 cfg.UseSqlServer(new SqlServerOptions()
                 {
-                    ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
+                    ConnectionString = "data source=.;initial catalog=sagatest;uid=dba;pwd=sql;"
                 });
                 cfg.UseDistributedLock(new SqlServerLockingOptions()
                 {
-                    ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
+                    ConnectionString = "data source=.;initial catalog=sagatest;uid=dba;pwd=sql;"
                 });
 #endif
             });

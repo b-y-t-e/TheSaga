@@ -1,4 +1,4 @@
-﻿namespace TheSaga.ModelsSaga.History
+﻿namespace TheSaga.Models.History
 {
     public interface IStepData
     {

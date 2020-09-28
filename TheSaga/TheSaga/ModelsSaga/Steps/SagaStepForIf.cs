@@ -5,7 +5,7 @@ using TheSaga.Conditions;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
 using TheSaga.Models.Interfaces;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.ModelsSaga.Steps.Interfaces;
 
 namespace TheSaga.ModelsSaga.Steps

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 
 namespace TheSaga.ModelsSaga.Steps.Interfaces
 {

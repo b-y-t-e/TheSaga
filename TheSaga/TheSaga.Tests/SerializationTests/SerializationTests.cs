@@ -15,7 +15,7 @@ using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Locking.DistributedLock;
 using TheSaga.Tests.SagaTests.ResumeSaga.States;
 using TheSaga.Locking.DistributedLock.Options;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using Newtonsoft.Json;
 
 namespace TheSaga.Tests.SerializationTests
@@ -35,11 +35,13 @@ namespace TheSaga.Tests.SerializationTests
                     TypeNameHandling = TypeNameHandling.All,
                     Error = (s, e) =>
                     {
-                        if (e.CurrentObject is StepExecutionData executionData &&
-                            executionData != null &&
-                            nameof(executionData.Error).Equals(e.ErrorContext.Member))
+                        if (e.CurrentObject is SagaExecutionState executionState)
                         {
-                            //executionData.Error = 
+                            if (e.ErrorContext.Member.Equals(nameof(executionState.History)))
+                            {
+                                executionState.History = new SagaHistory();
+                                e.ErrorContext.Handled = true;
+                            }
                         }
                     }
                 });

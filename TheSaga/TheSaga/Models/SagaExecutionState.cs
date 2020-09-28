@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using TheSaga.Events;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.ValueObjects;
 
 namespace TheSaga.Models

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TheSaga.ModelsSaga.History
+namespace TheSaga.Models.History
 {
     public class StepExecutionData
     {
