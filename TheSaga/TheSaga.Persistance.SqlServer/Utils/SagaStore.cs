@@ -26,6 +26,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
         public Boolean IsCompensating { get; set; }
         public Boolean IsResuming { get; set; }
         public Boolean IsDeleted { get; set; }
+        public Boolean IsBreaked { get; set; }
         public String DataJson { get; set; }
         public String InfoJson { get; set; }
         public String StateJson { get; set; }
@@ -97,6 +98,9 @@ if not exists(select 1 from information_schema.columns where table_name = '{_sql
 
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'IsDeleted')
     alter table {_sqlServerOptions.TableName} add IsDeleted bit not null;
+
+if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'IsBreaked')
+    alter table {_sqlServerOptions.TableName} add IsBreaked bit not null;
 
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'DataJson')
     alter table {_sqlServerOptions.TableName} add DataJson nvarchar(max);
@@ -234,6 +238,7 @@ if not exists(select 1 from information_schema.columns where table_name = '{_sql
             sagaDb.IsCompensating = saga.ExecutionState.IsCompensating;
             sagaDb.IsDeleted = saga.ExecutionState.IsDeleted;
             sagaDb.IsResuming = saga.ExecutionState.IsResuming;
+            sagaDb.IsBreaked = saga.ExecutionState.IsBreaked;
             sagaDb.ModelName = saga.ExecutionInfo.ModelName;
             sagaDb.State = saga.ExecutionState.CurrentState;
             sagaDb.Step = saga.ExecutionState.CurrentStep;
