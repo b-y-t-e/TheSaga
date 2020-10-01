@@ -91,16 +91,16 @@ if not exists(select 1 from information_schema.columns where table_name = '{_sql
     alter table {_sqlServerOptions.TableName} add Step nvarchar(4000);
 
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'IsCompensating')
-    alter table {_sqlServerOptions.TableName} add IsCompensating bit not null;
+    alter table {_sqlServerOptions.TableName} add IsCompensating bit not null default(0);
 
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'IsResuming')
-    alter table {_sqlServerOptions.TableName} add IsResuming bit not null;
+    alter table {_sqlServerOptions.TableName} add IsResuming bit not null default(0);
 
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'IsDeleted')
-    alter table {_sqlServerOptions.TableName} add IsDeleted bit not null;
+    alter table {_sqlServerOptions.TableName} add IsDeleted bit not null default(0);
 
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'IsBreaked')
-    alter table {_sqlServerOptions.TableName} add IsBreaked bit not null;
+    alter table {_sqlServerOptions.TableName} add IsBreaked bit not null default(0);
 
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'DataJson')
     alter table {_sqlServerOptions.TableName} add DataJson nvarchar(max);
