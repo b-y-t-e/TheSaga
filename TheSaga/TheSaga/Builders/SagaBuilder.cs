@@ -430,6 +430,17 @@ namespace TheSaga.Builders
             return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
 
+        public ISagaBuilderThen<TSagaData, TEvent> Break()
+        {
+            builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
+                new SagaStepForBreak<TSagaData>(
+                    builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Break)),
+                    false,
+                    builderState.ParentStep));
+
+            return new SagaBuilder<TSagaData, TEvent>(builderState);
+        }
+
         public ISagaBuilderThen<TSagaData, TEvent> Publish<TEventToSend>(
             SendActionAsyncDelegate<TSagaData, TEventToSend> action)
             where TEventToSend : ISagaEvent, new()

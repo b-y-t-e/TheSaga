@@ -121,5 +121,11 @@ namespace TheSaga.Builders
             where TSagaActivity : ISagaActivity<TSagaData>;
 
         ISagaBuilderThen<TSagaData, TEvent> TransitionTo<TState>() where TState : ISagaState;
+
+        ISagaBuilderThen<TSagaData, TEvent> Break();
+
+        /*ISagaBuilderThen<TSagaData, TEvent> Retry<TException>(int count)
+            where TException : Exception;
+        */
     }
 }

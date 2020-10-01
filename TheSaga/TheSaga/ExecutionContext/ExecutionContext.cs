@@ -27,7 +27,7 @@ namespace TheSaga.ExecutionContext
 
         public IStepExecutionValues StepExecutionValues { get; set; }
 
-        Task IExecutionContext<TSagaData>.Stop()
+        Task IExecutionContext.Stop()
         {
             throw new SagaStopException();
         }
