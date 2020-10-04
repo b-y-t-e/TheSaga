@@ -16,5 +16,6 @@ namespace TheSaga.Models
         SagaHistory History { get; }
         bool IsCompensating { get; }
         bool IsResuming { get; }
+        bool IsBreaked { get; }
     }
 }

@@ -50,9 +50,7 @@ namespace TheSaga.Commands.Handlers
             ISagaModel model = command.Model;
 
             StepData stepData = GetOrCreateStepData(saga, step, model);
-
             await sagaPersistance.Set(saga);
-
 
             Exception executionError = null;
             try
@@ -121,12 +119,15 @@ namespace TheSaga.Commands.Handlers
         }
 
         private string CalculateNextStepName(
-            ISaga saga, 
-            ISagaStep sagaStep, 
-            ISagaAction sagaAction, 
-            StepData stepData, 
+            ISaga saga,
+            ISagaStep sagaStep,
+            ISagaAction sagaAction,
+            StepData stepData,
             Exception executionError)
         {
+            if (saga.ExecutionState.IsBreaked)            
+                return null;
+            
             if (executionError != null)
             {
                 saga.ExecutionState.IsResuming = false;

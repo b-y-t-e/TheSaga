@@ -29,23 +29,20 @@ namespace TheSaga.Tests.SagaTests.IfElseSaga
                         HandleBy<Test1EventHandler>().
                     If(c => c.Data.Condition == 1, b => b.
                         Then(c => c.Data.Value1 = new TrueValue())).
-                    // TransitionTo<SecondState>().
 
                 During<Init>().
                     When<Test2Event>().
                         HandleBy<Test2EventHandler>().
                     If(c => c.Data.Condition == 1, b => b.
                         Then(c => c.Data.Value1 = new TrueValue())).
-                    TransitionTo<SecondState>().
 
                 During<Init>().
                     When<Test3Event>().
                         HandleBy<Test3EventHandler>().
                     If(c => c.Data.Condition == 1, b => b.
                         Then(c => c.Data.Value1 = new TrueValue())).
-                    Else(b=> b.
-                        Then(c => c.Data.Value1 = new FalseValue())).
-                    TransitionTo<SecondState>();
+                    Else(b => b.
+                        Then(c => c.Data.Value1 = new FalseValue()));
 
             return builder.
                 Build();

@@ -21,11 +21,13 @@ namespace TheSaga.Persistance.SqlServer.Utils
     {
         public Guid ID { get; set; }
         public String ModelName { get; set; }
+        public String Name { get; set; }
         public String State { get; set; }
         public String Step { get; set; }
         public Boolean IsCompensating { get; set; }
         public Boolean IsResuming { get; set; }
         public Boolean IsDeleted { get; set; }
+        public Boolean IsBreaked { get; set; }
         public String DataJson { get; set; }
         public String InfoJson { get; set; }
         public String StateJson { get; set; }
@@ -83,6 +85,9 @@ if not exists(select 1 from information_schema.tables where table_name = '{_sqlS
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'ModelName')
     alter table {_sqlServerOptions.TableName} add ModelName nvarchar(1000);
 
+if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'Name')
+    alter table {_sqlServerOptions.TableName} add Name nvarchar(1000);
+
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'State')
     alter table {_sqlServerOptions.TableName} add State nvarchar(1000);
 
@@ -90,13 +95,16 @@ if not exists(select 1 from information_schema.columns where table_name = '{_sql
     alter table {_sqlServerOptions.TableName} add Step nvarchar(4000);
 
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'IsCompensating')
-    alter table {_sqlServerOptions.TableName} add IsCompensating bit not null;
+    alter table {_sqlServerOptions.TableName} add IsCompensating bit not null default(0);
 
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'IsResuming')
-    alter table {_sqlServerOptions.TableName} add IsResuming bit not null;
+    alter table {_sqlServerOptions.TableName} add IsResuming bit not null default(0);
 
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'IsDeleted')
-    alter table {_sqlServerOptions.TableName} add IsDeleted bit not null;
+    alter table {_sqlServerOptions.TableName} add IsDeleted bit not null default(0);
+
+if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'IsBreaked')
+    alter table {_sqlServerOptions.TableName} add IsBreaked bit not null default(0);
 
 if not exists(select 1 from information_schema.columns where table_name = '{_sqlServerOptions.TableName}' and column_name = 'DataJson')
     alter table {_sqlServerOptions.TableName} add DataJson nvarchar(max);
@@ -234,6 +242,8 @@ if not exists(select 1 from information_schema.columns where table_name = '{_sql
             sagaDb.IsCompensating = saga.ExecutionState.IsCompensating;
             sagaDb.IsDeleted = saga.ExecutionState.IsDeleted;
             sagaDb.IsResuming = saga.ExecutionState.IsResuming;
+            sagaDb.IsBreaked = saga.ExecutionState.IsBreaked;
+            sagaDb.Name = saga.Data?.GetType().Name ?? "";
             sagaDb.ModelName = saga.ExecutionInfo.ModelName;
             sagaDb.State = saga.ExecutionState.CurrentState;
             sagaDb.Step = saga.ExecutionState.CurrentStep;
