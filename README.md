@@ -1,7 +1,6 @@
 # TheSaga
  .net core Saga / ProcessManager implementation
 
-
 ```c#
     public class OrderSagaBuilder : ISagaModelBuilder<OrderData>
     {
