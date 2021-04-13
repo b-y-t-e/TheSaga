@@ -76,7 +76,10 @@ namespace TheSaga.Commands.Handlers
             }
             else
             {
-                return await DispatchStepSync(executeStepCommand);
+                using (IServiceScope scope = serviceScopeFactory.CreateScope())
+                {
+                    return await DispatchStepSync(scope.ServiceProvider, executeStepCommand);
+                }
             }
         }
 
@@ -87,7 +90,10 @@ namespace TheSaga.Commands.Handlers
             {
                 try
                 {
-                    await DispatchStepSync(command);
+                    using (IServiceScope scope = serviceScopeFactory.CreateScope())
+                    {
+                        await DispatchStepSync(scope.ServiceProvider, command);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -97,44 +103,42 @@ namespace TheSaga.Commands.Handlers
         }
 
         private async Task<ISaga> DispatchStepSync(
+            IServiceProvider serviceProvider,
             ExecuteStepCommand command)
         {
-            using (IServiceScope scope = serviceScopeFactory.CreateScope())
+            ExecuteStepCommandHandler stepExecutor = ActivatorUtilities.
+                CreateInstance<ExecuteStepCommandHandler>(serviceProvider);
+
+            ISaga saga = await stepExecutor.
+                Handle(command);
+
+            if (saga == null)
             {
-                ExecuteStepCommandHandler stepExecutor = ActivatorUtilities.
-                    CreateInstance<ExecuteStepCommandHandler>(scope.ServiceProvider);
-
-                ISaga saga = await stepExecutor.
-                    Handle(command);
-
-                if (saga == null)
+                await messageBus.Publish(
+                    new ExecutionEndMessage(SagaID.From(command.Saga.Data.ID)));
+                
+                return null;
+            }
+            else
+            {
+                if (saga.IsIdle())
                 {
                     await messageBus.Publish(
-                        new ExecutionEndMessage(SagaID.From(command.Saga.Data.ID)));
+                        new ExecutionEndMessage(SagaID.From(saga.Data.ID)));
 
-                    return null;
+                    if (saga.HasError())
+                        throw saga.ExecutionState.CurrentError;
+
+                    return saga;
                 }
                 else
                 {
-                    if (saga.IsIdle())
+                    return await Handle(new ExecuteActionCommand()
                     {
-                        await messageBus.Publish(
-                            new ExecutionEndMessage(SagaID.From(saga.Data.ID)));
-
-                        if (saga.HasError())
-                            throw saga.ExecutionState.CurrentError;
-
-                        return saga;
-                    }
-                    else
-                    {
-                        return await Handle(new ExecuteActionCommand()
-                        {
-                            Async = AsyncExecution.False(),
-                            Saga = saga,
-                            Model = command.Model
-                        });
-                    }
+                        Async = AsyncExecution.False(),
+                        Saga = saga,
+                        Model = command.Model
+                    });
                 }
             }
         }

@@ -1,43 +1,46 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>.net core Saga / ProcessManager implementation
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Description>
+			.net core Saga / ProcessManager implementation
 
-https://github.com/b-y-t-e/TheSaga</Description>
-    <RepositoryUrl>https://github.com/b-y-t-e/TheSaga</RepositoryUrl>
-    <Version>0.8.1</Version>
-    <Authors>Andrzej Ból</Authors>
-    <Copyright>Andrzej Ból</Copyright>
-    <PackageProjectUrl>https://github.com/b-y-t-e/TheSaga</PackageProjectUrl>
-  </PropertyGroup>
+			https://github.com/b-y-t-e/TheSaga
+		</Description>
+		<Version>1.0.156</Version>
+		<Authors>else s.j. / Andrzej Ból</Authors>
+		<Copyright>else s.j. / Andrzej Ból</Copyright>
+		<PackageId>Else.TheSaga</PackageId>
+		<RepositoryUrl>https://github.com/elsesj/Else.WebApi.Libraries</RepositoryUrl>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;SQL_SERVER</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DefineConstants>TRACE;SQL_SERVER</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Execution\Actions\**" />
-    <EmbeddedResource Remove="Execution\Actions\**" />
-    <None Remove="Execution\Actions\**" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Execution\Actions\**" />
+		<EmbeddedResource Remove="Execution\Actions\**" />
+		<None Remove="Execution\Actions\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Commands\Handlers\ExecuteActionResult.cs" />
-    <Compile Remove="Execution\ISagaExecutor.cs" />
-    <Compile Remove="Execution\SagaExecutor.cs" />
-    <Compile Remove="ISagaRunningState.cs" />
-    <Compile Remove="SagaExtensions.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Commands\Handlers\ExecuteActionResult.cs" />
+		<Compile Remove="Execution\ISagaExecutor.cs" />
+		<Compile Remove="Execution\SagaExecutor.cs" />
+		<Compile Remove="ISagaRunningState.cs" />
+		<Compile Remove="SagaExtensions.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.7" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.3" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.3" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Scrutor" Version="3.0.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.7" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.3" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.3" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.3" />
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+		<PackageReference Include="Scrutor" Version="3.2.2" />
+	</ItemGroup>
 
 </Project>

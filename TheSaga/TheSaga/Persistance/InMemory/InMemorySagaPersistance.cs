@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using TheSaga.MessageBus.Interfaces;
+using TheSaga.Messages;
 using TheSaga.Models;
 using TheSaga.Models.Interfaces;
 
@@ -10,17 +12,21 @@ namespace TheSaga.Persistance.InMemory
 {
     public class InMemorySagaPersistance : ISagaPersistance
     {
+        private readonly IMessageBus messageBus;
         private Dictionary<Guid, ISaga> objectInstances;
         private Dictionary<Guid, string> serializedInstances;
 
-        public InMemorySagaPersistance()
+        public InMemorySagaPersistance(IMessageBus messageBus)
         {
             serializedInstances = new Dictionary<Guid, string>();
             objectInstances = new Dictionary<Guid, ISaga>();
+            this.messageBus = messageBus;
         }
 
         public async Task<ISaga> Get(Guid id)
         {
+            ISaga saga = null;
+
             lock (serializedInstances)
             {
                 string json = null;
@@ -28,9 +34,14 @@ namespace TheSaga.Persistance.InMemory
                 if (json == null)
                     return null;
 
-                return (ISaga)JsonConvert.DeserializeObject(json,
+                saga = (ISaga)JsonConvert.DeserializeObject(json,
                     new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
             }
+
+            await messageBus.
+                Publish(new SagaAfterRetrivedMessage(saga));
+
+            return saga;
         }
 
         public async Task<IList<Guid>> GetUnfinished()
@@ -57,8 +68,12 @@ namespace TheSaga.Persistance.InMemory
             {
                 serializedInstances[saga.Data.ID] = JsonConvert.SerializeObject(saga,
                 new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+
                 objectInstances[saga.Data.ID] = saga;
             }
+
+            await messageBus.
+                Publish(new SagaBeforeStoredMessage(saga));
         }
     }
 }

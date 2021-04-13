@@ -12,7 +12,7 @@ using TheSaga.Models;
 using TheSaga.Models.Interfaces;
 using TheSaga.ModelsSaga.Actions;
 using TheSaga.ModelsSaga.Actions.Interfaces;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.ModelsSaga.Interfaces;
 using TheSaga.ModelsSaga.Steps.Interfaces;
 using TheSaga.Persistance;
@@ -21,6 +21,7 @@ using TheSaga.Providers.Interfaces;
 using TheSaga.States;
 using TheSaga.Utils;
 using TheSaga.ValueObjects;
+using System.Collections.Generic;
 
 namespace TheSaga.Commands.Handlers
 {
@@ -51,13 +52,16 @@ namespace TheSaga.Commands.Handlers
 
             StepData stepData = GetOrCreateStepData(saga, step, model);
 
-            await sagaPersistance.Set(saga);
-
+            MiddlewaresChain middlewaresChain = Middlewares.BuildChain(
+                serviceProvider,
+                SaveSaga, ExecuteStep);
 
             Exception executionError = null;
             try
             {
-                await ExecuteStep(saga, step, stepData);
+                await Middlewares.ExecuteChain(
+                    middlewaresChain,
+                    saga, step, stepData);
 
                 stepData.
                     SetSucceeded(saga.ExecutionState, dateTimeProvider);
@@ -78,6 +82,9 @@ namespace TheSaga.Commands.Handlers
             }
             finally
             {
+                middlewaresChain.
+                    Clean();
+
                 stepData.
                     SetEnded(saga.ExecutionState, dateTimeProvider);
             }
@@ -120,23 +127,34 @@ namespace TheSaga.Commands.Handlers
             saga.ExecutionInfo.Modified = dateTimeProvider.Now;
         }
 
-        private string CalculateNextStepName(ISaga saga, ISagaStep sagaStep, ISagaAction sagaAction, StepData stepData, Exception executionError)
+        private string CalculateNextStepName(
+            ISaga saga,
+            ISagaStep sagaStep,
+            ISagaAction sagaAction,
+            StepData stepData,
+            Exception executionError)
         {
-            string nextStepName = null;
+            if (saga.ExecutionState.IsBreaked)
+                return null;
+
             if (executionError != null)
             {
                 saga.ExecutionState.IsResuming = false;
                 saga.ExecutionState.IsCompensating = true;
                 saga.ExecutionState.CurrentError = executionError.ToSagaStepException();
-                nextStepName = CalculateNextCompensationStep(saga);
+                return CalculateNextCompensationStep(saga);
             }
             else
             {
-                nextStepName = CalculateNextStep(saga, sagaAction, sagaStep, stepData);
+                string nextStepName = CalculateNextStep(saga, sagaAction, sagaStep, stepData);
                 saga.ExecutionState.IsResuming = false;
+                return nextStepName;
             }
+        }
 
-            return nextStepName;
+        private async Task SaveSaga(ISaga saga, ISagaStep sagaStep, StepData stepData)
+        {
+            await sagaPersistance.Set(saga);
         }
 
         private async Task ExecuteStep(ISaga saga, ISagaStep sagaStep, StepData stepData)
@@ -181,9 +199,9 @@ namespace TheSaga.Commands.Handlers
         {
             if (saga.ExecutionState.IsResuming)
                 return sagaStep.StepName;
-            
-            if (saga.ExecutionState.IsCompensating)            
-                return CalculateNextCompensationStep(saga);            
+
+            if (saga.ExecutionState.IsCompensating)
+                return CalculateNextCompensationStep(saga);
 
             return sagaAction.
                 GetNextStepToExecute(sagaStep, saga.ExecutionState)?.StepName;

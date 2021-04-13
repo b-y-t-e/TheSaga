@@ -8,7 +8,10 @@ namespace TheSaga.ExecutionContext
         where TSagaData : ISagaData
     {
         TSagaData Data { get; }
+    }
 
+    public interface IExecutionContext
+    {
         ISagaExecutionInfo ExecutionInfo { get; }
 
         ISagaExecutionState ExecutionState { get; }
@@ -18,9 +21,5 @@ namespace TheSaga.ExecutionContext
         IStepExecutionValues StepExecutionValues { get; }
 
         internal Task Stop();
-    }
-
-    public interface IExecutionContext
-    {
     }
 }

@@ -7,7 +7,7 @@ using TheSaga.ModelsSaga.Interfaces;
 using TheSaga.ModelsSaga.Steps.Interfaces;
 using TheSaga.ValueObjects;
 
-namespace TheSaga.ModelsSaga.History
+namespace TheSaga.Models.History
 {
     public class SagaHistory : List<StepData>
     {
@@ -103,8 +103,7 @@ namespace TheSaga.ModelsSaga.History
             {
                 stepData.ResumeData = new StepExecutionData
                 {
-                    EndStateName = saga.ExecutionState.CurrentState,
-                    StepType = step.GetType()
+
                 };
             }
             else if (saga.ExecutionState.IsCompensating)
@@ -116,7 +115,7 @@ namespace TheSaga.ModelsSaga.History
 
                 stepData.CompensationData = new StepExecutionData()
                 {
-                    StepType = step.GetType()
+
                 };
             }
             else
@@ -140,8 +139,6 @@ namespace TheSaga.ModelsSaga.History
 
                 stepData.ExecutionData = new StepExecutionData
                 {
-                    EndStateName = saga.ExecutionState.CurrentState,
-                    StepType = step.GetType()
                 };
             }
 

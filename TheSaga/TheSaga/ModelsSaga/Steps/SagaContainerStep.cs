@@ -2,15 +2,17 @@
 using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.ModelsSaga.Steps.Interfaces;
 
 namespace TheSaga.ModelsSaga.Steps
 {
     internal class SagaContainerStep : ISagaStep
     {
-        public ISagaStep ParentStep { get; }
         public SagaSteps ChildSteps { get; private set; }
+        public ISagaStep ParentStep { get; set; }
+        public bool Async { get; set; }
+        public string StepName { get; set; }
 
         public SagaContainerStep(
             string StepName, ISagaStep parentStep)
@@ -20,9 +22,6 @@ namespace TheSaga.ModelsSaga.Steps
             ChildSteps = new SagaSteps();
             ParentStep = parentStep;
         }
-
-        public bool Async { get; }
-        public string StepName { get; }
 
         public void SetChildSteps(SagaSteps steps)
         {

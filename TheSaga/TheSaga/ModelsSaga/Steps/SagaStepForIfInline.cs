@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
 using TheSaga.Models.Interfaces;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.ModelsSaga.Steps.Delegates;
 using TheSaga.ModelsSaga.Steps.Interfaces;
 
@@ -12,8 +12,10 @@ namespace TheSaga.ModelsSaga.Steps
     internal class SagaStepForIfInline<TSagaData> : ISagaStep, ISagaStepForIf
         where TSagaData : ISagaData
     {
-        public ISagaStep ParentStep { get; }
         public SagaSteps ChildSteps { get; private set; }
+        public ISagaStep ParentStep { get; set; }
+        public bool Async { get; set; }
+        public string StepName { get; set; }
 
         public SagaStepForIfInline(
             string StepName,
@@ -29,8 +31,6 @@ namespace TheSaga.ModelsSaga.Steps
             this.ParentStep = parentStep;
         }
 
-        public bool Async { get; }
-        public string StepName { get; }
         private IfFuncAsyncDelegate<TSagaData> action { get; }
         private ThenAsyncActionDelegate<TSagaData> compensation { get; }
 

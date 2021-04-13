@@ -68,7 +68,7 @@ namespace TheSaga.Coordinators
             foreach (Guid id in ids)
             {
                 ISaga saga = await sagaPersistance.Get(id);
-
+              
                 ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
 
                 logger.
@@ -87,7 +87,7 @@ namespace TheSaga.Coordinators
         {
             List<string> invalidModels = new List<string>();
 
-            ISaga saga = await sagaPersistance.Get(id);
+            ISaga saga = await sagaPersistance.Get(id);            
             ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
 
             if (model == null)
@@ -165,7 +165,7 @@ namespace TheSaga.Coordinators
                 });
 
                 ISaga saga = await sagaPersistance.Get(id);
-
+                
                 if (saga == null)
                     throw new SagaInstanceNotFoundException(id);
 
@@ -207,7 +207,9 @@ namespace TheSaga.Coordinators
                 sagaStarted = true;
 
                 if (saga == null)
+                {
                     saga = await sagaPersistance.Get(sagaID);
+                }
 
                 if (saga == null)
                     throw new SagaInstanceNotFoundException();

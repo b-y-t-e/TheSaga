@@ -6,11 +6,12 @@ using TheSaga.Conditions;
 using TheSaga.Events;
 using TheSaga.Exceptions;
 using TheSaga.Models;
+
 using TheSaga.Models.Interfaces;
 using TheSaga.ModelsSaga;
 using TheSaga.ModelsSaga.Actions;
 using TheSaga.ModelsSaga.Actions.Interfaces;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.ModelsSaga.Interfaces;
 using TheSaga.ModelsSaga.Steps;
 using TheSaga.ModelsSaga.Steps.Delegates;
@@ -367,13 +368,18 @@ namespace TheSaga.Builders
             where TEventToSend : ISagaEvent, new()
             where TCompensateEvent : ISagaEvent, new()
         {
+            ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent> publishActivity = (ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent>)builderState.ServiceProvider.
+                GetService(typeof(ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent>));
+
+            if (publishActivity == null)            
+                publishActivity = new SagaStepForPublishActivity<TSagaData, TEventToSend, TCompensateEvent>();
+
+            publishActivity.StepName = builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name);
+            publishActivity.Async = false;
+            publishActivity.ParentStep = builderState.ParentStep;
+
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
-                new SagaStepForSendActivity<TSagaData, TEventToSend, TCompensateEvent>(
-                    null,
-                    null,
-                    builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name),
-                    false,
-                    builderState.ParentStep));
+                publishActivity);
 
             return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
@@ -384,13 +390,20 @@ namespace TheSaga.Builders
             where TEventToSend : ISagaEvent, new()
             where TCompensateEvent : ISagaEvent, new()
         {
+            ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent> publishActivity = (ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent>)builderState.ServiceProvider.
+                GetService(typeof(ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent>));
+
+            if (publishActivity == null)            
+                publishActivity = new SagaStepForPublishActivity<TSagaData, TEventToSend, TCompensateEvent>();
+
+            publishActivity.ActionDelegate = action;
+            publishActivity.CompensateDelegate = compensation;
+            publishActivity.StepName = builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name);
+            publishActivity.Async = false;
+            publishActivity.ParentStep = builderState.ParentStep;
+
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
-                new SagaStepForSendActivity<TSagaData, TEventToSend, TCompensateEvent>(
-                    action,
-                    compensation,
-                    builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name),
-                    false,
-                    builderState.ParentStep));
+                publishActivity);
 
             return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
@@ -403,14 +416,21 @@ namespace TheSaga.Builders
         {
             SendActionDelegate<TSagaData, TEventToSend> a = action;
             SendActionDelegate<TSagaData, TCompensateEvent> c = compensation;
+            
+            ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent> publishActivity = (ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent>)builderState.ServiceProvider.
+                GetService(typeof(ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent>));
+
+            if (publishActivity == null)
+                publishActivity = new SagaStepForPublishActivity<TSagaData, TEventToSend, TCompensateEvent>();
+
+            publishActivity.ActionDelegate = (ctx, ev) => { a?.Invoke(ctx, ev); return Task.CompletedTask; };
+            publishActivity.CompensateDelegate = (ctx, ev) => { c?.Invoke(ctx, ev); return Task.CompletedTask; };
+            publishActivity.StepName = builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name);
+            publishActivity.Async = false;
+            publishActivity.ParentStep = builderState.ParentStep;
 
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
-                new SagaStepForSendActivity<TSagaData, TEventToSend, TCompensateEvent>(
-                    (ctx, ev) => { a?.Invoke(ctx, ev); return Task.CompletedTask; },
-                    (ctx, ev) => { c?.Invoke(ctx, ev); return Task.CompletedTask; },
-                    builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name),
-                    false,
-                    builderState.ParentStep));
+                publishActivity);
 
             return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
@@ -418,11 +438,29 @@ namespace TheSaga.Builders
         public ISagaBuilderThen<TSagaData, TEvent> Publish<TEventToSend>()
             where TEventToSend : ISagaEvent, new()
         {
+            ISagaPublishActivity<TSagaData, TEventToSend, EmptyEvent> publishActivity = (ISagaPublishActivity<TSagaData, TEventToSend, EmptyEvent>)builderState.ServiceProvider.
+                GetService(typeof(ISagaPublishActivity<TSagaData, TEventToSend, EmptyEvent>));
+
+            if (publishActivity == null)
+                publishActivity = new SagaStepForPublishActivity<TSagaData, TEventToSend, EmptyEvent>();
+
+            publishActivity.ActionDelegate = null;
+            publishActivity.CompensateDelegate = null;
+            publishActivity.StepName = builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name);
+            publishActivity.Async = false;
+            publishActivity.ParentStep = builderState.ParentStep;
+
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
-                new SagaStepForSendActivity<TSagaData, TEventToSend, EmptyEvent>(
-                    null,
-                    null,
-                    builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name),
+                publishActivity);
+
+            return new SagaBuilder<TSagaData, TEvent>(builderState);
+        }
+
+        public ISagaBuilderThen<TSagaData, TEvent> Break()
+        {
+            builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
+                new SagaStepForBreak<TSagaData>(
+                    builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Break)),
                     false,
                     builderState.ParentStep));
 
@@ -433,13 +471,20 @@ namespace TheSaga.Builders
             SendActionAsyncDelegate<TSagaData, TEventToSend> action)
             where TEventToSend : ISagaEvent, new()
         {
+            ISagaPublishActivity<TSagaData, TEventToSend, EmptyEvent> publishActivity = (ISagaPublishActivity<TSagaData, TEventToSend, EmptyEvent>)builderState.ServiceProvider.
+                GetService(typeof(ISagaPublishActivity<TSagaData, TEventToSend, EmptyEvent>));
+
+            if (publishActivity == null)
+                publishActivity = new SagaStepForPublishActivity<TSagaData, TEventToSend, EmptyEvent>();
+
+            publishActivity.ActionDelegate = action;
+            publishActivity.CompensateDelegate = null;
+            publishActivity.StepName = builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name);
+            publishActivity.Async = false;
+            publishActivity.ParentStep = builderState.ParentStep;
+
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
-                new SagaStepForSendActivity<TSagaData, TEventToSend, EmptyEvent>(
-                    action,
-                    null,
-                    builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name),
-                    false,
-                    builderState.ParentStep));
+                publishActivity);
 
             return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
@@ -450,13 +495,20 @@ namespace TheSaga.Builders
         {
             SendActionDelegate<TSagaData, TEventToSend> a = action;
 
+            ISagaPublishActivity<TSagaData, TEventToSend, EmptyEvent> publishActivity = (ISagaPublishActivity<TSagaData, TEventToSend, EmptyEvent>)builderState.ServiceProvider.
+                GetService(typeof(ISagaPublishActivity<TSagaData, TEventToSend, EmptyEvent>));
+
+            if (publishActivity == null)
+                publishActivity = new SagaStepForPublishActivity<TSagaData, TEventToSend, EmptyEvent>();
+
+            publishActivity.ActionDelegate = (ctx, ev) => { a?.Invoke(ctx, ev); return Task.CompletedTask; };
+            publishActivity.CompensateDelegate = null;
+            publishActivity.StepName = builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name);
+            publishActivity.Async = false;
+            publishActivity.ParentStep = builderState.ParentStep;
+
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
-                new SagaStepForSendActivity<TSagaData, TEventToSend, EmptyEvent>(
-                    (ctx, ev) => { a?.Invoke(ctx, ev); return Task.CompletedTask; },
-                    null,
-                    builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name),
-                    false,
-                    builderState.ParentStep));
+                publishActivity);
 
             return new SagaBuilder<TSagaData, TEvent>(builderState);
         }

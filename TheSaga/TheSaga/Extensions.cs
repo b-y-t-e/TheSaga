@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TheSaga.Builders;
@@ -15,12 +16,16 @@ using TheSaga.MessageBus.InMemory;
 using TheSaga.MessageBus.Interfaces;
 using TheSaga.ModelsSaga.Interfaces;
 using TheSaga.Observables.Registrator;
+using TheSaga.Options;
 using TheSaga.Persistance;
+using TheSaga.Persistance.InFile;
 using TheSaga.Persistance.InMemory;
 using TheSaga.Providers;
 using TheSaga.Providers.Interfaces;
 using TheSaga.Registrator;
 using TheSaga.Registrator.Interfaces;
+using Microsoft.Extensions.Configuration;
+using TheSaga.Models.Interfaces;
 
 [assembly: InternalsVisibleTo("TheSaga.Tests")]
 
@@ -32,7 +37,6 @@ namespace TheSaga
             this IServiceCollection services,
             Action<ITheSagaConfig> configAction = null)
         {
-
             services.AddSingleton<ObservableRegistrator>();
             services.AddSingleton<IMessageBus, InMemoryMessageBus>();
             services.AddSingleton<ISagaPersistance, InMemorySagaPersistance>();
@@ -65,6 +69,20 @@ namespace TheSaga
             return services;
         }
 
+        public static void AddBeforeMiddlewares<T>(
+            this ITheSagaConfig config)
+            where T : ISagaMiddleware
+        {
+            Middlewares.AddBeforeMiddlewares(typeof(T));
+        }
+
+        public static void AddAfterMiddlewares<T>(
+            this ITheSagaConfig config)
+            where T : ISagaMiddleware
+        {
+            Middlewares.AddAfterMiddlewares(typeof(T));
+        }
+
         public static ITheSagaConfig AddModelDefinitions(
             this ITheSagaConfig config)
         {
@@ -93,6 +111,10 @@ namespace TheSaga
             await coordinator.ResumeAll();
 
             return provider;
+        }
+        public static void UseFilePersistance(this ITheSagaConfig config)
+        {
+            config.Services.AddTransient<ISagaPersistance, InFileSagaPersistance>();
         }
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
 using TheSaga.Models.Interfaces;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.ModelsSaga.Steps.Interfaces;
 
 namespace TheSaga.ModelsSaga.Steps
@@ -14,8 +14,10 @@ namespace TheSaga.ModelsSaga.Steps
         where TEventHandler : ISagaEventHandler<TSagaData, TEvent>
         where TEvent : ISagaEvent
     {
-        public ISagaStep ParentStep { get; }
-        public SagaSteps ChildSteps { get; }
+        public SagaSteps ChildSteps { get; private set; }
+        public ISagaStep ParentStep { get; set; }
+        public bool Async { get; set; }
+        public string StepName { get; set; }
 
         public SagaStepForEventHandler(
             string StepName, bool async, ISagaStep parentStep)
@@ -25,9 +27,6 @@ namespace TheSaga.ModelsSaga.Steps
             ChildSteps = new SagaSteps();
             ParentStep = parentStep;
         }
-
-        public bool Async { get; }
-        public string StepName { get; }
 
         public async Task Compensate(IServiceProvider serviceProvider, IExecutionContext context, ISagaEvent @event, IStepData stepData)
         {

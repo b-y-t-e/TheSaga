@@ -15,6 +15,7 @@ using TheSaga.Persistance.SqlServer;
 using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Locking.DistributedLock;
 using TheSaga.Locking.DistributedLock.Options;
+using TheSaga.Models.History;
 
 namespace TheSaga.Tests.SagaTests.SyncAndValid
 {
@@ -70,7 +71,7 @@ namespace TheSaga.Tests.SagaTests.SyncAndValid
             // then
             ISaga persistedSaga = await sagaPersistance.
                 Get(newSagaState.Data.ID);
-
+            
             persistedSaga.ShouldNotBeNull();
             persistedSaga.ExecutionState.CurrentState.ShouldBe(nameof(StateCompleted));
             persistedSaga.ExecutionState.CurrentStep.ShouldBe(null);

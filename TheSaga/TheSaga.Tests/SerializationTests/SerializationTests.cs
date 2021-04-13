@@ -15,7 +15,6 @@ using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Locking.DistributedLock;
 using TheSaga.Tests.SagaTests.ResumeSaga.States;
 using TheSaga.Locking.DistributedLock.Options;
-using TheSaga.ModelsSaga.History;
 using Newtonsoft.Json;
 
 namespace TheSaga.Tests.SerializationTests

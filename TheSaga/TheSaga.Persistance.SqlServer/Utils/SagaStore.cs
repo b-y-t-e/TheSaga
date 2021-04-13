@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Dapper.Contrib.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,25 @@ using TheSaga.Providers.Interfaces;
 
 namespace TheSaga.Persistance.SqlServer.Utils
 {
+    public class SagaDb
+    {
+        public Guid ID { get; set; }
+        public String ModelName { get; set; }
+        public String Name { get; set; }
+        public String State { get; set; }
+        public String Step { get; set; }
+        public Boolean IsCompensating { get; set; }
+        public Boolean IsResuming { get; set; }
+        public Boolean IsDeleted { get; set; }
+        public Boolean IsBreaked { get; set; }
+        public String DataJson { get; set; }
+        public String InfoJson { get; set; }
+        public String StateJson { get; set; }
+        public String ValuesJson { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime Modified { get; set; }
+    }
+
     public class SagaStore : IDisposable
     {
         ISqlServerConnection _con;
@@ -23,22 +43,6 @@ namespace TheSaga.Persistance.SqlServer.Utils
         IDateTimeProvider _dateTimeProvider;
 
         SqlServerOptions _sqlServerOptions;
-
-        string idColumn = "id";
-
-        string stateNameColumn = "name";
-
-        string jsonColumn = "json";
-
-        string createdColumn = "created";
-
-        string modifiedColumn = "modified";
-
-        string stateColumn = "state";
-
-        string stepColumn = "step";
-
-        string compensatingColumn = "iscompensating";
 
         JsonSerializerSettings _serializerSettings;
 
@@ -66,16 +70,63 @@ namespace TheSaga.Persistance.SqlServer.Utils
             }
             catch (SqlException ex)
             {
-                if (ex.Number == 208)
+                if (ex.Number == 208 || ex.Number == 207)
                     await createStorageTable();
                 await saveStorageData(saga);
             }
         }
         private async Task createStorageTable()
         {
-            _con.Connection().Execute(await generateTableScriptForType());
-        }
+            var sql = @$"
 
+if not exists(select 1 from information_schema.tables where table_name = '{getTableName()}')
+    create table {getTableName()} (ID uniqueidentifier not null primary key)
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'ModelName')
+    alter table {getTableName()} add ModelName nvarchar(1000);
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'Name')
+    alter table {getTableName()} add Name nvarchar(1000);
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'State')
+    alter table {getTableName()} add State nvarchar(1000);
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'Step')
+    alter table {getTableName()} add Step nvarchar(4000);
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'IsCompensating')
+    alter table {getTableName()} add IsCompensating bit not null default(0);
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'IsResuming')
+    alter table {getTableName()} add IsResuming bit not null default(0);
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'IsDeleted')
+    alter table {getTableName()} add IsDeleted bit not null default(0);
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'IsBreaked')
+    alter table {getTableName()} add IsBreaked bit not null default(0);
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'DataJson')
+    alter table {getTableName()} add DataJson nvarchar(max);
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'InfoJson')
+    alter table {getTableName()} add InfoJson nvarchar(max);
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'StateJson')
+    alter table {getTableName()} add StateJson nvarchar(max);
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'ValuesJson')
+    alter table {getTableName()} add ValuesJson nvarchar(max);
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'Created')
+    alter table {getTableName()} add Created datetime;
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'Modified')
+    alter table {getTableName()} add Modified datetime;
+            ";
+
+            _con.Connection().Execute(sql);
+        }
 
         public async Task<ISaga> Get(Guid id)
         {
@@ -85,7 +136,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             }
             catch (SqlException ex)
             {
-                if (ex.Number == 208)
+                if (ex.Number == 208 || ex.Number == 207)
                     await createStorageTable();
                 return getStorageData(id);
             }
@@ -99,7 +150,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             }
             catch (SqlException ex)
             {
-                if (ex.Number == 208)
+                if (ex.Number == 208 || ex.Number == 207)
                     await createStorageTable();
                 return getUnfinishedStorageData();
             }
@@ -108,7 +159,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
         private IList<Guid> getUnfinishedStorageData()
         {
             using var reader = _con.Connection().ExecuteReader(
-                $"select {idColumn} from {_sqlServerOptions.TableName} where step is not null ");
+                $"select ID from {getTableName()} where step is not null ");
 
             List<Guid> guids = new List<Guid>();
             while (reader.Read())
@@ -119,15 +170,28 @@ namespace TheSaga.Persistance.SqlServer.Utils
 
         private ISaga getStorageData(Guid id)
         {
-            string json = _con.Connection().ExecuteScalar<string>(
-                $"select {jsonColumn} from {_sqlServerOptions.TableName} where {idColumn} = @id",
-                new { id = id });
-
-            if (json == null)
+            SagaDb sagaDb = get(id);
+            if (sagaDb == null)
                 return null;
 
-            object stateObject = JsonConvert.DeserializeObject(json, _serializerSettings);
-            return (ISaga)stateObject;
+            return new Saga()
+            {
+                Data = JsonConvert.DeserializeObject<ISagaData>(
+                    sagaDb.DataJson, _serializerSettings),
+                ExecutionState = JsonConvert.DeserializeObject<SagaExecutionState>(
+                    sagaDb.StateJson, _serializerSettings),
+                ExecutionInfo = JsonConvert.DeserializeObject<SagaExecutionInfo>(
+                    sagaDb.InfoJson, _serializerSettings),
+                ExecutionValues = JsonConvert.DeserializeObject<SagaExecutionValues>(
+                    sagaDb.ValuesJson, _serializerSettings)
+            };
+        }
+
+        private SagaDb get(Guid id)
+        {
+            return _con.Connection().QueryFirstOrDefault<SagaDb>(
+                $"select * from {getTableName()} where ID = @id",
+                new { id = id });
         }
 
         public async Task Remove(Guid id)
@@ -138,7 +202,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             }
             catch (SqlException ex)
             {
-                if (ex.Number == 208)
+                if (ex.Number == 208 || ex.Number == 207)
                     await createStorageTable();
                 removeStorageData(id);
             }
@@ -147,63 +211,64 @@ namespace TheSaga.Persistance.SqlServer.Utils
         private void removeStorageData(Guid id)
         {
             _con.Connection().Execute(
-                $"delete from {_sqlServerOptions.TableName} where {idColumn} = @id",
+                $"delete from {getTableName()} where ID = @id",
                 new { id = id });
         }
 
         private async Task saveStorageData(ISaga saga)
         {
-            StringBuilder sqlScript = new StringBuilder();
-            if (await stateExists(saga.Data.ID))
-                sqlScript.Append(generateUpdateScriptForObject(saga));
+            Boolean exists = true;
+            SagaDb sagaDb = get(saga.Data.ID);
+            if (sagaDb == null)
+            {
+                exists = false;
+                sagaDb = new SagaDb()
+                {
+                    ID = saga.Data.ID,
+                    Created = _dateTimeProvider.Now,
+                    Modified = _dateTimeProvider.Now,
+                };
+            }
+
+
+            sagaDb.DataJson = JsonConvert.SerializeObject(
+                saga.Data, _serializerSettings);
+            sagaDb.InfoJson = JsonConvert.SerializeObject(
+                        saga.ExecutionInfo, _serializerSettings);
+            sagaDb.StateJson = JsonConvert.SerializeObject(
+                        saga.ExecutionState, _serializerSettings);
+            sagaDb.ValuesJson = JsonConvert.SerializeObject(
+                        saga.ExecutionValues, _serializerSettings);
+            sagaDb.IsCompensating = saga.ExecutionState.IsCompensating;
+            sagaDb.IsDeleted = saga.ExecutionState.IsDeleted;
+            sagaDb.IsResuming = saga.ExecutionState.IsResuming;
+            sagaDb.IsBreaked = saga.ExecutionState.IsBreaked;
+            sagaDb.Name = saga.Data?.GetType().Name ?? "";
+            sagaDb.ModelName = saga.ExecutionInfo.ModelName;
+            sagaDb.State = saga.ExecutionState.CurrentState;
+            sagaDb.Step = saga.ExecutionState.CurrentStep;
+
+            if (exists)
+            {
+                _con.Connection().Save(
+                    getTableName(), sagaDb,
+                    "ID", false);
+            }
             else
-                sqlScript.Append(generateInsertScriptForObject(saga));
-
-            Dictionary<string, object> dbobjectObject = prepareDbObject(saga);
-
-            if (sqlScript.Length <= 0)
-                return;
-
-            _con.Connection().Execute(sqlScript.ToString(), dbobjectObject);
-        }
-
-        private Dictionary<string, object> prepareDbObject(ISaga saga)
-        {
-            Type sagaDataType = saga.Data.GetType();
-
-            Dictionary<string, object> dbobject = new Dictionary<string, object>();
-            dbobject[idColumn] = saga.Data.ID;
-            dbobject[stateNameColumn] = sagaDataType.Name;
-            dbobject[createdColumn] = saga.ExecutionInfo.Created;
-            dbobject[modifiedColumn] = saga.ExecutionInfo.Modified;
-            dbobject[stateColumn] = saga.ExecutionState.CurrentState;
-            dbobject[stepColumn] = saga.ExecutionState.CurrentStep;
-            dbobject[compensatingColumn] = saga.ExecutionState.IsCompensating;
-            dbobject[jsonColumn] = JsonConvert.SerializeObject(saga, _serializerSettings);
-
-            return dbobject;
-        }
-
-        async Task<bool> stateExists(Guid id)
-        {
-            try
             {
-                return (await _con.Connection().ExecuteScalarAsync<int?>(
-                $"select 1 from {_sqlServerOptions.TableName} where {idColumn} = @id",
-                new { id = id })) != null;
-            }
-            catch (Exception ex)
-            {
-                return false;
+                _con.Connection().Save(
+                    getTableName(), sagaDb,
+                    "ID", true);
             }
         }
 
+        /*
         private string generateInsertScriptForObject(ISaga @state)
         {
             Type type = @state.GetType();
             StringBuilder script = new StringBuilder();
 
-            script.Append($"insert into {_sqlServerOptions.TableName} ({idColumn},{stateNameColumn},{jsonColumn},{createdColumn},{modifiedColumn},{stateColumn},{stepColumn},{compensatingColumn}");
+            script.Append($"insert into {getTableName()} ({idColumn},{stateNameColumn},{jsonColumn},{createdColumn},{modifiedColumn},{stateColumn},{stepColumn},{compensatingColumn}");
 
             script.Append($") select @{idColumn},@{stateNameColumn},@{jsonColumn},@{createdColumn},@{modifiedColumn},@{stateColumn},@{stepColumn},@{compensatingColumn}");
 
@@ -217,7 +282,7 @@ namespace TheSaga.Persistance.SqlServer.Utils
             Type type = @state.GetType();
             StringBuilder script = new StringBuilder();
 
-            script.Append($" update {_sqlServerOptions.TableName} set ");
+            script.Append($" update {getTableName()} set ");
 
             script.Append($" {stateNameColumn} = @{stateNameColumn}, ");
             script.Append($" {jsonColumn} = @{jsonColumn}, ");
@@ -231,24 +296,27 @@ namespace TheSaga.Persistance.SqlServer.Utils
 
             return script.ToString();
         }
+        */
 
+        /*
         async Task<string> generateTableScriptForType()
         {
             StringBuilder script = new StringBuilder();
 
             if (!(await tableExists(_sqlServerOptions.TableName)))
-                script.
-                    Append($" if object_id('{_sqlServerOptions.TableName}') is null ").
-                    Append($" create table {_sqlServerOptions.TableName} (").
-                    Append($"   {idColumn} uniqueidentifier not null primary key, ").
-                    Append($"   {stateNameColumn} nvarchar(500) not null, ").
-                    Append($"   {jsonColumn} nvarchar(max), ").
-                    Append($"   {createdColumn} datetime, ").
-                    Append($"   {modifiedColumn} datetime, ").
-                    Append($"   {stateColumn} nvarchar(500), ").
-                    Append($"   {stepColumn} nvarchar(500), ").
-                    Append($"   {compensatingColumn} int, ").
-                    Append($" ); ");
+                script.Append(@$" 
+                    if object_id('{getTableName()}') is null 
+                      create table {getTableName()} (
+                        {idColumn} uniqueidentifier not null primary key, 
+                        {stateNameColumn} nvarchar(500) not null, 
+                        {jsonColumn} nvarchar(max), 
+                        {createdColumn} datetime, 
+                        {modifiedColumn} datetime, 
+                        {stateColumn} nvarchar(500), 
+                        {stepColumn} nvarchar(500), 
+                        {compensatingColumn} int, 
+                      ); 
+                ");
 
             return script.ToString();
         }
@@ -268,16 +336,27 @@ namespace TheSaga.Persistance.SqlServer.Utils
                 new { tablename = tablename })) > 0;
             return exists;
         }
-
-        public void Dispose()
-        {
-            _con.Dispose();
-        }
-
         class columnInfo
         {
             public string dbName;
             public string csName;
         }
+        */
+        string getTableName() =>
+            CorrectTemplateName(_sqlServerOptions.TableName);
+        string CorrectTemplateName(string name)
+        {
+            name = name.
+                Replace(".", "_").Replace("-", "_").Replace(" ", "_").
+                Replace("[", "_").Replace("]", "_").
+                Replace("__", "_").Replace("__", "_");
+
+            return name;
+        }
+        public void Dispose()
+        {
+            _con.Dispose();
+        }
+
     }
 }

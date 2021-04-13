@@ -5,7 +5,7 @@ using TheSaga.Conditions;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
 using TheSaga.Models.Interfaces;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.ModelsSaga.Steps.Interfaces;
 
 namespace TheSaga.ModelsSaga.Steps
@@ -14,8 +14,10 @@ namespace TheSaga.ModelsSaga.Steps
         where TSagaData : ISagaData
         where TSagaCondition : ISagaCondition<TSagaData>
     {
-        public ISagaStep ParentStep { get; }
         public SagaSteps ChildSteps { get; private set; }
+        public ISagaStep ParentStep { get; set; }
+        public bool Async { get; set; }
+        public string StepName { get; set; }
 
         public SagaStepForWhile(string StepName, ISagaStep parentStep)
         {
@@ -24,9 +26,6 @@ namespace TheSaga.ModelsSaga.Steps
             this.ChildSteps = new SagaSteps();
             this.ParentStep = parentStep;
         }
-
-        public bool Async { get; }
-        public string StepName { get; }
 
         public void SetChildSteps(SagaSteps steps)
         {

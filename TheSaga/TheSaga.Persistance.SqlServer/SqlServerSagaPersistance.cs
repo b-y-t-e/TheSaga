@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TheSaga.MessageBus.Interfaces;
+using TheSaga.Messages;
 using TheSaga.Models;
 using TheSaga.Models.Interfaces;
 using TheSaga.Persistance.InMemory;
@@ -15,13 +17,14 @@ namespace TheSaga.Persistance.SqlServer
 {
     public class SqlServerSagaPersistance : ISagaPersistance
     {
+        private readonly IMessageBus messageBus;
         Dictionary<Guid, string> instances;
         ISqlServerConnection sqlServerConnection;
         IDateTimeProvider dateTimeProvider;
         SqlServerOptions sqlServerOptions;
         WeakInMemorySagaPersistance weakInMemorySagaPersistance;
 
-        public SqlServerSagaPersistance(ISqlServerConnection sqlServerConnection, IDateTimeProvider dateTimeProvider, SqlServerOptions sqlServerOptions)
+        public SqlServerSagaPersistance(ISqlServerConnection sqlServerConnection, IDateTimeProvider dateTimeProvider, SqlServerOptions sqlServerOptions, IMessageBus messageBus)
         {
             this.instances = new Dictionary<Guid, string>();
             this.sqlServerConnection = sqlServerConnection;
@@ -29,16 +32,24 @@ namespace TheSaga.Persistance.SqlServer
             this.sqlServerOptions = sqlServerOptions;
             this.weakInMemorySagaPersistance = new WeakInMemorySagaPersistance(
                 TimeSpan.FromSeconds(15));
+            this.messageBus = messageBus;
         }
 
         public async Task<ISaga> Get(Guid id)
         {
-            ISaga saga = await weakInMemorySagaPersistance.Get(id);
+            /*ISaga saga = await weakInMemorySagaPersistance.Get(id);
             if (saga != null)
-                return saga;
+                return saga;*/
 
             using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
-                return await sagaStore.Get(id);
+            {
+                var saga = await sagaStore.Get(id);
+                
+                await messageBus.
+                    Publish(new SagaAfterRetrivedMessage(saga));
+
+                return saga;
+            }
         }
 
         public Task<IList<Guid>> GetUnfinished()
@@ -58,7 +69,12 @@ namespace TheSaga.Persistance.SqlServer
         {
             await weakInMemorySagaPersistance.Set(saga);
             using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
+            {
+                await messageBus.
+                    Publish(new SagaBeforeStoredMessage(saga));
+
                 await sagaStore.Store(saga);
+            }
         }
 
     }

@@ -1,25 +1,28 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>0.8.2</Version>
-    <Authors>Andrzej Ból</Authors>
-    <Description>A module that allows you use distributed locking (using sql server, thanks to DistributedLock library)
----------------------
-.net core Saga / ProcessManager implementation
+	<PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<Description>
+			A module that allows you use distributed locking (using sql server, thanks to DistributedLock library)
+			---------------------
+			.net core Saga / ProcessManager implementation
 
-https://github.com/b-y-t-e/TheSaga</Description>
-    <Copyright>Andrzej Ból</Copyright>
-    <PackageProjectUrl>https://github.com/b-y-t-e/TheSaga</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/b-y-t-e/TheSaga</RepositoryUrl>
-  </PropertyGroup>
+			https://github.com/b-y-t-e/TheSaga
+		</Description>
+		<Version>1.0.156</Version>
+		<Authors>else s.j. / Andrzej Ból</Authors>
+		<Copyright>else s.j. / Andrzej Ból</Copyright>
+		<RepositoryUrl>https://github.com/elsesj/Else.WebApi.Libraries</RepositoryUrl>
+		<PackageId>Else.TheSaga.Locking.DistributedLock</PackageId>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="DistributedLock" Version="1.5.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="DistributedLock" Version="1.5.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TheSaga\TheSaga.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\TheSaga\TheSaga.csproj" />
+	</ItemGroup>
 
 </Project>

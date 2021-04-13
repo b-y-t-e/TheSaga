@@ -5,43 +5,41 @@ using TheSaga.Coordinators;
 using TheSaga.Events;
 using TheSaga.ExecutionContext;
 using TheSaga.Models.Interfaces;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.ModelsSaga.Steps.Delegates;
 using TheSaga.ModelsSaga.Steps.Interfaces;
 
 namespace TheSaga.ModelsSaga.Steps
 {
-    internal class SagaStepForSendActivity<TSagaData, TExecuteEvent, TCompensateEvent> : ISagaStep
+    public class SagaStepForPublishActivity<TSagaData, TExecuteEvent, TCompensateEvent> : ISagaStep, ISagaPublishActivity<TSagaData, TExecuteEvent, TCompensateEvent>
         where TSagaData : ISagaData
         where TExecuteEvent : ISagaEvent, new()
         where TCompensateEvent : ISagaEvent, new()
     {
-        private readonly SendActionAsyncDelegate<TSagaData, TExecuteEvent> action;
+        public SendActionAsyncDelegate<TSagaData, TExecuteEvent> ActionDelegate { get; set; }
+        public SendActionAsyncDelegate<TSagaData, TCompensateEvent> CompensateDelegate { get; set; }
+        public SagaSteps ChildSteps { get; private set; }
+        public ISagaStep ParentStep { get; set; }
+        public bool Async { get; set; }
+        public string StepName { get; set; }
 
-        private readonly SendActionAsyncDelegate<TSagaData, TCompensateEvent> compensate;
-        public SagaSteps ChildSteps { get; }
-        public ISagaStep ParentStep { get; }
-
-        public SagaStepForSendActivity(
-            SendActionAsyncDelegate<TSagaData, TExecuteEvent> action,
-            SendActionAsyncDelegate<TSagaData, TCompensateEvent> compensate,
-            string StepName, bool async, ISagaStep parentStep)
+        public SagaStepForPublishActivity(
+            /* SendActionAsyncDelegate<TSagaData, TExecuteEvent> action,
+             SendActionAsyncDelegate<TSagaData, TCompensateEvent> compensate,
+             string StepName, bool async, ISagaStep parentStep*/)
         {
-            this.StepName = StepName;
-            Async = async;
-            this.action = action;
-            this.compensate = compensate;
+            //this.StepName = StepName;
+            //Async = async;
+            //this.action = action;
+            //this.compensate = compensate;
             ChildSteps = new SagaSteps();
-            ParentStep = parentStep;
+            //ParentStep = parentStep;
         }
-
-        public bool Async { get; }
-        public string StepName { get; }
 
         public async Task Compensate(
             IServiceProvider serviceProvider,
-            IExecutionContext context, 
-            ISagaEvent @event, 
+            IExecutionContext context,
+            ISagaEvent @event,
             IStepData stepData)
         {
             if (typeof(TCompensateEvent) == typeof(EmptyEvent))
@@ -54,8 +52,8 @@ namespace TheSaga.ModelsSaga.Steps
                 (IExecutionContext<TSagaData>)context;
 
             TCompensateEvent compensationEvent = new TCompensateEvent();
-            if (compensate != null)
-                await compensate(contextForAction, compensationEvent);
+            if (CompensateDelegate != null)
+                await CompensateDelegate(contextForAction, compensationEvent);
 
             await sagaCoordinator.
                 Publish(compensationEvent, contextForAction.ExecutionValues);
@@ -63,8 +61,8 @@ namespace TheSaga.ModelsSaga.Steps
 
         public async Task Execute(
             IServiceProvider serviceProvider,
-            IExecutionContext context, 
-            ISagaEvent @event, 
+            IExecutionContext context,
+            ISagaEvent @event,
             IStepData stepData)
         {
             if (typeof(TExecuteEvent) == typeof(EmptyEvent))
@@ -77,8 +75,8 @@ namespace TheSaga.ModelsSaga.Steps
                 (IExecutionContext<TSagaData>)context;
 
             TExecuteEvent executionEvent = new TExecuteEvent();
-            if (action != null)
-                await action(contextForAction, executionEvent);
+            if (ActionDelegate != null)
+                await ActionDelegate(contextForAction, executionEvent);
 
             await sagaCoordinator.
                 Publish(executionEvent, contextForAction.ExecutionValues);

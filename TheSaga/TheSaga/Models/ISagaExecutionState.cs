@@ -1,6 +1,6 @@
 ﻿using System;
 using TheSaga.Events;
-using TheSaga.ModelsSaga.History;
+using TheSaga.Models.History;
 using TheSaga.ValueObjects;
 
 namespace TheSaga.Models
@@ -16,5 +16,6 @@ namespace TheSaga.Models
         SagaHistory History { get; }
         bool IsCompensating { get; }
         bool IsResuming { get; }
+        bool IsBreaked { get; }
     }
 }
