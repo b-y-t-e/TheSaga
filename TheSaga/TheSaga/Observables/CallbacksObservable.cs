@@ -10,11 +10,11 @@ using TheSaga.Observables.Interfaces;
 
 namespace TheSaga.Observables
 {
-    internal class LockingObservable : IObservable
+    internal class CallbacksObservable : IObservable
     {
         private readonly IServiceProvider serviceProvider;
 
-        public LockingObservable(IServiceProvider serviceProvider)
+        public CallbacksObservable(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
         }
@@ -38,23 +38,12 @@ namespace TheSaga.Observables
 
         private async Task OnSagaProcessingStart(ExecutionStartMessage msg)
         {
-            ISagaLocking sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
-            var id = msg?.Saga?.Data?.ID;
-            if (id == null)
-                return;
-
-            if (!await sagaLocking.Acquire(id.Value))
-                throw new SagaIsBusyException(id.Value);
+            await Callbacks.ExecuteBeforeRequestCallbacks(serviceProvider, msg.Saga);
         }
 
         private async Task OnSagaProcessingEnd(ExecutionEndMessage msg)
         {
-            ISagaLocking sagaLocking = serviceProvider.GetRequiredService<ISagaLocking>();
-            var id = msg?.Saga?.Data?.ID;
-            if (id == null)
-                return;
-
-            await sagaLocking.Banish(id.Value);
+            await Callbacks.ExecuteAfterRequestCallbacks(serviceProvider, msg.Saga, msg.Error);
         }
     }
 }

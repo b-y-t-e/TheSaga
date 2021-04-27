@@ -23,8 +23,8 @@ namespace TheSaga.Locking.DistributedLock
             SqlDistributedLock sqlDistributedLock =
                 new SqlDistributedLock($"TheSaga-{guid}", lockingOptions.ConnectionString);
 
-            IDisposable handle = await sqlDistributedLock.
-                TryAcquireAsync(TimeSpan.FromSeconds(1));
+            IDisposable handle = sqlDistributedLock.
+                TryAcquire(TimeSpan.FromSeconds(1));
 
             if (handle == null)
                 return false;

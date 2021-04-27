@@ -9,4 +9,9 @@ namespace TheSaga.Models.Interfaces
         /// </summary>
         public Guid ID { get; set; }
     }
+
+    public class EmptySagaData : ISagaData
+    {
+        public Guid ID { get; set; }
+    }
 }

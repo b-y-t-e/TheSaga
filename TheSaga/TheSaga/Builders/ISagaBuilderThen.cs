@@ -122,7 +122,7 @@ namespace TheSaga.Builders
 
         ISagaBuilderThen<TSagaData, TEvent> TransitionTo<TState>() where TState : ISagaState;
 
-        ISagaBuilderThen<TSagaData, TEvent> Break();
+        ISagaBuilderThen<TSagaData, TEvent> Abort();
 
         /*ISagaBuilderThen<TSagaData, TEvent> Retry<TException>(int count)
             where TException : Exception;

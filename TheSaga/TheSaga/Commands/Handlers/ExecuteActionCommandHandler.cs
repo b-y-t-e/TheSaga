@@ -115,8 +115,8 @@ namespace TheSaga.Commands.Handlers
             if (saga == null)
             {
                 await messageBus.Publish(
-                    new ExecutionEndMessage(SagaID.From(command.Saga.Data.ID)));
-                
+                    new ExecutionEndMessage(command.Saga, command.Saga?.ExecutionState?.CurrentError));
+
                 return null;
             }
             else
@@ -124,7 +124,7 @@ namespace TheSaga.Commands.Handlers
                 if (saga.IsIdle())
                 {
                     await messageBus.Publish(
-                        new ExecutionEndMessage(SagaID.From(saga.Data.ID)));
+                        new ExecutionEndMessage(saga, saga.ExecutionState?.CurrentError));
 
                     if (saga.HasError())
                         throw saga.ExecutionState.CurrentError;

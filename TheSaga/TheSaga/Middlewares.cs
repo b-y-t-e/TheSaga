@@ -14,35 +14,20 @@ namespace TheSaga
         static List<Type> beforeSetMiddlewares = new List<Type>();
         static List<Type> afterGetMiddlewares = new List<Type>();
 
-        public static void AddBeforeMiddlewares(Type type) =>
-            beforeSetMiddlewares.Add(type);
-
-        public static void AddAfterMiddlewares(Type type) =>
-            afterGetMiddlewares.Add(type);
-
-        /* public static async Task InvokeChain(
-           IServiceProvider serviceProvider,
-            ISaga saga,
-            ISagaStep sagaStep,
-            StepData stepData,
-            params ExecuteSagaDelegate[] executeDelegates)
+        public static void AddBeforeExecuteMiddlewares<T>()
+            where T : ISagaMiddleware
         {
-            List<NextMiddleware> actions = null;
-            try
-            {
-                actions = BuildChain(serviceProvider, executeDelegates);
-                await actions[0].Invoke(saga, sagaStep, stepData);
-            }
-            finally
-            {
-                if (actions != null)
-                {
-                    foreach (var action in actions)
-                        action.Clean();
-                    actions.Clear();
-                }
-            }
-        }*/
+            if (!beforeSetMiddlewares.Contains(typeof(T)))
+                beforeSetMiddlewares.Add(typeof(T));
+        }
+
+        public static void AddAfterExecuteMiddlewares<T>()
+            where T : ISagaMiddleware
+        {
+            if (!afterGetMiddlewares.Contains(typeof(T)))
+                afterGetMiddlewares.Add(typeof(T));
+        }
+
         public static async Task ExecuteChain(
             List<NextMiddleware> middlewaresChain,
             ISaga saga,
@@ -52,7 +37,7 @@ namespace TheSaga
             await middlewaresChain[0].Invoke(saga, sagaStep, stepData);
         }
 
-        public static MiddlewaresChain BuildChain(IServiceProvider serviceProvider, params ExecuteSagaDelegate[] executeDelegates)
+        public static MiddlewaresChain BuildFullChain(IServiceProvider serviceProvider, params ExecuteSagaDelegate[] executeDelegates)
         {
             MiddlewaresChain actions = new MiddlewaresChain();
             foreach (var item in beforeSetMiddlewares)
@@ -63,6 +48,25 @@ namespace TheSaga
 
             foreach (var item in afterGetMiddlewares)
                 actions.Add(new NextMiddleware(serviceProvider, item, null));
+
+            for (var i = 0; i < actions.Count - 1; i++)
+            {
+                var action = actions[i];
+                var nextAction = actions[i + 1];
+                action.Next = nextAction;
+            }
+
+            return actions;
+        }
+
+        public static MiddlewaresChain BuildSimpleChain(IServiceProvider serviceProvider, params ExecuteSagaDelegate[] executeDelegates)
+        {
+            MiddlewaresChain actions = new MiddlewaresChain();
+            foreach (var item in beforeSetMiddlewares)
+                actions.Add(new NextMiddleware(serviceProvider, item, null));
+
+            foreach (var executeDelegate in executeDelegates)
+                actions.Add(new NextMiddleware(serviceProvider, null, executeDelegate));
 
             for (var i = 0; i < actions.Count - 1; i++)
             {

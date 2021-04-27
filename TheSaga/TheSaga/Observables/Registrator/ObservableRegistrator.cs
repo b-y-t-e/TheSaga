@@ -20,6 +20,7 @@ namespace TheSaga.Observables.Registrator
                 return;
 
             new LockingObservable(serviceProvider).Subscribe();
+            new CallbacksObservable(serviceProvider).Subscribe();
             wasInitialized = true;
         }
     }

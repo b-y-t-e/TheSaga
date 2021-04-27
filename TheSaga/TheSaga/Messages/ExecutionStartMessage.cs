@@ -7,15 +7,15 @@ using TheSaga.ValueObjects;
 
 namespace TheSaga.Messages
 {
-    internal class ExecutionStartMessage : IInternalMessage
+    public class ExecutionStartMessage : IInternalMessage
     {
-        public SagaID SagaID;
         public ISagaModel Model;
+        public ISaga Saga;
 
-        public ExecutionStartMessage(SagaID saga, ISagaModel model)
+        public ExecutionStartMessage(ISaga saga, ISagaModel model)
         {
-            SagaID = saga;
-            this.Model = model;
+            Saga = saga;
+            Model = model;
         }
     }
 }

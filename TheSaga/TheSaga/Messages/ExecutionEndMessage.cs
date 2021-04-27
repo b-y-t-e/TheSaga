@@ -1,4 +1,5 @@
-﻿using TheSaga.MessageBus;
+﻿using System;
+using TheSaga.MessageBus;
 using TheSaga.MessageBus.Interfaces;
 using TheSaga.Models;
 using TheSaga.Models.Interfaces;
@@ -6,13 +7,15 @@ using TheSaga.ValueObjects;
 
 namespace TheSaga.Messages
 {
-    internal class ExecutionEndMessage : IInternalMessage
+    public class ExecutionEndMessage : IInternalMessage
     {
-        public ExecutionEndMessage(SagaID sagaId)
+        public ExecutionEndMessage(ISaga saga, Exception ex)
         {
-            SagaId = sagaId;
+            Saga = saga;
+            Error = ex;
         }
 
-        public SagaID SagaId { get; set; }
+        public ISaga Saga { get; set; }
+        public Exception Error { get; set; }
     }
 }

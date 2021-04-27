@@ -98,7 +98,7 @@ namespace TheSaga.Models.History
             return data;
         }
 
-        public static bool HasSucceeded(this StepData data)
+        internal static bool HasSucceeded(this StepData data)
         {
             return data.ExecutionData?.SucceedTime != null;
         }

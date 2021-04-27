@@ -230,7 +230,7 @@ if not exists(select 1 from information_schema.columns where table_name = '{getT
                 };
             }
 
-
+            sagaDb.Modified = _dateTimeProvider.Now;
             sagaDb.DataJson = JsonConvert.SerializeObject(
                 saga.Data, _serializerSettings);
             sagaDb.InfoJson = JsonConvert.SerializeObject(
@@ -262,86 +262,6 @@ if not exists(select 1 from information_schema.columns where table_name = '{getT
             }
         }
 
-        /*
-        private string generateInsertScriptForObject(ISaga @state)
-        {
-            Type type = @state.GetType();
-            StringBuilder script = new StringBuilder();
-
-            script.Append($"insert into {getTableName()} ({idColumn},{stateNameColumn},{jsonColumn},{createdColumn},{modifiedColumn},{stateColumn},{stepColumn},{compensatingColumn}");
-
-            script.Append($") select @{idColumn},@{stateNameColumn},@{jsonColumn},@{createdColumn},@{modifiedColumn},@{stateColumn},@{stepColumn},@{compensatingColumn}");
-
-            script.Append($"; ");
-
-            return script.ToString();
-        }
-
-        private string generateUpdateScriptForObject(ISaga @state)
-        {
-            Type type = @state.GetType();
-            StringBuilder script = new StringBuilder();
-
-            script.Append($" update {getTableName()} set ");
-
-            script.Append($" {stateNameColumn} = @{stateNameColumn}, ");
-            script.Append($" {jsonColumn} = @{jsonColumn}, ");
-            script.Append($" {createdColumn} = @{createdColumn}, ");
-            script.Append($" {modifiedColumn} = @{modifiedColumn}, ");
-            script.Append($" {stateColumn} = @{stateColumn}, ");
-            script.Append($" {stepColumn} = @{stepColumn}, ");
-            script.Append($" {compensatingColumn} = @{compensatingColumn} ");
-
-            script.Append($" where {idColumn} = @{idColumn}; ");
-
-            return script.ToString();
-        }
-        */
-
-        /*
-        async Task<string> generateTableScriptForType()
-        {
-            StringBuilder script = new StringBuilder();
-
-            if (!(await tableExists(_sqlServerOptions.TableName)))
-                script.Append(@$" 
-                    if object_id('{getTableName()}') is null 
-                      create table {getTableName()} (
-                        {idColumn} uniqueidentifier not null primary key, 
-                        {stateNameColumn} nvarchar(500) not null, 
-                        {jsonColumn} nvarchar(max), 
-                        {createdColumn} datetime, 
-                        {modifiedColumn} datetime, 
-                        {stateColumn} nvarchar(500), 
-                        {stepColumn} nvarchar(500), 
-                        {compensatingColumn} int, 
-                      ); 
-                ");
-
-            return script.ToString();
-        }
-
-        private async Task<bool> columnExists(string tablename, string columnName)
-        {
-            bool exists = (await _con.Connection().ExecuteScalarAsync<int?>(
-                $"select 1 from information_schema.columns where table_name = @tablename and column_name = @columnName",
-                new { tablename = tablename, columnName = columnName })) > 0;
-            return exists;
-        }
-
-        private async Task<bool> tableExists(string tablename)
-        {
-            bool exists = (await _con.Connection().ExecuteScalarAsync<int?>(
-                $"select 1 from information_schema.tables where table_name = @tablename",
-                new { tablename = tablename })) > 0;
-            return exists;
-        }
-        class columnInfo
-        {
-            public string dbName;
-            public string csName;
-        }
-        */
         string getTableName() =>
             CorrectTemplateName(_sqlServerOptions.TableName);
         string CorrectTemplateName(string name)

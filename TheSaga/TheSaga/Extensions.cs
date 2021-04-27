@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TheSaga.Builders;
@@ -24,7 +23,6 @@ using TheSaga.Providers;
 using TheSaga.Providers.Interfaces;
 using TheSaga.Registrator;
 using TheSaga.Registrator.Interfaces;
-using Microsoft.Extensions.Configuration;
 using TheSaga.Models.Interfaces;
 
 [assembly: InternalsVisibleTo("TheSaga.Tests")]
@@ -69,18 +67,32 @@ namespace TheSaga
             return services;
         }
 
-        public static void AddBeforeMiddlewares<T>(
+        public static void AddBeforeExecuteMiddlewares<T>(
             this ITheSagaConfig config)
             where T : ISagaMiddleware
         {
-            Middlewares.AddBeforeMiddlewares(typeof(T));
+            Middlewares.AddBeforeExecuteMiddlewares<T>();
         }
 
-        public static void AddAfterMiddlewares<T>(
+        public static void AddAfterExecuteMiddlewares<T>(
             this ITheSagaConfig config)
             where T : ISagaMiddleware
         {
-            Middlewares.AddAfterMiddlewares(typeof(T));
+            Middlewares.AddAfterExecuteMiddlewares<T>();
+        }
+
+        public static void AddBeforeRequestCallback<T>(
+            this ITheSagaConfig config)
+            where T : ISagaBeforeRequestCallback
+        {
+            Callbacks.AddBeforeRequestCallback<T>();
+        }
+
+        public static void AddAfterRequestCallback<T>(
+            this ITheSagaConfig config)
+            where T : ISagaAfterRequestCallback
+        {
+            Callbacks.AddAfterRequestCallback<T>();
         }
 
         public static ITheSagaConfig AddModelDefinitions(

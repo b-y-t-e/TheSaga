@@ -67,27 +67,66 @@ namespace TheSaga.Coordinators
 
             foreach (Guid id in ids)
             {
-                ISaga saga = await sagaPersistance.Get(id);
-              
-                ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
+                ISaga saga = await sagaPersistance.
+                    Get(id);
+
+                ISagaModel model = sagaRegistrator.
+                    FindModelByName(saga.ExecutionInfo.ModelName);
 
                 logger.
-                    LogInformation($"Trying to resume saga: {id}");
+                    LogInformation($"Trying to resume the saga {id}");
 
-                await ExecuteSaga(
-                    new EmptyEvent(),
-                    model,
-                    saga,
-                    saga.Data.ID,
-                    null,
-                    true);
+                bool isCompensating = saga.ExecutionState.IsCompensating;
+                var error = saga?.ExecutionState?.CurrentError;
+
+                try
+                {
+                    await ExecuteSaga(
+                        new EmptyEvent(),
+                        model,
+                        saga,
+                        saga.Data.ID,
+                        null,
+                        true);
+
+                    logger.
+                        LogInformation($"The saga {id} has been resumed");
+                }
+                catch (Exception ex)
+                {
+                    // ZROBIĆ TAK ABY WYJATEK POKAZYWAL SIE TYLKO WTEDY, GDY
+                    // SAGA ZOSTAŁA WZNOWIONA I BYŁ BŁĄD
+                    // SAGA ZOSTAŁA WZNOWIONA I BEZ BLEDU - TYLKO INFORMACJA
+                    // GDY SAGA COMPENSOWANA TO NIE POKAZUJEMY BLEDU - TYLKO INFORMACJE
+                    var currentSaga = await sagaPersistance.Get(id);
+                    var currentError = currentSaga?.ExecutionState?.CurrentError;
+
+                    if (isCompensating)
+                    {
+                        if(error?.Message != currentError?.Message)
+                        {
+                            logger.
+                                LogError(ex, $"The saga {id} has been compensated, but an error has occurred");
+                        }
+                        else
+                        {
+                            logger.
+                                LogInformation($"The saga {id} has been compensated");
+                        }
+                    }
+                    else
+                    {
+                        logger.
+                            LogError(ex, $"The saga {id} has been resumed, but an error has occurred");
+                    }
+                }
             }
         }
         public async Task Resume(Guid id)
         {
             List<string> invalidModels = new List<string>();
 
-            ISaga saga = await sagaPersistance.Get(id);            
+            ISaga saga = await sagaPersistance.Get(id);
             ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
 
             if (model == null)
@@ -155,7 +194,7 @@ namespace TheSaga.Coordinators
 
                 messageBus.Subscribe<ExecutionEndMessage>(this, mesage =>
                 {
-                    if (mesage.SagaId.Value == id)
+                    if (mesage.Saga?.Data?.ID == id)
                     {
                         ISaga saga = sagaPersistance.Get(id).GetAwaiter().GetResult();
                         if (saga?.IsIdle() == true)
@@ -165,7 +204,7 @@ namespace TheSaga.Coordinators
                 });
 
                 ISaga saga = await sagaPersistance.Get(id);
-                
+
                 if (saga == null)
                     throw new SagaInstanceNotFoundException(id);
 
@@ -202,7 +241,7 @@ namespace TheSaga.Coordinators
                     Initialize();
 
                 await messageBus.
-                    Publish(new ExecutionStartMessage(SagaID.From(sagaID), model));
+                    Publish(new ExecutionStartMessage(saga ?? new Saga { Data = new EmptySagaData { ID = sagaID } }, model));
 
                 sagaStarted = true;
 
@@ -260,7 +299,7 @@ namespace TheSaga.Coordinators
             {
                 if (sagaStarted)
                     await messageBus.Publish(
-                        new ExecutionEndMessage(SagaID.From(sagaID)));
+                        new ExecutionEndMessage(new Saga { Data = new EmptySagaData { ID = sagaID } }, ex));
 
                 if (ex is SagaStepException sagaStepException && sagaStepException?.OriginalException != null)
                     throw sagaStepException.OriginalException;

@@ -456,11 +456,11 @@ namespace TheSaga.Builders
             return new SagaBuilder<TSagaData, TEvent>(builderState);
         }
 
-        public ISagaBuilderThen<TSagaData, TEvent> Break()
+        public ISagaBuilderThen<TSagaData, TEvent> Abort()
         {
             builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent).ChildSteps.AddStep(
                 new SagaStepForBreak<TSagaData>(
-                    builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Break)),
+                    builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Abort)),
                     false,
                     builderState.ParentStep));
 

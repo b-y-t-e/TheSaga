@@ -17,7 +17,7 @@ namespace TheSaga.Models.History
         {
             StepData executionData = this.LastOrDefault(s =>
                 s.ExecutionID == executionID &&
-                s.CompensationData == null &&
+                (s.CompensationData == null || s.CompensationData.EndTime == null) &&
                 s.StepName == stepName);
 
             return executionData;

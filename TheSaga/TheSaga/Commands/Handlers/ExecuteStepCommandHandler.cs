@@ -52,7 +52,7 @@ namespace TheSaga.Commands.Handlers
 
             StepData stepData = GetOrCreateStepData(saga, step, model);
 
-            MiddlewaresChain middlewaresChain = Middlewares.BuildChain(
+            MiddlewaresChain middlewaresChain = Middlewares.BuildFullChain(
                 serviceProvider,
                 SaveSaga, ExecuteStep);
 
