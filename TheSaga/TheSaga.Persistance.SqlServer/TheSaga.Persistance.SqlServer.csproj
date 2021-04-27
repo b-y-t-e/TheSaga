@@ -10,10 +10,11 @@
 			https://github.com/b-y-t-e/TheSaga
 		</Description>
 		<Version>1.0.191</Version>
-		<Authors>else s.j. / Andrzej Ból</Authors>
-		<Copyright>else s.j. / Andrzej Ból</Copyright>
-		<RepositoryUrl>https://github.com/elsesj/Else.WebApi.Libraries</RepositoryUrl>
-		<PackageId>Else.TheSaga.Persistance.SqlServer</PackageId>
+		<Authors>Andrzej Ból</Authors>
+		<Copyright>Andrzej Ból</Copyright>
+    <RepositoryUrl>https://github.com/b-y-t-e/TheSaga</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/b-y-t-e/TheSaga</PackageProjectUrl>
+		<PackageId>TheSaga.Persistance.SqlServer</PackageId>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 

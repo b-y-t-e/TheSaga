@@ -9,10 +9,11 @@
 			https://github.com/b-y-t-e/TheSaga
 		</Description>
 		<Version>1.0.191</Version>
-		<Authors>else s.j. / Andrzej Ból</Authors>
-		<Copyright>else s.j. / Andrzej Ból</Copyright>
-		<PackageId>Else.TheSaga</PackageId>
-		<RepositoryUrl>https://github.com/elsesj/Else.WebApi.Libraries</RepositoryUrl>
+		<Authors>Andrzej Ból</Authors>
+		<Copyright>Andrzej Ból</Copyright>
+		<PackageId>TheSaga</PackageId>
+    <RepositoryUrl>https://github.com/b-y-t-e/TheSaga</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/b-y-t-e/TheSaga</PackageProjectUrl>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 
