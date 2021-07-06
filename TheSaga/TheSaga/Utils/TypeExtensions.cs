@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TheSaga.Utils
 {
@@ -65,44 +66,61 @@ namespace TheSaga.Utils
             return obj.GetType().Is(baseType);
         }
 
+        static Dictionary<Type, Dictionary<Type, bool>> isThisTypeCache =
+            new Dictionary<Type, Dictionary<Type, bool>>();
+
         internal static bool Is(this Type thisType, Type baseType)
         {
-            bool result =
-                baseType == thisType ||
-                baseType.IsAssignableFrom(thisType);
-
-            if (!result)
+            lock (isThisTypeCache)
             {
-                if (thisType.IsInterface && thisType.IsGenericType)
+                Dictionary<Type, bool> baseTypeType;
+                isThisTypeCache.TryGetValue(thisType, out baseTypeType);
+                if (baseTypeType != null)
                 {
-                    Type genericType = thisType.GetGenericTypeDefinition();
-
-                    if (genericType != null)
-                        result =
-                            baseType == genericType ||
-                            baseType.IsAssignableFrom(genericType);
-                }
-                else
-                {
-                    foreach (Type interfaceType in thisType.GetInterfaces())
-                        if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == baseType)
-                            return true;
-                        else if (baseType == interfaceType || baseType.IsAssignableFrom(interfaceType))
-                            return true;
+                    bool isResult;
+                    if (baseTypeType.TryGetValue(baseType, out isResult))
+                        return isResult;
                 }
 
-                /*foreach( var iterface in thisType.GetInterfaces())
-                {
-                    result =
-                        baseType == iterface ||
-                        baseType.IsAssignableFrom(iterface);
+                bool result =
+                    baseType == thisType ||
+                    baseType.IsAssignableFrom(thisType);
 
-                    if (result)
-                        return true;
-                }*/
+                if (!result)
+                {
+                    if (thisType.IsInterface && thisType.IsGenericType)
+                    {
+                        Type genericType = thisType.GetGenericTypeDefinition();
+
+                        if (genericType != null)
+                            result =
+                                baseType == genericType ||
+                                baseType.IsAssignableFrom(genericType);
+                    }
+                    else
+                    {
+                        foreach (Type interfaceType in thisType.GetInterfaces())
+                        {
+                            if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == baseType)
+                            {
+                                result = true;
+                                break;
+                            }
+                            else if (baseType == interfaceType || baseType.IsAssignableFrom(interfaceType))
+                            {
+                                result = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!isThisTypeCache.ContainsKey(thisType))
+                    isThisTypeCache[thisType] = new Dictionary<Type, bool>();
+                isThisTypeCache[thisType][baseType] = result;
+
+                return result;
             }
-
-            return result;
         }
     }
 }
