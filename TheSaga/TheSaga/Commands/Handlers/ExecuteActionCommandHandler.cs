@@ -92,6 +92,10 @@ namespace TheSaga.Commands.Handlers
                 {
                     using (IServiceScope scope = serviceScopeFactory.CreateScope())
                     {
+                        // when Saga is forced to run asynchronously, then it can be resumed
+                        if (command?.Saga?.ExecutionState != null)
+                            command.Saga.ExecutionState.CanBeResumed = true;
+
                         await DispatchStepSync(scope.ServiceProvider, command);
                     }
                 }
