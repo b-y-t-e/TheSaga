@@ -7,6 +7,7 @@ using TheSaga.MessageBus.Interfaces;
 using TheSaga.Messages;
 using TheSaga.Models;
 using TheSaga.Models.Interfaces;
+using TheSaga.States;
 
 namespace TheSaga.Persistance.InMemory
 {
@@ -49,7 +50,10 @@ namespace TheSaga.Persistance.InMemory
             lock (serializedInstances)
             {
                 IList<ISaga> unfinished = objectInstances.Values.Where(v => !v.IsIdle()).ToArray();
-                return unfinished.Select(i => i.Data.ID).ToArray();
+                return unfinished.
+                    OrderByDescending(i => i.ExecutionState.ParentID != null && i.ExecutionState.CurrentState == new SagaStartState().GetStateName() ? 1 : 0).
+                    Select(i => i.Data.ID).
+                    ToArray();
             }
         }
 

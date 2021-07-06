@@ -39,7 +39,7 @@ namespace TheSaga.Persistance.InFile
 
         public async Task<IList<Guid>> GetUnfinished()
         {
-            throw new NotImplementedException();
+            return new List<Guid>();
         }
 
         public async Task Remove(Guid id)

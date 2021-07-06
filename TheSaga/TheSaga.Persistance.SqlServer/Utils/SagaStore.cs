@@ -32,6 +32,8 @@ namespace TheSaga.Persistance.SqlServer.Utils
         public String InfoJson { get; set; }
         public String StateJson { get; set; }
         public String ValuesJson { get; set; }
+        public Int32 CanBeResumed { get; set; }
+        public Guid? ParentId { get; set; }
         public DateTime Created { get; set; }
         public DateTime Modified { get; set; }
     }
@@ -123,6 +125,12 @@ if not exists(select 1 from information_schema.columns where table_name = '{getT
 
 if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'Modified')
     alter table {getTableName()} add Modified datetime;
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'CanBeResumed')
+    alter table {getTableName()} add CanBeResumed int;
+
+if not exists(select 1 from information_schema.columns where table_name = '{getTableName()}' and column_name = 'ParentId')
+    alter table {getTableName()} add ParentId uniqueidentifier;
             ";
 
             _con.Connection().Execute(sql);
@@ -159,7 +167,7 @@ if not exists(select 1 from information_schema.columns where table_name = '{getT
         private IList<Guid> getUnfinishedStorageData()
         {
             using var reader = _con.Connection().ExecuteReader(
-                $"select ID from {getTableName()} where step is not null ");
+                $" select ID from {getTableName()} where step is not null order by (case when parentid is not null and state = '' then 1 else 0 end) desc ");
 
             List<Guid> guids = new List<Guid>();
             while (reader.Read())
@@ -234,11 +242,11 @@ if not exists(select 1 from information_schema.columns where table_name = '{getT
             sagaDb.DataJson = JsonConvert.SerializeObject(
                 saga.Data, _serializerSettings);
             sagaDb.InfoJson = JsonConvert.SerializeObject(
-                        saga.ExecutionInfo, _serializerSettings);
+                saga.ExecutionInfo, _serializerSettings);
             sagaDb.StateJson = JsonConvert.SerializeObject(
-                        saga.ExecutionState, _serializerSettings);
+                saga.ExecutionState, _serializerSettings);
             sagaDb.ValuesJson = JsonConvert.SerializeObject(
-                        saga.ExecutionValues, _serializerSettings);
+                saga.ExecutionValues, _serializerSettings);
             sagaDb.IsCompensating = saga.ExecutionState.IsCompensating;
             sagaDb.IsDeleted = saga.ExecutionState.IsDeleted;
             sagaDb.IsResuming = saga.ExecutionState.IsResuming;
@@ -247,6 +255,8 @@ if not exists(select 1 from information_schema.columns where table_name = '{getT
             sagaDb.ModelName = saga.ExecutionInfo.ModelName;
             sagaDb.State = saga.ExecutionState.CurrentState;
             sagaDb.Step = saga.ExecutionState.CurrentStep;
+            sagaDb.CanBeResumed = saga.ExecutionState.CanBeResumed ? 1 : 0;
+            sagaDb.ParentId = saga.ExecutionState.ParentID;
 
             if (exists)
             {
