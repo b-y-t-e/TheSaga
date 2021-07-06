@@ -65,14 +65,9 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
         [Fact]
         public async Task WHEN_sagaIsStoppedOnCreationSecondSaga_THEN_resumingSagaToInitState()
         {
-            // when
-            /*ResumeSagaSettings.ThrowError = false;
-            await sagaCoordinator.
-                ResumeAll();*/
-
             // given
-            Guid id = Guid.Parse("00000000-0000-0000-0000-000000000001");
-            Guid newId = Guid.Parse("00000000-0000-0000-0000-000000000002");
+            Guid id = Guid.NewGuid();
+            Guid newId = Guid.NewGuid();
             ResumeSagaSettings.StopSagaExecution = true;
             await Assert.ThrowsAsync<SagaStopException>(async () =>
             {
