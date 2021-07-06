@@ -68,6 +68,7 @@ namespace TheSaga.Commands.Handlers
             }
             catch (SagaStopException)
             {
+                throw;
                 return null;
             }
             catch (Exception ex)
@@ -103,8 +104,12 @@ namespace TheSaga.Commands.Handlers
 
         private static void CheckIfSagaIsDeleted(ISaga saga)
         {
-            if (saga.HasError() && saga.ExecutionState.CurrentState == new SagaStartState().GetStateName())
-                saga.ExecutionState.IsDeleted = true;
+            if (saga.HasError() &&
+                saga.ExecutionState.CurrentState == new SagaStartState().GetStateName())
+            {
+                if (saga.ExecutionState.CurrentStep == null)
+                    saga.ExecutionState.IsDeleted = true;
+            }
         }
 
         private void SaveNextStep(ISaga saga, StepData stepData, string nextStepName)
