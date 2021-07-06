@@ -8,6 +8,7 @@ using TheSaga.Models.Interfaces;
 using TheSaga.Models.History;
 using TheSaga.ModelsSaga.Steps.Delegates;
 using TheSaga.ModelsSaga.Steps.Interfaces;
+using TheSaga.Options;
 
 namespace TheSaga.ModelsSaga.Steps
 {
@@ -24,9 +25,9 @@ namespace TheSaga.ModelsSaga.Steps
         public string StepName { get; set; }
 
         public SagaStepForPublishActivity(
-            /* SendActionAsyncDelegate<TSagaData, TExecuteEvent> action,
-             SendActionAsyncDelegate<TSagaData, TCompensateEvent> compensate,
-             string StepName, bool async, ISagaStep parentStep*/)
+             /* SendActionAsyncDelegate<TSagaData, TExecuteEvent> action,
+              SendActionAsyncDelegate<TSagaData, TCompensateEvent> compensate,
+              string StepName, bool async, ISagaStep parentStep*/)
         {
             //this.StepName = StepName;
             //Async = async;
@@ -68,8 +69,8 @@ namespace TheSaga.ModelsSaga.Steps
             if (typeof(TExecuteEvent) == typeof(EmptyEvent))
                 return;
 
-            ISagaCoordinator sagaCoordinator = serviceProvider.
-                GetRequiredService<ISagaCoordinator>();
+            ISagaInternalCoordinator sagaCoordinator = serviceProvider.
+                GetRequiredService<ISagaCoordinator>() as ISagaInternalCoordinator;
 
             IExecutionContext<TSagaData> contextForAction =
                 (IExecutionContext<TSagaData>)context;
@@ -78,8 +79,8 @@ namespace TheSaga.ModelsSaga.Steps
             if (ActionDelegate != null)
                 await ActionDelegate(contextForAction, executionEvent);
 
-            await sagaCoordinator.
-                Publish(executionEvent, contextForAction.ExecutionValues);
+            ISaga newSaga = await sagaCoordinator.
+                Publish(executionEvent, contextForAction.ExecutionValues, contextForAction.Data.ID, new SagaRunOptions());
         }
     }
 }
