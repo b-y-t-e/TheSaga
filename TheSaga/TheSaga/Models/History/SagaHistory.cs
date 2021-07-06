@@ -81,13 +81,18 @@ namespace TheSaga.Models.History
                 stepData.ExecutionData != null &&
                 stepData.ResumeData?.EndTime == null)
             {
-                if (model.ResumePolicy == ESagaResumePolicy.DoCurrentStepCompensation)
+                if (!saga.ExecutionState.CanBeResumed)
                 {
-                    saga.ExecutionState.IsResuming = true;
+                    saga.ExecutionState.IsCompensating = true;
+                    saga.ExecutionState.IsResuming = false;
                 }
                 else if (model.ResumePolicy == ESagaResumePolicy.DoFullCompensation)
                 {
                     throw new SagaCompensateAllOnResumeException();
+                }
+                else if (model.ResumePolicy == ESagaResumePolicy.DoCurrentStepCompensation)
+                {
+                    saga.ExecutionState.IsResuming = true;
                 }
                 else
                 {
