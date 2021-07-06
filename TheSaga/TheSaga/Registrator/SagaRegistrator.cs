@@ -15,16 +15,16 @@ namespace TheSaga.Registrator
 {
     public class SagaRegistrator : ISagaRegistrator
     {
-        private readonly List<ISagaModel> registeredModels;
+        private static readonly List<ISagaModel> registeredModels = new List<ISagaModel>();
+        private static bool wasInitialized = false;
+
         private readonly IServiceProvider serviceProvider;
         private IMessageBus messageBus;
-        private bool wasInitialized;
 
         public SagaRegistrator(
             IMessageBus messageBus,
             IServiceProvider serviceProvider)
         {
-            registeredModels = new List<ISagaModel>();
             this.messageBus = messageBus;
             this.serviceProvider = serviceProvider;
             RegisterAllModelWithBuilders();
