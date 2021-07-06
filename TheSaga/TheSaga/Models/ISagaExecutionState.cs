@@ -7,6 +7,7 @@ namespace TheSaga.Models
 {
     public interface ISagaExecutionState
     {
+        Guid? ParentID { get; }
         AsyncExecution AsyncExecution { get; }
         Exception CurrentError { get; }
         ISagaEvent CurrentEvent { get; }
