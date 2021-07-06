@@ -25,20 +25,44 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
                     InHistoryStoreOnlyCurrentStep()).
 
                 Start<CreateEvent>().
-                    TransitionTo<Init>().
+                    TransitionTo<InitState>().
+
+                Start<CreateNewSaga>().
+                    HandleBy<CreateNewSagaHandler1>().
+                    HandleBy<CreateNewSagaHandler2>().
+                    HandleBy<CreateNewSagaHandler3>().
+                    Then(async ctx => { }).
+                    /*Then(async ctx => { }).
+                    Then(async ctx => { }).
+                    Then(async ctx =>
+                    {
+                        if (ResumeSagaSettings.StopSagaExecution) await ctx.Stop();
+                        if (ResumeSagaSettings.ThrowError) throw new System.Exception("!!");
+                    }).*/
+                    TransitionTo<SecondState>().
 
                 Start<CreateWithBreakEvent>().
                     Then(async ctx => { if (ResumeSagaSettings.StopSagaExecution) await ctx.Stop(); }).
-                    TransitionTo<Init>().
+                    TransitionTo<InitState>().
 
                 Start<CreateWithErrorEvent>().
                     Then(async ctx => { if (ResumeSagaSettings.StopSagaExecution) await ctx.Stop(); }).
                     Then(async ctx => throw new System.Exception("!!!")).
 
-                During<Init>().
+                During<InitState>().
                     When<ResumeSagaUpdateEvent>().
-                    Then(async ctx => { if (ResumeSagaSettings.StopSagaExecution) await ctx.Stop(); }).
-                    TransitionTo<SecondState>();
+                        Then(async ctx => { if (ResumeSagaSettings.StopSagaExecution) await ctx.Stop(); }).
+                        TransitionTo<SecondState>().
+                    When<CreateNewSagaEvent>().
+                        Publish<CreateNewSaga>((data, @event) =>
+                        {
+                            @event.ID = (data.ExecutionState.CurrentEvent as CreateNewSagaEvent).NewID;
+                        }).
+                        Then(async ctx =>
+                        {
+                            if (ResumeSagaSettings.StopSagaExecution) await ctx.Stop();
+                        }).
+                        TransitionTo<SecondState>();
 
             return builder.
                 Build();

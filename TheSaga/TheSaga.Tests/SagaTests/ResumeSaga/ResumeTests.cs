@@ -15,6 +15,7 @@ using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Locking.DistributedLock;
 using TheSaga.Tests.SagaTests.ResumeSaga.States;
 using TheSaga.Locking.DistributedLock.Options;
+using TheSaga.Exceptions;
 
 namespace TheSaga.Tests.SagaTests.ResumeSaga
 {
@@ -28,7 +29,10 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
             ISaga saga = await sagaCoordinator.Publish(new CreateEvent());
 
             // when
-            await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
+            await Assert.ThrowsAsync<SagaStopException>(async () =>
+            {
+                await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
+            });
 
             // then
             ISaga persistedSaga = await sagaPersistance.Get(saga.Data.ID);
@@ -41,8 +45,10 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
             // given
             Guid id = Guid.NewGuid();
             ResumeSagaSettings.StopSagaExecution = true;
-            await sagaCoordinator.Publish(new CreateWithBreakEvent() { ID = id });
-            //await sagaLocking.Banish(id);
+            await Assert.ThrowsAsync<SagaStopException>(async () =>
+            {
+                await sagaCoordinator.Publish(new CreateWithBreakEvent() { ID = id });
+            });
 
             // when
             ResumeSagaSettings.StopSagaExecution = false;
@@ -52,8 +58,43 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
             // then
             ISaga persistedSaga = await sagaPersistance.Get(id);
             persistedSaga.IsIdle().ShouldBeTrue();
-            persistedSaga.ExecutionState.CurrentState.ShouldBe(nameof(Init));
+            persistedSaga.ExecutionState.CurrentState.ShouldBe(nameof(InitState));
             persistedSaga.ExecutionState.History.Count.ShouldBe(3);
+        }
+
+        [Fact]
+        public async Task WHEN_sagaIsStoppedOnCreationSecondSaga_THEN_resumingSagaToInitState()
+        {
+            // when
+            /*ResumeSagaSettings.ThrowError = false;
+            await sagaCoordinator.
+                ResumeAll();*/
+
+            // given
+            Guid id = Guid.Parse("00000000-0000-0000-0000-000000000001");
+            Guid newId = Guid.Parse("00000000-0000-0000-0000-000000000002");
+            ResumeSagaSettings.StopSagaExecution = true;
+            await Assert.ThrowsAsync<SagaStopException>(async () =>
+            {
+                await sagaCoordinator.Publish(new CreateEvent() { ID = id });
+                await sagaCoordinator.Publish(new CreateNewSagaEvent() { ID = id, NewID = newId });
+            });
+
+            //await sagaLocking.Banish(id);
+
+            // when
+            ResumeSagaSettings.StopSagaExecution = false;
+            await sagaCoordinator.
+                ResumeAll();
+
+            // then
+            ISaga persistedSaga = await sagaPersistance.Get(id);
+            persistedSaga.IsIdle().ShouldBeTrue();
+            persistedSaga.ExecutionState.CurrentState.ShouldBe(nameof(SecondState));
+
+            ISaga persistedSagaNew = await sagaPersistance.Get(newId);
+            persistedSagaNew.IsIdle().ShouldBeTrue();
+            persistedSagaNew.ExecutionState.CurrentState.ShouldBe(nameof(SecondState));
         }
 
         [Fact]
@@ -62,7 +103,10 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
             // given
             Guid id = Guid.NewGuid();
             ResumeSagaSettings.StopSagaExecution = true;
-            await sagaCoordinator.Publish(new CreateWithErrorEvent() { ID = id });
+            await Assert.ThrowsAsync<SagaStopException>(async () =>
+            {
+                await sagaCoordinator.Publish(new CreateWithErrorEvent() { ID = id });
+            });
             //await sagaLocking.Banish(id);
 
             // when
@@ -89,7 +133,10 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
             ISaga saga = await sagaCoordinator.Publish(new CreateEvent());
 
             // when
-            await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
+            await Assert.ThrowsAsync<SagaStopException>(async () =>
+            {
+                await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
+            });
 
             // then
             (await sagaLocking.IsAcquired(saga.Data.ID)).
@@ -102,7 +149,10 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
             // given
             ResumeSagaSettings.StopSagaExecution = true;
             ISaga saga = await sagaCoordinator.Publish(new CreateEvent());
-            await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
+            await Assert.ThrowsAsync<SagaStopException>(async () =>
+            {
+                await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
+            });
             ResumeSagaSettings.StopSagaExecution = false;
             //await sagaLocking.Banish(saga.Data.ID);
 
@@ -121,7 +171,10 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
             // given
             ResumeSagaSettings.StopSagaExecution = true;
             ISaga saga = await sagaCoordinator.Publish(new CreateEvent());
-            await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
+            await Assert.ThrowsAsync<SagaStopException>(async () =>
+            {
+                await sagaCoordinator.Publish(new ResumeSagaUpdateEvent() { ID = saga.Data.ID });
+            });
             ResumeSagaSettings.StopSagaExecution = false;
             //await sagaLocking.Banish(saga.Data.ID);
 
@@ -151,11 +204,11 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
 #if SQL_SERVER
                 cfg.UseSqlServer(new SqlServerOptions()
                 {
-                    ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
+                    ConnectionString = "data source=.;initial catalog=sagatest;uid=dba;pwd=sql;"
                 });
                 cfg.UseDistributedLock(new SqlServerLockingOptions()
                 {
-                    ConnectionString = "data source=lab16;initial catalog=ziarno;uid=dba;pwd=sql;"
+                    ConnectionString = "data source=.;initial catalog=sagatest;uid=dba;pwd=sql;"
                 });
 #endif
             });
