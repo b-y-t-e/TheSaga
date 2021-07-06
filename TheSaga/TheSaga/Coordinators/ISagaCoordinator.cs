@@ -11,10 +11,17 @@ namespace TheSaga.Coordinators
 {
     public interface ISagaCoordinator
     {
+        Task<ISagaRunningState> GetSagaState(Guid id);
         Task<ISaga> Publish(ISagaEvent @event);
         Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues);
+        Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, SagaRunOptions runOptions);
         Task ResumeAll();
         Task Resume(Guid id);
         Task WaitForIdle(Guid id, SagaWaitOptions waitOptions = null);
+    }
+
+    internal interface ISagaInternalCoordinator
+    {
+        Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, Guid? parentId, SagaRunOptions runOptions);
     }
 }

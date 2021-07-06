@@ -27,8 +27,9 @@ using TheSaga.ValueObjects;
 
 namespace TheSaga.Coordinators
 {
-    public class SagaCoordinator : ISagaCoordinator
+    public class SagaCoordinator : ISagaCoordinator, ISagaInternalCoordinator
     {
+        private static int isResuming;
         private readonly ILogger logger;
         private readonly IDateTimeProvider dateTimeProvider;
         private readonly IMessageBus messageBus;
@@ -48,100 +49,132 @@ namespace TheSaga.Coordinators
             this.logger = logger;
         }
 
+        public async Task<ISagaRunningState> GetSagaState(Guid id)
+        {
+            ISaga saga = await sagaPersistance.Get(id);
+            if (saga == null)
+                return null;
+
+            return new SagaRunningState
+            {
+                IsRunning = !saga.IsIdle(),
+                IsResuming = saga.ExecutionState.IsResuming,
+                IsCompensating = saga.ExecutionState.IsCompensating
+            };
+        }
+
         public async Task ResumeAll()
         {
-            IList<Guid> ids = await sagaPersistance.GetUnfinished();
-
-            List<string> invalidModels = new List<string>();
-            foreach (Guid id in ids)
+            isResuming++;
+            try
             {
+                IList<Guid> ids = await sagaPersistance.GetUnfinished();
+
+                List<string> invalidModels = new List<string>();
+                foreach (Guid id in ids)
+                {
+                    ISaga saga = await sagaPersistance.Get(id);
+                    ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
+
+                    if (model == null)
+                        invalidModels.Add(saga.ExecutionInfo.ModelName);
+                }
+
+                if (invalidModels.Count > 0)
+                    throw new Exception($"Saga models {string.Join(", ", invalidModels.Distinct().ToArray())} not found");
+
+                foreach (Guid id in ids)
+                {
+                    ISaga saga = await sagaPersistance.
+                        Get(id);
+
+                    ISagaModel model = sagaRegistrator.
+                        FindModelByName(saga.ExecutionInfo.ModelName);
+
+                    logger.
+                        LogInformation($"Trying to resume the saga {id}");
+
+                    bool isCompensating = saga.ExecutionState.IsCompensating;
+                    var error = saga?.ExecutionState?.CurrentError;
+
+                    try
+                    {
+                        await ExecuteSaga(
+                            new EmptyEvent(),
+                            model,
+                            saga,
+                            saga.Data.ID,
+                            null,
+                            true,
+                            null);
+
+                        logger.
+                            LogInformation($"The saga {id} has been resumed");
+                    }
+                    catch (Exception ex)
+                    {
+                        // ZROBIĆ TAK ABY WYJATEK POKAZYWAL SIE TYLKO WTEDY, GDY
+                        // SAGA ZOSTAŁA WZNOWIONA I BYŁ BŁĄD
+                        // SAGA ZOSTAŁA WZNOWIONA I BEZ BLEDU - TYLKO INFORMACJA
+                        // GDY SAGA COMPENSOWANA TO NIE POKAZUJEMY BLEDU - TYLKO INFORMACJE
+                        var currentSaga = await sagaPersistance.Get(id);
+                        var currentError = currentSaga?.ExecutionState?.CurrentError;
+
+                        if (isCompensating)
+                        {
+                            if (error?.Message != currentError?.Message)
+                            {
+                                logger.
+                                    LogError(ex, $"The saga {id} has been compensated, but an error has occurred");
+                            }
+                            else
+                            {
+                                logger.
+                                    LogInformation($"The saga {id} has been compensated");
+                            }
+                        }
+                        else
+                        {
+                            logger.
+                                LogError(ex, $"The saga {id} has been resumed, but an error has occurred");
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                isResuming--;
+            }
+        }
+        public async Task Resume(Guid id)
+        {
+            isResuming++;
+            try
+            {
+                List<string> invalidModels = new List<string>();
+
                 ISaga saga = await sagaPersistance.Get(id);
                 ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
 
                 if (model == null)
                     invalidModels.Add(saga.ExecutionInfo.ModelName);
+
+                if (invalidModels.Count > 0)
+                    throw new Exception($"Saga models {string.Join(", ", invalidModels.Distinct().ToArray())} not found");
+
+                await ExecuteSaga(
+                    new EmptyEvent(),
+                    model,
+                    saga,
+                    saga.Data.ID,
+                    null,
+                    true,
+                    null);
             }
-
-            if (invalidModels.Count > 0)
-                throw new Exception($"Saga models {string.Join(", ", invalidModels.Distinct().ToArray())} not found");
-
-            foreach (Guid id in ids)
+            finally
             {
-                ISaga saga = await sagaPersistance.
-                    Get(id);
-
-                ISagaModel model = sagaRegistrator.
-                    FindModelByName(saga.ExecutionInfo.ModelName);
-
-                logger.
-                    LogInformation($"Trying to resume the saga {id}");
-
-                bool isCompensating = saga.ExecutionState.IsCompensating;
-                var error = saga?.ExecutionState?.CurrentError;
-
-                try
-                {
-                    await ExecuteSaga(
-                        new EmptyEvent(),
-                        model,
-                        saga,
-                        saga.Data.ID,
-                        null,
-                        true);
-
-                    logger.
-                        LogInformation($"The saga {id} has been resumed");
-                }
-                catch (Exception ex)
-                {
-                    // ZROBIĆ TAK ABY WYJATEK POKAZYWAL SIE TYLKO WTEDY, GDY
-                    // SAGA ZOSTAŁA WZNOWIONA I BYŁ BŁĄD
-                    // SAGA ZOSTAŁA WZNOWIONA I BEZ BLEDU - TYLKO INFORMACJA
-                    // GDY SAGA COMPENSOWANA TO NIE POKAZUJEMY BLEDU - TYLKO INFORMACJE
-                    var currentSaga = await sagaPersistance.Get(id);
-                    var currentError = currentSaga?.ExecutionState?.CurrentError;
-
-                    if (isCompensating)
-                    {
-                        if(error?.Message != currentError?.Message)
-                        {
-                            logger.
-                                LogError(ex, $"The saga {id} has been compensated, but an error has occurred");
-                        }
-                        else
-                        {
-                            logger.
-                                LogInformation($"The saga {id} has been compensated");
-                        }
-                    }
-                    else
-                    {
-                        logger.
-                            LogError(ex, $"The saga {id} has been resumed, but an error has occurred");
-                    }
-                }
+                isResuming--;
             }
-        }
-        public async Task Resume(Guid id)
-        {
-            List<string> invalidModels = new List<string>();
-
-            ISaga saga = await sagaPersistance.Get(id);
-            ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
-
-            if (model == null)
-                invalidModels.Add(saga.ExecutionInfo.ModelName);
-
-            if (invalidModels.Count > 0)
-                throw new Exception($"Saga models {string.Join(", ", invalidModels.Distinct().ToArray())} not found");
-
-            await ExecuteSaga(
-                new EmptyEvent(),
-                model,
-                saga,
-                saga.Data.ID,
-                null,
-                true);
         }
 
         public Task<ISaga> Publish(
@@ -150,8 +183,20 @@ namespace TheSaga.Coordinators
             return Publish(@event, null);
         }
 
-        public async Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues)
+        public Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues)
         {
+            return Publish(@event, executionValues, new SagaRunOptions());
+        }
+
+        public async Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, SagaRunOptions runOptions)
+        {
+            return await Publish(@event, executionValues, null, runOptions);
+        }
+
+        public async Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, Guid? parentId, SagaRunOptions runOptions)
+        {
+            runOptions = runOptions ?? new SagaRunOptions();
+
             Type eventType = @event.GetType();
             SagaID sagaId = SagaID.From(@event.ID);
 
@@ -161,18 +206,27 @@ namespace TheSaga.Coordinators
             if (model == null)
                 throw new SagaEventNotRegisteredException(eventType);
 
-            ISaga newSaga = await CreateNewSagaIfRequired(model, sagaId, eventType);
+            SagaID? parentSagaId = parentId == null ? (SagaID?)null : SagaID.From(parentId.Value);
+            ISaga newSaga = await CreateNewSagaIfRequired(model, sagaId, parentSagaId, eventType);
 
+            var id = SagaID.From(newSaga?.Data?.ID ?? sagaId.Value);
             try
             {
-                return await ExecuteSaga(
+                var createdSaga = await ExecuteSaga(
                     @event,
                     model,
                     newSaga,
-                    SagaID.From(newSaga?.Data?.ID ?? sagaId.Value),
+                    id,
                     executionValues,
-                    false);
+                    false,
+                    runOptions);
+
+                return createdSaga;
             }
+            /*catch (SagaStopException ex)
+             {
+                 return await sagaPersistance.Get(id.Value);
+             }*/
             catch
             {
                 //if (newSaga != null)
@@ -230,7 +284,8 @@ namespace TheSaga.Coordinators
             ISaga saga,
             Guid sagaID,
             IDictionary<string, object> executionValues,
-            bool resume)
+            bool executeResuming,
+            SagaRunOptions runOptions)
         {
             bool sagaStarted = false;
 
@@ -246,9 +301,7 @@ namespace TheSaga.Coordinators
                 sagaStarted = true;
 
                 if (saga == null)
-                {
                     saga = await sagaPersistance.Get(sagaID);
-                }
 
                 if (saga == null)
                     throw new SagaInstanceNotFoundException();
@@ -256,8 +309,11 @@ namespace TheSaga.Coordinators
                 if (saga.ExecutionState.IsDeleted)
                     throw new CountNotExecuteDeletedSagaException(sagaID);
 
-                if (!resume)
+                if (!executeResuming)
                 {
+                    if (runOptions != null)
+                        saga.ExecutionState.CanBeResumed = runOptions.CanBeResumed;
+
                     if (saga.IsIdle())
                     {
                         saga.ExecutionState.CurrentError = null;
@@ -308,7 +364,7 @@ namespace TheSaga.Coordinators
             }
         }
 
-        private async Task<ISaga> CreateNewSagaIfRequired(ISagaModel model, SagaID id, Type eventType)
+        private async Task<ISaga> CreateNewSagaIfRequired(ISagaModel model, SagaID id, SagaID? parentId, Type eventType)
         {
             ISaga saga = null;
 
@@ -317,13 +373,13 @@ namespace TheSaga.Coordinators
                 bool isStartEvent = model.Actions.IsStartEvent(eventType);
 
                 if (isStartEvent)
-                    saga = await CreateNewSaga(model, id);
+                    saga = await CreateNewSaga(model, id, parentId);
             }
 
             return saga;
         }
 
-        private async Task<ISaga> CreateNewSaga(ISagaModel model, SagaID id)
+        private async Task<ISaga> CreateNewSaga(ISagaModel model, SagaID id, SagaID? parentId)
         {
             if (id == SagaID.Empty())
                 id = SagaID.New();
@@ -342,6 +398,7 @@ namespace TheSaga.Coordinators
                 },
                 ExecutionState = new SagaExecutionState
                 {
+                    ParentID = parentId?.Value,
                     CurrentState = new SagaStartState().GetStateName(),
                     CurrentStep = null
                 }
