@@ -9,6 +9,7 @@ namespace TheSaga.Exceptions
         public SagaIsBusyException(Guid id) :
             base($"Saga {id} is busy")
         {
+            Id = id;
         }
 
         protected SagaIsBusyException(
@@ -16,5 +17,7 @@ namespace TheSaga.Exceptions
             StreamingContext context) : base(info, context)
         {
         }
+
+        public Guid Id { get; }
     }
 }
