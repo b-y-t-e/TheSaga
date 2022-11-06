@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using TheSaga.Models;
 using TheSaga.Models.Interfaces;
+using TheSaga.Serializer;
 
 namespace TheSaga.Persistance.SqlServer
 {
@@ -12,11 +13,13 @@ namespace TheSaga.Persistance.SqlServer
     {
         private readonly TimeSpan timeInMemory;
         private Dictionary<Guid, InMemorySnapshot> instances;
+        private readonly ISagaSerializer sagaSerializer;
 
-        public WeakInMemorySagaPersistance(TimeSpan timeInMemory)
+        public WeakInMemorySagaPersistance(TimeSpan timeInMemory, ISagaSerializer sagaSerializer)
         {
             instances = new Dictionary<Guid, InMemorySnapshot>();
             this.timeInMemory = timeInMemory;
+            this.sagaSerializer = sagaSerializer;
         }
 
         public async Task<ISaga> Get(Guid id)
@@ -36,8 +39,7 @@ namespace TheSaga.Persistance.SqlServer
                     return null;
                 }
 
-                return (ISaga)JsonConvert.DeserializeObject(item.Json,
-                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+                return (ISaga)sagaSerializer.Deserialize(item.Json);
             }
         }
 
@@ -56,8 +58,7 @@ namespace TheSaga.Persistance.SqlServer
             {
                 instances[saga.Data.ID] = new InMemorySnapshot()
                 {
-                    Json = JsonConvert.SerializeObject(saga,
-                        new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All }),
+                    Json = sagaSerializer.Serialize(saga),
                     Saga = saga,
                     TTL = DateTime.UtcNow.Add(timeInMemory)
                 };

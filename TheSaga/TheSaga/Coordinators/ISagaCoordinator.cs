@@ -12,9 +12,9 @@ namespace TheSaga.Coordinators
     public interface ISagaCoordinator
     {
         Task<ISagaRunningState> GetSagaState(Guid id);
-        Task<ISaga> Publish(ISagaEvent @event);
-        Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues);
-        Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, SagaRunOptions runOptions);
+        Task<ISaga> Publish(ISagaEvent @event, TimeSpan? timeout = null);
+        Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, TimeSpan? timeout = null);
+        Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, SagaRunOptions runOptions, TimeSpan? timeout = null);
         Task ResumeAll();
         Task Resume(Guid id);
         Task WaitForIdle(Guid id, SagaWaitOptions waitOptions = null);
@@ -22,6 +22,6 @@ namespace TheSaga.Coordinators
 
     internal interface ISagaInternalCoordinator
     {
-        Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, Guid? parentId, SagaRunOptions runOptions);
+        Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, Guid? parentId, SagaRunOptions runOptions, TimeSpan? timeout = null);
     }
 }

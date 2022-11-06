@@ -7,6 +7,7 @@ using TheSaga.MessageBus.Interfaces;
 using TheSaga.Messages;
 using TheSaga.Models;
 using TheSaga.Models.Interfaces;
+using TheSaga.Serializer;
 using TheSaga.States;
 
 namespace TheSaga.Persistance.InMemory
@@ -16,12 +17,14 @@ namespace TheSaga.Persistance.InMemory
         private readonly IMessageBus messageBus;
         private Dictionary<Guid, ISaga> objectInstances;
         private Dictionary<Guid, string> serializedInstances;
+        private readonly ISagaSerializer sagaSerializer;
 
-        public InMemorySagaPersistance(IMessageBus messageBus)
+        public InMemorySagaPersistance(IMessageBus messageBus, ISagaSerializer sagaSerializer)
         {
             serializedInstances = new Dictionary<Guid, string>();
             objectInstances = new Dictionary<Guid, ISaga>();
             this.messageBus = messageBus;
+            this.sagaSerializer = sagaSerializer;
         }
 
         public async Task<ISaga> Get(Guid id)
@@ -35,8 +38,7 @@ namespace TheSaga.Persistance.InMemory
                 if (json == null)
                     return null;
 
-                saga = (ISaga)JsonConvert.DeserializeObject(json,
-                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+                saga = (ISaga)sagaSerializer.Deserialize(json);
             }
 
             await messageBus.
@@ -70,8 +72,7 @@ namespace TheSaga.Persistance.InMemory
         {
             lock (serializedInstances)
             {
-                serializedInstances[saga.Data.ID] = JsonConvert.SerializeObject(saga,
-                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+                serializedInstances[saga.Data.ID] = sagaSerializer.Serialize(saga);
 
                 objectInstances[saga.Data.ID] = saga;
             }

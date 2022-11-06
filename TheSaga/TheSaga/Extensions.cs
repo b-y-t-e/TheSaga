@@ -24,6 +24,7 @@ using TheSaga.Providers.Interfaces;
 using TheSaga.Registrator;
 using TheSaga.Registrator.Interfaces;
 using TheSaga.Models.Interfaces;
+using TheSaga.Serializer;
 
 [assembly: InternalsVisibleTo("TheSaga.Tests")]
 
@@ -36,6 +37,7 @@ namespace TheSaga
             Action<ITheSagaConfig> configAction = null)
         {
             services.AddSingleton<ObservableRegistrator>();
+            services.AddTransient<ISagaSerializer, SagaSerializer>();
             services.AddSingleton<IMessageBus, InMemoryMessageBus>();
             services.AddSingleton<ISagaPersistance, InMemorySagaPersistance>();
             services.AddSingleton<ISagaLocking, InMemorySagaLocking>();
@@ -55,7 +57,8 @@ namespace TheSaga
             //services.AddTransient<ExecuteSagaCommandHandler>();
             services.AddTransient<ExecuteActionCommandHandler>();
             services.AddTransient<ExecuteStepCommandHandler>();
-
+            services.AddTransient<CalculateNextStepHandler>();
+            
             services.AddSagaModelDefinitions();
 
             if (configAction != null)

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30406.217
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheSaga", "TheSaga\TheSaga.csproj", "{030D2975-F592-440F-83A7-1CFCB2BE56EB}"
 EndProject
@@ -9,7 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheSaga.Tests", "TheSaga.Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheSaga.Persistance.SqlServer", "TheSaga.Persistance.SqlServer\TheSaga.Persistance.SqlServer.csproj", "{334734F2-BA36-47AB-B7D3-A267495A3EEB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheSaga.Locking.DistributedLock", "TheSaga.Locking.DistributedLock\TheSaga.Locking.DistributedLock.csproj", "{279280D5-59C9-4EE3-8A18-BC2C316277D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheSaga.Locking.DistributedLock", "TheSaga.Locking.DistributedLock\TheSaga.Locking.DistributedLock.csproj", "{279280D5-59C9-4EE3-8A18-BC2C316277D0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheSaga.Abstractions", "TheSaga.Abstractions\TheSaga.Abstractions.csproj", "{28904C77-270B-4DA7-879F-D9D35FC09D53}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheSaga.Integrations.Convey", "TheSaga.Integrations.Convey\TheSaga.Integrations.Convey.csproj", "{E5C4CFE1-E05F-4D57-A61F-47487FF43CA5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheSaga.Persistance.Sqlite", "TheSaga.Persistance.Sqlite\TheSaga.Persistance.Sqlite.csproj", "{8ADA98A1-0161-4188-95FA-82936B8F1AF2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +39,18 @@ Global
 		{279280D5-59C9-4EE3-8A18-BC2C316277D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{279280D5-59C9-4EE3-8A18-BC2C316277D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{279280D5-59C9-4EE3-8A18-BC2C316277D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28904C77-270B-4DA7-879F-D9D35FC09D53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28904C77-270B-4DA7-879F-D9D35FC09D53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28904C77-270B-4DA7-879F-D9D35FC09D53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28904C77-270B-4DA7-879F-D9D35FC09D53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5C4CFE1-E05F-4D57-A61F-47487FF43CA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5C4CFE1-E05F-4D57-A61F-47487FF43CA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5C4CFE1-E05F-4D57-A61F-47487FF43CA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5C4CFE1-E05F-4D57-A61F-47487FF43CA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8ADA98A1-0161-4188-95FA-82936B8F1AF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8ADA98A1-0161-4188-95FA-82936B8F1AF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8ADA98A1-0161-4188-95FA-82936B8F1AF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8ADA98A1-0161-4188-95FA-82936B8F1AF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2</TargetFramework>
+		<Nullable>enable</Nullable>
+		<LangVersion>8.0</LangVersion>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Description>
+			.net core Saga / ProcessManager implementation
+
+			https://github.com/b-y-t-e/TheSaga
+		</Description>
+		<Version>3.5.35-beta</Version>
+		<Authors>else s.j. / Andrzej Ból</Authors>
+		<Copyright>else s.j. / Andrzej Ból</Copyright>
+		<PackageId>Else.TheSaga.Abstractions</PackageId>
+		<RepositoryUrl>https://github.com/elsesj/Else.WebApi.Libraries</RepositoryUrl>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+	
+	
+
+</Project>

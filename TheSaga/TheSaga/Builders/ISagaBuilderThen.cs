@@ -2,6 +2,7 @@
 using TheSaga.Activities;
 using TheSaga.Conditions;
 using TheSaga.Events;
+using TheSaga.ExecutionContext;
 using TheSaga.Models;
 using TheSaga.Models.Interfaces;
 using TheSaga.ModelsSaga.Interfaces;
@@ -121,6 +122,15 @@ namespace TheSaga.Builders
             where TSagaActivity : ISagaActivity<TSagaData>;
 
         ISagaBuilderThen<TSagaData, TEvent> TransitionTo<TState>() where TState : ISagaState;
+
+        ISagaBuilderThen<TSagaData, TEvent2> MoveTo<TState, TEvent2>()
+            where TState : ISagaState
+            where TEvent2 : ISagaEvent, new();
+
+        ISagaBuilderThen<TSagaData, TEvent2> MoveTo<TState, TEvent2>(
+            Func<TSagaData, TEvent2> createEventDelegate = null)
+            where TState : ISagaState
+            where TEvent2 : ISagaEvent;
 
         ISagaBuilderThen<TSagaData, TEvent> Abort();
 

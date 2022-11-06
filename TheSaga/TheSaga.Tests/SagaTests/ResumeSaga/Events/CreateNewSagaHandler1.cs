@@ -34,13 +34,15 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga.Events
     {
         public async Task Compensate(IExecutionContext<ResumeSagaData> context, CreateNewSaga @event)
         {
-            if (ResumeSagaSettings.StopSagaExecution) await context.Stop();
+            //if (ResumeSagaSettings.StopSagaExecution) 
+            //    await context.Stop();
         }
 
         public async Task Execute(IExecutionContext<ResumeSagaData> context, CreateNewSaga @event)
         {
-            if (ResumeSagaSettings.StopSagaExecution) throw new System.Exception("!!");
-            //if (ResumeSagaSettings.ThrowError) 
+            if (ResumeSagaSettings.StopSagaExecution)
+                await context.Stop();
+            //throw new System.Exception("!!");
         }
     }
 }

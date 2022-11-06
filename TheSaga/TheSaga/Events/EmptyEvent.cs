@@ -7,6 +7,6 @@ namespace TheSaga.Events
         /// <summary>
         ///     Saga's correlation ID
         /// </summary>
-        public Guid ID => Guid.Empty;
+        public Guid ID { get => Guid.Empty; set { } }
     }
 }

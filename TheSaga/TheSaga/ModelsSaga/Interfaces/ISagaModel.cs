@@ -3,14 +3,11 @@ using TheSaga.ModelsSaga.Actions.Interfaces;
 
 namespace TheSaga.ModelsSaga.Interfaces
 {
-
-
     public interface ISagaModel
     {
         ISagaActions Actions { get; }
         Type SagaStateType { get; }
         string Name { get; set; }
-        ESagaHistoryPolicy HistoryPolicy { get; set; }
         ESagaResumePolicy ResumePolicy { get; set; }
     }
 }

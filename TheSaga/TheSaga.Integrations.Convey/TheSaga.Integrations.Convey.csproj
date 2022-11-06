@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Description>
+			A module that allows you integrate with Convey libraries
+			---------------------
+			.net core Saga / ProcessManager implementation
+
+			https://github.com/b-y-t-e/TheSaga
+		</Description>
+		<Version>3.5.35-beta</Version>
+		<Authors>else s.j. / Andrzej Ból</Authors>
+		<Copyright>else s.j. / Andrzej Ból</Copyright>
+		<RepositoryUrl>https://github.com/elsesj/Else.WebApi.Libraries</RepositoryUrl>
+		<PackageId>Else.TheSaga.Integrations.Convey</PackageId>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Convey" Version="1.0.541" />
+	  <PackageReference Include="Convey.WebApi" Version="1.0.541" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TheSaga\TheSaga.csproj" />
+  </ItemGroup>
+
+</Project>

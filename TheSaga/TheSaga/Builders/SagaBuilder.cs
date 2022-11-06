@@ -18,6 +18,8 @@ using TheSaga.ModelsSaga.Steps.Delegates;
 using TheSaga.States;
 using TheSaga.States.Interfaces;
 using TheSaga.Utils;
+using TheSaga.ExecutionContext;
+using static System.Collections.Specialized.BitVector32;
 
 namespace TheSaga.Builders
 {
@@ -348,20 +350,83 @@ namespace TheSaga.Builders
                     ctx =>
                     {
                         SagaExecutionState executionState = ctx.ExecutionState as SagaExecutionState;
+                        ctx.StepExecutionValues["prevStep"] = executionState.CurrentState;
                         executionState.CurrentState = typeof(TState).Name;
                         return Task.CompletedTask;
                     },
                     ctx =>
                     {
                         SagaExecutionState executionState = ctx.ExecutionState as SagaExecutionState;
-                        StepData data = executionState.CurrentStepData();
-                        executionState.CurrentState = data.StateName;
+                        if (ctx.StepExecutionValues.ContainsKey("prevStep"))
+                        {
+                            executionState.CurrentState = (string)ctx.StepExecutionValues["prevStep"];
+                        }
+                        else
+                        {
+                            StepData data = executionState.CurrentStepData();
+                            executionState.CurrentState = data.StateName;
+                        }
                         return Task.CompletedTask;
                     },
                     false,
                     builderState.ParentStep));
 
             return new SagaBuilder<TSagaData, TEvent>(builderState);
+        }
+
+        public ISagaBuilderThen<TSagaData, TEvent2> MoveTo<TState, TEvent2>()
+            where TState : ISagaState
+            where TEvent2 : ISagaEvent, new()
+        {
+            var action = builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent);
+            //action.ChildSteps.RemoveEmptyStepsAtBeginning();
+            action.ChildSteps.AddStep(
+                new SagaStepForThenInline<TSagaData>(
+                    builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(MoveTo)),
+                    ctx =>
+                    {
+                        SagaExecutionState executionState = ctx.ExecutionState as SagaExecutionState;
+                        executionState.PrepareForExecution(new TEvent2());
+                        executionState.CurrentEvent.ID = ctx.Data.ID;
+                        executionState.CurrentState = typeof(TState).Name;
+                        return Task.CompletedTask;
+                    },
+                    ctx =>
+                    {
+                        return Task.CompletedTask;
+                    },
+                    false,
+                    builderState.ParentStep));
+
+            return new SagaBuilder<TSagaData, TEvent2>(builderState);
+        }
+
+        public ISagaBuilderThen<TSagaData, TEvent2> MoveTo<TState, TEvent2>(
+            Func<TSagaData, TEvent2> createEventDelegate = null)
+            where TState : ISagaState
+            where TEvent2 : ISagaEvent
+        {
+            var action = builderState.Model.FindActionForStateAndEvent(builderState.CurrentState, builderState.CurrentEvent);
+            //action.ChildSteps.RemoveEmptyStepsAtBeginning();
+            action.ChildSteps.AddStep(
+                new SagaStepForThenInline<TSagaData>(
+                    builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(MoveTo)),
+                    ctx =>
+                    {
+                        SagaExecutionState executionState = ctx.ExecutionState as SagaExecutionState;
+                        executionState.PrepareForExecution(createEventDelegate(ctx.Data));
+                        executionState.CurrentEvent.ID = ctx.Data.ID;
+                        executionState.CurrentState = typeof(TState).Name;
+                        return Task.CompletedTask;
+                    },
+                    ctx =>
+                    {
+                        return Task.CompletedTask;
+                    },
+                    false,
+                    builderState.ParentStep));
+
+            return new SagaBuilder<TSagaData, TEvent2>(builderState);
         }
 
         public ISagaBuilderThen<TSagaData, TEvent> Publish<TEventToSend, TCompensateEvent>()
@@ -371,7 +436,7 @@ namespace TheSaga.Builders
             ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent> publishActivity = (ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent>)builderState.ServiceProvider.
                 GetService(typeof(ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent>));
 
-            if (publishActivity == null)            
+            if (publishActivity == null)
                 publishActivity = new SagaStepForPublishActivity<TSagaData, TEventToSend, TCompensateEvent>();
 
             publishActivity.StepName = builderState.UniqueNameGenerator.Generate(builderState.CurrentState, nameof(Publish), typeof(TEventToSend).Name);
@@ -393,7 +458,7 @@ namespace TheSaga.Builders
             ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent> publishActivity = (ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent>)builderState.ServiceProvider.
                 GetService(typeof(ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent>));
 
-            if (publishActivity == null)            
+            if (publishActivity == null)
                 publishActivity = new SagaStepForPublishActivity<TSagaData, TEventToSend, TCompensateEvent>();
 
             publishActivity.ActionDelegate = action;
@@ -416,7 +481,7 @@ namespace TheSaga.Builders
         {
             SendActionDelegate<TSagaData, TEventToSend> a = action;
             SendActionDelegate<TSagaData, TCompensateEvent> c = compensation;
-            
+
             ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent> publishActivity = (ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent>)builderState.ServiceProvider.
                 GetService(typeof(ISagaPublishActivity<TSagaData, TEventToSend, TCompensateEvent>));
 

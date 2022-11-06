@@ -69,7 +69,6 @@ namespace TheSaga.Commands.Handlers
             catch (SagaStopException)
             {
                 throw;
-                return null;
             }
             catch (Exception ex)
             {

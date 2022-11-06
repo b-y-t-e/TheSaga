@@ -21,8 +21,7 @@ namespace TheSaga.Tests.SagaTests.ResumeSaga
                 Name(nameof(ResumeSagaBuilder)).
 
                 Settings(b => b.
-                    OnResumeDoCurrentStepCompensation().
-                    InHistoryStoreOnlyCurrentStep()).
+                    OnResumeDoCurrentStepCompensation()).
 
                 Start<CreateEvent>().
                     TransitionTo<InitState>().

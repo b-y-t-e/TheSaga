@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 using TheSaga.Events;
 using TheSaga.Models.History;
+using TheSaga.Models.Interfaces;
+using TheSaga.ModelsSaga.Interfaces;
 using TheSaga.ValueObjects;
 
 namespace TheSaga.Models
@@ -37,6 +40,17 @@ namespace TheSaga.Models
         public StepData CurrentStepData()
         {
             return History.GetLatestByStepName(ExecutionID, CurrentStep);
+        }
+
+        public void PrepareForExecution(ISagaEvent @event)
+        {
+            this.IsBreaked = false;
+            this.CurrentError = null;
+            this.ExecutionID = ExecutionID.New();
+            this.CurrentEvent = @event ?? new EmptyEvent();
+
+            //if (model.HistoryPolicy == ESagaHistoryPolicy.StoreOnlyCurrentStep)
+            this.History.Clear();
         }
     }
 }

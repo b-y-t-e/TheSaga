@@ -8,16 +8,19 @@ using TheSaga.MessageBus.Interfaces;
 using TheSaga.Messages;
 using TheSaga.Models;
 using TheSaga.Models.Interfaces;
+using TheSaga.Serializer;
 
 namespace TheSaga.Persistance.InFile
 {
     public class InFileSagaPersistance : ISagaPersistance
     {
         private readonly IMessageBus messageBus;
+        private readonly ISagaSerializer sagaSerializer;
 
-        public InFileSagaPersistance(IMessageBus messageBus)
+        public InFileSagaPersistance(IMessageBus messageBus, ISagaSerializer sagaSerializer)
         {
             this.messageBus = messageBus;
+            this.sagaSerializer = sagaSerializer;
         }
 
         public async Task<ISaga> Get(Guid id)
@@ -28,8 +31,7 @@ namespace TheSaga.Persistance.InFile
             var json = File.
                 ReadAllText($"{id}.json");
 
-            var saga = (ISaga)JsonConvert.DeserializeObject(json,
-                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+            var saga = (ISaga)sagaSerializer.Deserialize(json);
 
             await messageBus.
                 Publish(new SagaAfterRetrivedMessage(saga));
@@ -53,8 +55,7 @@ namespace TheSaga.Persistance.InFile
             if (File.Exists($"{saga.Data.ID}.json"))
                 File.Delete($"{saga.Data.ID}.json");
 
-            var json = JsonConvert.SerializeObject(saga,
-                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All });
+            var json = sagaSerializer.Serialize(saga);
 
             await messageBus.
                 Publish(new SagaBeforeStoredMessage(saga));

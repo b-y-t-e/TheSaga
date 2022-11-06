@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using TheSaga.Errors;
 using TheSaga.Events;
@@ -131,7 +132,10 @@ namespace TheSaga.Commands.Handlers
                         new ExecutionEndMessage(saga, saga.ExecutionState?.CurrentError));
 
                     if (saga.HasError())
+                    {
+                        saga.ExecutionState.CurrentError.PreserveStackTrace();
                         throw saga.ExecutionState.CurrentError;
+                    }
 
                     return saga;
                 }
@@ -145,6 +149,25 @@ namespace TheSaga.Commands.Handlers
                     });
                 }
             }
+        }
+    }
+    static class ExceptionHelper
+    {
+        private static Action<Exception> _preserveInternalException;
+
+        static ExceptionHelper()
+        {
+            try
+            {
+                MethodInfo preserveStackTrace = typeof(Exception).GetMethod("InternalPreserveStackTrace", BindingFlags.Instance | BindingFlags.NonPublic);
+                _preserveInternalException = (Action<Exception>)Delegate.CreateDelegate(typeof(Action<Exception>), preserveStackTrace);
+            }
+            catch { }
+        }
+
+        public static void PreserveStackTrace(this Exception ex)
+        {
+            _preserveInternalException(ex);
         }
     }
 }

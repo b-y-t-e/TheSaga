@@ -1,0 +1,411 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using TheSaga.Commands;
+using TheSaga.Commands.Handlers;
+using TheSaga.Events;
+using TheSaga.Exceptions;
+using TheSaga.MessageBus;
+using TheSaga.MessageBus.Interfaces;
+using TheSaga.Messages;
+using TheSaga.Models;
+using TheSaga.Models.Interfaces;
+using TheSaga.ModelsSaga.Interfaces;
+using TheSaga.Observables.Registrator;
+using TheSaga.Options;
+using TheSaga.Persistance;
+using TheSaga.Providers;
+using TheSaga.Providers.Interfaces;
+using TheSaga.Registrator;
+using TheSaga.Registrator.Interfaces;
+using TheSaga.States;
+using TheSaga.ValueObjects;
+
+namespace TheSaga.Coordinators
+{
+    public class SagaCoordinator : ISagaCoordinator, ISagaInternalCoordinator
+    {
+        private static int isResuming;
+        private readonly ILogger logger;
+        private readonly IDateTimeProvider dateTimeProvider;
+        private readonly IMessageBus messageBus;
+        private readonly ISagaPersistance sagaPersistance;
+        private readonly ISagaRegistrator sagaRegistrator;
+        private readonly IServiceProvider serviceProvider;
+
+        public SagaCoordinator(ISagaRegistrator sagaRegistrator, ISagaPersistance sagaPersistance,
+            IMessageBus messageBus, IDateTimeProvider dateTimeProvider,
+            IServiceProvider serviceProvider, ILogger logger)
+        {
+            this.sagaRegistrator = sagaRegistrator;
+            this.sagaPersistance = sagaPersistance;
+            this.messageBus = messageBus;
+            this.dateTimeProvider = dateTimeProvider;
+            this.serviceProvider = serviceProvider;
+            this.logger = logger;
+        }
+
+        public async Task<ISagaRunningState> GetSagaState(Guid id)
+        {
+            ISaga saga = await sagaPersistance.Get(id);
+            if (saga == null)
+                return null;
+
+            return new SagaRunningState
+            {
+                IsRunning = !saga.IsIdle(),
+                IsResuming = saga.ExecutionState.IsResuming,
+                IsCompensating = saga.ExecutionState.IsCompensating
+            };
+        }
+
+        public async Task ResumeAll()
+        {
+            isResuming++;
+            try
+            {
+                IList<Guid> ids = await sagaPersistance.GetUnfinished();
+
+                List<string> invalidModels = new List<string>();
+                foreach (Guid id in ids)
+                {
+                    ISaga saga = await sagaPersistance.Get(id);
+                    ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
+
+                    if (model == null)
+                        invalidModels.Add(saga.ExecutionInfo.ModelName);
+                }
+
+                if (invalidModels.Count > 0)
+                    throw new Exception($"Saga models {string.Join(", ", invalidModels.Distinct().ToArray())} not found");
+
+                foreach (Guid id in ids)
+                {
+                    ISaga saga = await sagaPersistance.
+                        Get(id);
+
+                    ISagaModel model = sagaRegistrator.
+                        FindModelByName(saga.ExecutionInfo.ModelName);
+
+                    logger.
+                        LogInformation($"Trying to resume the saga {id}");
+
+                    bool isCompensating = saga.ExecutionState.IsCompensating;
+                    var error = saga?.ExecutionState?.CurrentError;
+
+                    try
+                    {
+                        await ExecuteSaga(
+                            new EmptyEvent(),
+                            model,
+                            saga,
+                            saga.Data.ID,
+                            null,
+                            true,
+                            null);
+
+                        logger.
+                            LogInformation($"The saga {id} has been resumed");
+                    }
+                    catch (Exception ex)
+                    {
+                        // ZROBIĆ TAK ABY WYJATEK POKAZYWAL SIE TYLKO WTEDY, GDY
+                        // SAGA ZOSTAŁA WZNOWIONA I BYŁ BŁĄD
+                        // SAGA ZOSTAŁA WZNOWIONA I BEZ BLEDU - TYLKO INFORMACJA
+                        // GDY SAGA COMPENSOWANA TO NIE POKAZUJEMY BLEDU - TYLKO INFORMACJE
+                        var currentSaga = await sagaPersistance.Get(id);
+                        var currentError = currentSaga?.ExecutionState?.CurrentError;
+
+                        if (isCompensating)
+                        {
+                            if (error?.Message != currentError?.Message)
+                            {
+                                logger.
+                                    LogError(ex, $"The saga {id} has been compensated, but an error has occurred");
+                            }
+                            else
+                            {
+                                logger.
+                                    LogInformation($"The saga {id} has been compensated");
+                            }
+                        }
+                        else
+                        {
+                            logger.
+                                LogError(ex, $"The saga {id} has been resumed, but an error has occurred");
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                isResuming--;
+            }
+        }
+        public async Task Resume(Guid id)
+        {
+            isResuming++;
+            try
+            {
+                List<string> invalidModels = new List<string>();
+
+                ISaga saga = await sagaPersistance.Get(id);
+                ISagaModel model = sagaRegistrator.FindModelByName(saga.ExecutionInfo.ModelName);
+
+                if (model == null)
+                    invalidModels.Add(saga.ExecutionInfo.ModelName);
+
+                if (invalidModels.Count > 0)
+                    throw new Exception($"Saga models {string.Join(", ", invalidModels.Distinct().ToArray())} not found");
+
+                await ExecuteSaga(
+                    new EmptyEvent(),
+                    model,
+                    saga,
+                    saga.Data.ID,
+                    null,
+                    true,
+                    null);
+            }
+            finally
+            {
+                isResuming--;
+            }
+        }
+
+        public Task<ISaga> Publish(
+            ISagaEvent @event, TimeSpan? timeout = null)
+        {
+            return Publish(@event, null, timeout);
+        }
+
+        public Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, TimeSpan? timeout = null)
+        {
+            return Publish(@event, executionValues, new SagaRunOptions(), timeout);
+        }
+
+        public async Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, SagaRunOptions runOptions, TimeSpan? timeout = null)
+        {
+            return await Publish(@event, executionValues, null, runOptions, timeout);
+        }
+
+        public async Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, Guid? parentId, SagaRunOptions runOptions, TimeSpan? timeout = null)
+        {
+            runOptions = runOptions ?? new SagaRunOptions();
+
+            Type eventType = @event.GetType();
+            SagaID sagaId = SagaID.From(@event.ID);
+
+            ISagaModel model = sagaRegistrator.
+                FindModelForEventType(eventType);
+
+            if (model == null)
+                throw new SagaEventNotRegisteredException(eventType);
+
+            SagaID? parentSagaId = parentId == null ? (SagaID?)null : SagaID.From(parentId.Value);
+            ISaga newSaga = await CreateNewSagaIfRequired(model, sagaId, parentSagaId, eventType);
+
+            var st = Stopwatch.StartNew();
+            var id = SagaID.From(newSaga?.Data?.ID ?? sagaId.Value);
+            while (true)
+            {
+                try
+                {
+                    var createdSaga = await ExecuteSaga(
+                        @event,
+                        model,
+                        newSaga,
+                        id,
+                        executionValues,
+                        false,
+                        runOptions);
+
+                    return createdSaga;
+                }
+                catch (TheSaga.Exceptions.SagaIsBusyException ex)
+                {
+                    if (timeout == null || st.Elapsed > timeout || ex.Id != id)
+                        throw;
+                    await Task.Delay(25);
+                }
+            }
+        }
+
+        public async Task WaitForIdle(
+            Guid id, SagaWaitOptions waitOptions = null)
+        {
+            if (waitOptions == null)
+                waitOptions = new SagaWaitOptions();
+
+            try
+            {
+                bool isSagaInIdleState = false;
+
+                messageBus.Subscribe<ExecutionEndMessage>(this, mesage =>
+                {
+                    if (mesage.Saga?.Data?.ID == id)
+                    {
+                        ISaga saga = sagaPersistance.Get(id).GetAwaiter().GetResult();
+                        if (saga?.IsIdle() == true)
+                            isSagaInIdleState = true;
+                    }
+                    return Task.CompletedTask;
+                });
+
+                ISaga saga = await sagaPersistance.Get(id);
+
+                if (saga == null)
+                    throw new SagaInstanceNotFoundException(id);
+
+                if (saga.IsIdle())
+                    return;
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                while (!isSagaInIdleState)
+                {
+                    await Task.Delay(250);
+                    if (stopwatch.Elapsed >= waitOptions.Timeout)
+                        throw new TimeoutException();
+                }
+            }
+            finally
+            {
+                messageBus.Unsubscribe<ExecutionEndMessage>(this);
+            }
+        }
+
+        private async Task<ISaga> ExecuteSaga(
+            ISagaEvent @event, ISagaModel model,
+            ISaga saga,
+            Guid sagaID,
+            IDictionary<string, object> executionValues,
+            bool executeResuming,
+            SagaRunOptions runOptions)
+        {
+            bool sagaStarted = false;
+
+            try
+            {
+                serviceProvider.
+                    GetRequiredService<ObservableRegistrator>().
+                    Initialize();
+
+                await messageBus.
+                    Publish(new ExecutionStartMessage(saga ?? new Saga { Data = new EmptySagaData { ID = sagaID } }, model));
+
+                sagaStarted = true;
+
+                if (saga == null)
+                    saga = await sagaPersistance.Get(sagaID);
+
+                if (saga == null)
+                    throw new SagaInstanceNotFoundException(sagaID);
+
+                if (saga.ExecutionState.IsDeleted)
+                    throw new CountNotExecuteDeletedSagaException(sagaID);
+
+                if (!executeResuming)
+                {
+                    if (runOptions != null)
+                        saga.ExecutionState.CanBeResumed = runOptions.CanBeResumed;
+
+                    if (saga.IsIdle())
+                    {
+                        saga.ExecutionState.IsBreaked = false;
+                        saga.ExecutionState.CurrentError = null;
+                        saga.ExecutionState.ExecutionID = ExecutionID.New();
+                        if (model.HistoryPolicy == ESagaHistoryPolicy.StoreOnlyCurrentStep)
+                            saga.ExecutionState.History.Clear();
+
+                        saga.ExecutionValues.
+                            Set(executionValues);
+
+                        saga.ExecutionState.
+                            CurrentEvent = @event ?? new EmptyEvent();
+                    }
+                    else
+                    {
+                        throw new SagaNeedToBeResumedException(saga.Data.ID);
+                    }
+
+                    logger.
+                        LogInformation($"Executing saga: {saga.Data.ID}");
+                }
+                else
+                {
+                    logger.
+                        LogInformation($"Resuming saga: {saga.Data.ID}");
+                }
+
+                ExecuteActionCommandHandler handler = serviceProvider.
+                    GetRequiredService<ExecuteActionCommandHandler>();
+
+                return await handler.Handle(new ExecuteActionCommand
+                {
+                    Async = AsyncExecution.False(),
+                    Saga = saga,
+                    Model = model
+                });
+            }
+            catch (Exception ex)
+            {
+                if (sagaStarted)
+                    await messageBus.Publish(
+                        new ExecutionEndMessage(saga ?? new Saga { Data = new EmptySagaData { ID = sagaID } }, ex));
+
+                if (ex is SagaStepException sagaStepException && sagaStepException?.OriginalException != null)
+                    throw sagaStepException.OriginalException;
+
+                throw;
+            }
+        }
+
+        private async Task<ISaga> CreateNewSagaIfRequired(ISagaModel model, SagaID id, SagaID? parentId, Type eventType)
+        {
+            ISaga saga = null;
+
+            if (eventType != null)
+            {
+                bool isStartEvent = model.Actions.IsStartEvent(eventType);
+
+                if (isStartEvent)
+                    saga = await CreateNewSaga(model, id, parentId);
+            }
+
+            return saga;
+        }
+
+        private async Task<ISaga> CreateNewSaga(ISagaModel model, SagaID id, SagaID? parentId)
+        {
+            if (id == SagaID.Empty())
+                id = SagaID.New();
+
+            ISagaData data = (ISagaData)Activator.CreateInstance(model.SagaStateType);
+            data.ID = id;
+
+            ISaga saga = new Saga
+            {
+                Data = data,
+                ExecutionInfo = new SagaExecutionInfo
+                {
+                    ModelName = model.Name,
+                    Created = dateTimeProvider.Now,
+                    Modified = dateTimeProvider.Now
+                },
+                ExecutionState = new SagaExecutionState
+                {
+                    ParentID = parentId?.Value,
+                    CurrentState = new SagaStartState().GetStateName(),
+                    CurrentStep = null
+                }
+            };
+
+            return saga;
+        }
+
+    }
+}

@@ -14,5 +14,7 @@ namespace TheSaga.Persistance.SqlServer.Options
         public String ConnectionString { get; set; }
 
         public String TableName { get; set; }
+
+        public Boolean Compression { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<Description>
 			A module that allows you to save the state of the saga in sqlserver
 			---------------------
@@ -9,22 +9,21 @@
 
 			https://github.com/b-y-t-e/TheSaga
 		</Description>
-		<Version>1.1.0</Version>
-		<Authors>Andrzej Ból</Authors>
-		<Copyright>Andrzej Ból</Copyright>
-    <RepositoryUrl>https://github.com/b-y-t-e/TheSaga</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/b-y-t-e/TheSaga</PackageProjectUrl>
-		<PackageId>TheSaga.Persistance.SqlServer</PackageId>
+		<Version>3.5.35-beta</Version>
+		<Authors>else s.j. / Andrzej Ból</Authors>
+		<Copyright>else s.j. / Andrzej Ból</Copyright>
+		<RepositoryUrl>https://github.com/elsesj/Else.WebApi.Libraries</RepositoryUrl>
+		<PackageId>Else.TheSaga.Persistance.SqlServer</PackageId>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 
 
 	<ItemGroup>
-		<PackageReference Include="Dapper" Version="2.0.35" />
-		<PackageReference Include="Dapper.Contrib" Version="2.0.35" />
-		<PackageReference Include="Dapper.SqlBuilder" Version="2.0.35" />
+		<PackageReference Include="Dapper" Version="2.0.123" />
+		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
+		<PackageReference Include="Dapper.SqlBuilder" Version="2.0.78" />
 		<PackageReference Include="fasterflect" Version="3.0.0" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
 	</ItemGroup>
 
 	<ItemGroup>

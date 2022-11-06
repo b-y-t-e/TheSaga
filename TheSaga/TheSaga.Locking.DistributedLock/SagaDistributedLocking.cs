@@ -1,5 +1,5 @@
 ﻿using Medallion.Threading;
-using Medallion.Threading.Sql;
+using Medallion.Threading.SqlServer;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

@@ -12,6 +12,7 @@ using TheSaga.Persistance.SqlServer.Options;
 using TheSaga.Persistance.SqlServer.Utils;
 using TheSaga.Providers;
 using TheSaga.Providers.Interfaces;
+using TheSaga.Serializer;
 
 namespace TheSaga.Persistance.SqlServer
 {
@@ -23,16 +24,18 @@ namespace TheSaga.Persistance.SqlServer
         IDateTimeProvider dateTimeProvider;
         SqlServerOptions sqlServerOptions;
         WeakInMemorySagaPersistance weakInMemorySagaPersistance;
+        private readonly ISagaSerializer sagaSerializer;
 
-        public SqlServerSagaPersistance(ISqlServerConnection sqlServerConnection, IDateTimeProvider dateTimeProvider, SqlServerOptions sqlServerOptions, IMessageBus messageBus)
+        public SqlServerSagaPersistance(ISqlServerConnection sqlServerConnection, IDateTimeProvider dateTimeProvider, SqlServerOptions sqlServerOptions, IMessageBus messageBus, ISagaSerializer sagaSerializer)
         {
             this.instances = new Dictionary<Guid, string>();
             this.sqlServerConnection = sqlServerConnection;
             this.dateTimeProvider = dateTimeProvider;
             this.sqlServerOptions = sqlServerOptions;
             this.weakInMemorySagaPersistance = new WeakInMemorySagaPersistance(
-                TimeSpan.FromSeconds(15));
+                TimeSpan.FromSeconds(15), sagaSerializer);
             this.messageBus = messageBus;
+            this.sagaSerializer = sagaSerializer;
         }
 
         public async Task<ISaga> Get(Guid id)
@@ -41,7 +44,7 @@ namespace TheSaga.Persistance.SqlServer
             if (saga != null)
                 return saga;*/
 
-            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
+            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions, sagaSerializer))
             {
                 var saga = await sagaStore.Get(id);
                 
@@ -54,21 +57,21 @@ namespace TheSaga.Persistance.SqlServer
 
         public Task<IList<Guid>> GetUnfinished()
         {
-            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
+            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions, sagaSerializer))
                 return sagaStore.GetUnfinished();
         }
 
         public async Task Remove(Guid id)
         {
             await weakInMemorySagaPersistance.Remove(id);
-            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
+            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions, sagaSerializer))
                 await sagaStore.Remove(id);
         }
 
         public async Task Set(ISaga saga)
         {
             await weakInMemorySagaPersistance.Set(saga);
-            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions))
+            using (SagaStore sagaStore = new SagaStore(sqlServerConnection, dateTimeProvider, sqlServerOptions, sagaSerializer))
             {
                 await messageBus.
                     Publish(new SagaBeforeStoredMessage(saga));

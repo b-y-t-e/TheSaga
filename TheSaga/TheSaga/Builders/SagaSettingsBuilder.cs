@@ -11,18 +11,6 @@ namespace TheSaga.Builders
             this.model = model;
         }
 
-        public ISagaSettingsBuilder InHistoryStoreEverything()
-        {
-            model.HistoryPolicy = ESagaHistoryPolicy.StoreEverything;
-            return this;
-        }
-
-        public ISagaSettingsBuilder InHistoryStoreOnlyCurrentStep()
-        {
-            model.HistoryPolicy = ESagaHistoryPolicy.StoreOnlyCurrentStep;
-            return this;
-        }
-
         public ISagaSettingsBuilder OnResumeDoCurrentStepCompensation()
         {
             model.ResumePolicy = ESagaResumePolicy.DoCurrentStepCompensation;

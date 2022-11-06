@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using TheSaga.Commands;
 using TheSaga.Commands.Handlers;
@@ -178,22 +179,22 @@ namespace TheSaga.Coordinators
         }
 
         public Task<ISaga> Publish(
-            ISagaEvent @event)
+            ISagaEvent @event, TimeSpan? timeout = null)
         {
-            return Publish(@event, null);
+            return Publish(@event, null, timeout);
         }
 
-        public Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues)
+        public Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, TimeSpan? timeout = null)
         {
-            return Publish(@event, executionValues, new SagaRunOptions());
+            return Publish(@event, executionValues, new SagaRunOptions(), timeout);
         }
 
-        public async Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, SagaRunOptions runOptions)
+        public async Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, SagaRunOptions runOptions, TimeSpan? timeout = null)
         {
-            return await Publish(@event, executionValues, null, runOptions);
+            return await Publish(@event, executionValues, null, runOptions, timeout);
         }
 
-        public async Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, Guid? parentId, SagaRunOptions runOptions)
+        public async Task<ISaga> Publish(ISagaEvent @event, IDictionary<string, object> executionValues, Guid? parentId, SagaRunOptions runOptions, TimeSpan? timeout = null)
         {
             runOptions = runOptions ?? new SagaRunOptions();
 
@@ -209,30 +210,29 @@ namespace TheSaga.Coordinators
             SagaID? parentSagaId = parentId == null ? (SagaID?)null : SagaID.From(parentId.Value);
             ISaga newSaga = await CreateNewSagaIfRequired(model, sagaId, parentSagaId, eventType);
 
+            var st = Stopwatch.StartNew();
             var id = SagaID.From(newSaga?.Data?.ID ?? sagaId.Value);
-            try
+            while (true)
             {
-                var createdSaga = await ExecuteSaga(
-                    @event,
-                    model,
-                    newSaga,
-                    id,
-                    executionValues,
-                    false,
-                    runOptions);
+                try
+                {
+                    var createdSaga = await ExecuteSaga(
+                        @event,
+                        model,
+                        newSaga,
+                        id,
+                        executionValues,
+                        false,
+                        runOptions);
 
-                return createdSaga;
-            }
-            /*catch (SagaStopException ex)
-             {
-                 return await sagaPersistance.Get(id.Value);
-             }*/
-            catch
-            {
-                //if (newSaga != null)
-                //    await sagaPersistance.Remove(newSaga.Data.ID);
-
-                throw;
+                    return createdSaga;
+                }
+                catch (TheSaga.Exceptions.SagaIsBusyException ex)
+                {
+                    if (timeout == null || st.Elapsed > timeout || ex.Id != id)
+                        throw;
+                    await Task.Delay(25);
+                }
             }
         }
 
@@ -304,7 +304,7 @@ namespace TheSaga.Coordinators
                     saga = await sagaPersistance.Get(sagaID);
 
                 if (saga == null)
-                    throw new SagaInstanceNotFoundException();
+                    throw new SagaInstanceNotFoundException(sagaID);
 
                 if (saga.ExecutionState.IsDeleted)
                     throw new CountNotExecuteDeletedSagaException(sagaID);
@@ -316,16 +316,11 @@ namespace TheSaga.Coordinators
 
                     if (saga.IsIdle())
                     {
-                        saga.ExecutionState.CurrentError = null;
-                        saga.ExecutionState.ExecutionID = ExecutionID.New();
-                        if (model.HistoryPolicy == ESagaHistoryPolicy.StoreOnlyCurrentStep)
-                            saga.ExecutionState.History.Clear();
+                        saga.ExecutionState.
+                            PrepareForExecution(@event);
 
                         saga.ExecutionValues.
                             Set(executionValues);
-
-                        saga.ExecutionState.
-                            CurrentEvent = @event ?? new EmptyEvent();
                     }
                     else
                     {
@@ -355,10 +350,13 @@ namespace TheSaga.Coordinators
             {
                 if (sagaStarted)
                     await messageBus.Publish(
-                        new ExecutionEndMessage(new Saga { Data = new EmptySagaData { ID = sagaID } }, ex));
+                        new ExecutionEndMessage(saga ?? new Saga { Data = new EmptySagaData { ID = sagaID } }, ex));
 
                 if (ex is SagaStepException sagaStepException && sagaStepException?.OriginalException != null)
+                {
+                    sagaStepException.OriginalException.PreserveStackTrace();
                     throw sagaStepException.OriginalException;
+                }
 
                 throw;
             }
@@ -404,8 +402,31 @@ namespace TheSaga.Coordinators
                 }
             };
 
+            var existingProcessManager = await sagaPersistance.Get(id);
+            if (existingProcessManager != null)
+                throw new Exception($"Saga with id {id} already exists");
+
             return saga;
         }
 
+    }
+    static class ExceptionHelper
+    {
+        private static Action<Exception> _preserveInternalException;
+
+        static ExceptionHelper()
+        {
+            try
+            {
+                MethodInfo preserveStackTrace = typeof(Exception).GetMethod("InternalPreserveStackTrace", BindingFlags.Instance | BindingFlags.NonPublic);
+                _preserveInternalException = (Action<Exception>)Delegate.CreateDelegate(typeof(Action<Exception>), preserveStackTrace);
+            }
+            catch { }
+        }
+
+        public static void PreserveStackTrace(this Exception ex)
+        {
+            _preserveInternalException(ex);
+        }
     }
 }
